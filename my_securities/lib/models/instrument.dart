@@ -1,8 +1,9 @@
 import 'dart:typed_data';
+import 'package:flutter/material.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/common/exchange.dart';
 
-class Instrument {
+class Instrument extends ChangeNotifier{
   int id;
   String isin;
   String ticker;
@@ -101,6 +102,8 @@ class Instrument {
     this.averagePrice = source.averagePrice;
     this.value = source.value;
     this.operationCount = source.operationCount;
+
+    notifyListeners();
 
     return source;
   }
