@@ -1,0 +1,13 @@
+{
+  "defaultPortfolioName": "Мой портфель",
+
+  "operationTypeBuy": "Покупка",
+  "operationTypeSell": "Продажа",
+  "moneyOperationTypeDeposit": "Поступление",
+  "moneyOperationTypeWithdraw": "Вывод",
+  "instrumentTypeCurrency": "Валюта",
+  "instrumentTypeShare": "Акция",
+  "instrumentTypeEtf": "Фонд",
+  "instrumentTypeBond": "Облигация",
+  "pcs": "шт"
+}

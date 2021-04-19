@@ -1,0 +1,13 @@
+{
+  "defaultPortfolioName": "My portfolio",
+
+  "operationTypeBuy": "Buy",
+  "operationTypeSell": "Sell",
+  "moneyOperationTypeDeposit": "Deposit",
+  "moneyOperationTypeWithdraw": "Withdraw",
+  "instrumentTypeCurrency": "Currency",
+  "instrumentTypeShare": "Share",
+  "instrumentTypeEtf": "Etf",
+  "instrumentTypeBond": "Bond",
+  "pcs": "pcs"
+}
