@@ -12,7 +12,9 @@ class PortfolioList extends ListView {
         itemCount: context.watch<Portfolios>().length,
         itemBuilder: (context, index) =>
           ListTile(
-            title: Text(context.read<Portfolios>()[index].name),
+            title: Text(context.read<Portfolios>()[index].name,
+              style: TextStyle(fontSize: 20),
+            ),
           )
       );}
     );

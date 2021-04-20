@@ -35,6 +35,16 @@ class S {
     return Localizations.of<S>(context, S);
   }
 
+  /// `My securities`
+  String get applicationTitle {
+    return Intl.message(
+      'My securities',
+      name: 'applicationTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `My portfolio`
   String get defaultPortfolioName {
     return Intl.message(

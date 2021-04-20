@@ -1,4 +1,5 @@
 {
+  "applicationTitle": "My securities",
   "defaultPortfolioName": "My portfolio",
 
   "operationTypeBuy": "Buy",

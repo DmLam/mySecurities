@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-import '../generated/l10n.dart';
 import '../common/exchange.dart';
 import '../common/common.dart';
 
