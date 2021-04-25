@@ -59,13 +59,11 @@ class DBProvider {
     }
   }
   Future<void> _createTablePortfolio(Database db) async{
-    String defaultPortfolioName = S.current.defaultPortfolioName;
     await db.execute(
       '''CREATE TABLE portfolio (
          id INTEGER PRIMARY KEY AUTOINCREMENT,
          name TEXT NOT NULL UNIQUE
       )''');
-    await db.execute("INSERT INTO portfolio (name) VALUES ('$defaultPortfolioName')");
   }
   Future<void> _createTableInstrumentType(Database db) async {
     await db.execute('CREATE TABLE instrument_type (id INTEGER PRIMARY KEY, name TEXT NOT NULL);');
@@ -124,16 +122,16 @@ class DBProvider {
     await db.execute(
       '''CREATE TABLE operation (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
-          instrument_portfolio_id INTEGER NOT NULL,
+          portfolio_instrument_id INTEGER NOT NULL,
           date TEXT NOT NULL,
           type INTEGER NOT NULL,
           quantity INTEGER NOT NULL,
           price REAL NOT NULL,
           value REAL NOT NULL,
-          commission REAL,
-          FOREIGN KEY (instrument_portfolio_id) REFERENCES instrument_portfolio(id))''');
+          commission REAL DEFAULT 0,
+          FOREIGN KEY (portfolio_instrument_id) REFERENCES portfolio_instrument(id))''');
     await db.execute(
-        'CREATE INDEX idx_operation_instrument_portfolio_id ON operation (instrument_portfolio_id)');
+        'CREATE INDEX idx_operation_portfolio_instrument_id ON operation (portfolio_instrument_id)');
   }
   Future<void> _createTableQuote(Database db) async {
     // dates is stored in UNIX format
@@ -172,9 +170,7 @@ class DBProvider {
     await db.insert('preference', {'id': 1});
   }
 
-  void _onCreate(Database db, int version) async {
-    _database = db;
-
+  Future createTables(Database db) async {
     await db.execute('PRAGMA foreign_keys = ON');
     // справочник валют
     await _createTableCurrency(db);
@@ -198,6 +194,40 @@ class DBProvider {
     await _createTablePreference(db);
     // ввод/вывод денег
     await _createTableMoney(db);
+  }
+
+  Future initTables(Database db) async {
+    await db.insert("portfolio", {"name": S.current.defaultPortfolioName}, );
+    await db.insert("portfolio_instrument",
+      {
+        "portfolio_id": 1,
+        "instrument_id": 1
+      });
+    await db.insert("instrument",
+      {
+        "isin": "bla-bla-bla",
+        "ticker": "FXWO",
+        "name": "Акции мирового рынка",
+        "currency_id": 1,
+        "instrument_type_id": 3,
+        "exchange_id": 54
+      });
+    await db.insert("operation",
+      {
+        "portfolio_instrument_id": 1,
+        "date": dbDateString(DateTime(2021, 1, 12)),
+        "type": 0,
+        "quantity": 100,
+        "price": 1.632,
+        "value": 163.2
+      });
+  }
+
+  void _onCreate(Database db, int version) async {
+    _database = db;
+
+    await createTables(db);
+    await initTables(db);
   }
 
   void _onUpgrade(Database db, int oldVersion, int newVersion) {
@@ -294,11 +324,11 @@ class DBProvider {
   Future<int> addOperation(Operation op, bool createMoneyOperation) async {
     final Database db = await database;
     final double operationValue = op.type == OperationType.buy ? op.quantity * op.price : -op.quantity * op.price;
-    int currencyId = await getInstrumentCurrencyId(op.instrumentId);
+    int currencyId = await getInstrumentCurrencyId(op.portfolioInstrumentId);
     final Batch batch = db.batch();
     batch.execute(
-      "INSERT INTO operation (instrument_id, date, type, quantity, price, value, commission) values (?, ?, ?, ?, ?, ?, ?)",
-      [op.instrumentId, dbDateString(op.date), op.type.index, op.quantity, op.price, operationValue, op.commission]);
+      "INSERT INTO operation (portfolio_instrument_id, date, type, quantity, price, value, commission) values (?, ?, ?, ?, ?, ?, ?)",
+      [op.portfolioInstrumentId, dbDateString(op.date), op.type.index, op.quantity, op.price, operationValue, op.commission]);
     var operationId = await db.rawQuery("SELECT MAX(id) as id FROM operation");
     int result = operationId.first["id"];
     if (createMoneyOperation)
@@ -312,7 +342,7 @@ class DBProvider {
 
   updateOperation(Operation op) async {
     final Database db = await database;
-    int currencyId = await getInstrumentCurrencyId(op.instrumentId);
+    int currencyId = await getInstrumentCurrencyId(op.portfolioInstrumentId);
     final Batch batch = db.batch();
 
     batch.execute(
@@ -324,7 +354,7 @@ class DBProvider {
     batch.commit(noResult: true);
   }
 
-  static String _sqlInstrument =
+  static final String _sqlInstrument =
       '''SELECT i.id, i.isin, i.ticker, i.name, i.currency_id, i.instrument_type_id, i.exchange_id, i.image, i.additional, i.portfolio_percent_plan, 
                 i.additional, i.image, sum(o.quantity) quantity, sum(o.price * o.quantity) / sum(o.quantity) avgprice, sum(o.value) value, count(o.id) operation_count
          FROM instrument i LEFT JOIN operation o ON o.instrument_id = i.id , currency c 
@@ -345,19 +375,23 @@ class DBProvider {
     instrument.assign(inst.isNotEmpty ? Instrument.fromMap(inst.first) : Instrument.empty());
   }
 
-  Future<List<Instrument>> getInstruments() async {
-    final Database db = await database;
-    var instruments = await db.rawQuery(
-        '''SELECT i.id, i.isin, i.ticker, i.name, i.currency_id, i.instrument_type_id, i.exchange_id, i.additional, i.portfolio_percent_plan, 
+  static final String _sqlPortfolioInstruments =
+  '''SELECT i.id, i.isin, i.ticker, i.name, i.currency_id, i.instrument_type_id, i.exchange_id, i.additional, i.portfolio_percent_plan, 
                   i.additional, i.image, sum(o.quantity) quantity, sum(o.price * o.quantity) / sum(o.quantity) avgprice, sum(o.value) value, count(o.id) operation_count 
-             FROM instrument i, currency c LEFT OUTER JOIN operation o ON o.instrument_id = i.id 
+             FROM currency c, instrument i, portfolio_instrument pi LEFT OUTER JOIN operation o ON o.portfolio_instrument_id = pi.id 
             WHERE  
-              c.id = i.currency_id
+              c.id = i.currency_id AND
+              pi.instrument_id = i.id
            GROUP BY i.id   
-           HAVING i.id is not null''');
+           HAVING i.id is not null''';
+
+  Future<List<Instrument>> getPortfolioInstruments(int portfolioId) async {
+    final Database db = await database;
+    var instruments = await db.rawQuery(_sqlPortfolioInstruments);
 
     return instruments.isEmpty ? null:  instruments.map((i) => Instrument.fromMap(i)).toList();
   }
+
 
   deleteInstrument(int id) async {
     final Database db = await database;
@@ -366,9 +400,16 @@ class DBProvider {
     db.delete('quote', where: 'instrument_id = ?', whereArgs: [id]);
   }
 
-  Future<List<Operation>> getOperations(int instrumentId) async {
+  static final String _sqlPortfolioOperations =
+  '''SELECT o.id, o.portfolio_instrument_id, po.instrument_id, o.date, o.type, o.quantity, o.price, o.value, o.commission
+       FROM operation o, portfolio_instrument po
+       WHERE o.portfolio_instrument_id = po.id
+         and po.portfolio_id = ?  
+    ''';
+
+  Future<List<Operation>> getPortfolioOperations(int portfolioId) async {
     final Database db = await database;
-    var operations = await db.query('operation', where: 'instrument_id = ?', whereArgs: [instrumentId], orderBy: 'date');
+    var operations = await db.rawQuery(_sqlPortfolioOperations, [portfolioId]);
 
     return operations.isNotEmpty ? operations.map((o) => Operation.fromMap(o)).toList() : null;
   }
@@ -418,10 +459,10 @@ class DBProvider {
     }
   }
 
-  Future<DateTime> instrumentFirstOperationDate(int instrumentId) async {
+  Future<DateTime> portfolioInstrumentFirstOperationDate(int portfolioInstrumentId) async {
     final Database db = await database;
     DateTime result;
-    List<Map<String, dynamic>> r = await db.rawQuery('SELECT min(date) date FROM operation WHERE instrument_id = ?', [instrumentId]);
+    List<Map<String, dynamic>> r = await db.rawQuery('SELECT min(date) date FROM operation WHERE portfolio_instrument_id = ?', [portfolioInstrumentId]);
 
     if (r.isNotEmpty) {
       var date = r[0]['date'];
@@ -542,7 +583,11 @@ class DBProvider {
     final Database db = await database;
     List<Portfolio> result;
 
-    List<Map<String, dynamic>> portfolios = await db.rawQuery('SELECT id, name FROM portfolio');
+    List<Map<String, dynamic>> portfolios = await db.rawQuery(
+        '''SELECT p.id, p.name, min(o.date) start_date 
+           FROM portfolio p LEFT JOIN portfolio_instrument pi ON pi.portfolio_id = p.id 
+                            LEFT JOIN operation o ON o.portfolio_instrument_id = pi.id'''
+    );
     if (portfolios.isNotEmpty) {
       result = portfolios.map((p) => Portfolio.fromMap(p)).toList();
     }

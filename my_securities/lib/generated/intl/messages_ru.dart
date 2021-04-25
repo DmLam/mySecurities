@@ -30,6 +30,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "moneyOperationTypeWithdraw" : MessageLookupByLibrary.simpleMessage("Вывод"),
     "operationTypeBuy" : MessageLookupByLibrary.simpleMessage("Покупка"),
     "operationTypeSell" : MessageLookupByLibrary.simpleMessage("Продажа"),
-    "pcs" : MessageLookupByLibrary.simpleMessage("шт")
+    "pcs" : MessageLookupByLibrary.simpleMessage("шт"),
+    "portfolioCreated" : MessageLookupByLibrary.simpleMessage("Создан")
   };
 }

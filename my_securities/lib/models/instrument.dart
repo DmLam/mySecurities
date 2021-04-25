@@ -4,49 +4,77 @@ import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/common/exchange.dart';
 
 class Instrument extends ChangeNotifier{
-  int id;
-  String isin;
-  String ticker;
-  String name;
-  InstrumentType type;
-  Exchange exchange;
-  Currency currency;
-  Uint8List image;
-  String additional;
-  int portfolioPercentPlan;
-  int quantity;
-  double averagePrice;
-  double value;
-  int operationCount;
+  int _id;
+  String _isin;
+  String _ticker;
+  String _name;
+  InstrumentType _type;
+  Exchange _exchange;
+  Currency _currency;
+  Uint8List _image;
+  String _additional;
+  int _portfolioPercentPlan;
+  int _quantity;
+  double _averagePrice;
+  double _value;
+  int _operationCount;
 
-  Instrument(this.id, {this.isin = '', this.ticker, this.name, this.currency, this.type,
-    this.exchange = Exchange.MCX, this.image, this.additional, this.portfolioPercentPlan, this.quantity = 0,
-    this.averagePrice = 0, this.value = 0, this.operationCount = 0});
+  int get id => _id;
+  String get isin => _isin;
+  String get ticker => _ticker;
+  String get name => _name;
+  Currency get currency => _currency;
+  InstrumentType get type => _type;
+  Exchange get exchange => _exchange;
+  Uint8List get image => _image;
+  String get additional => _additional;
+  int get portfolioPercentPlan => _portfolioPercentPlan;
+  int get quantity => _quantity;
+  double get averagePrice => _averagePrice;
+  double get value => _value;
+  int get operationCount => _operationCount;
+
+  Instrument(this._id, {isin = '', @required ticker, name = '', currency, type,
+    exchange = Exchange.MCX, image, additional, portfolioPercentPlan, quantity = 0,
+    averagePrice = 0, value = 0, operationCount = 0}):
+    _isin = isin,
+    _ticker = ticker,
+    _name = name,
+    _currency = currency,
+    _type = type,
+    _exchange = exchange,
+    _image = image,
+    _additional = additional,
+    _portfolioPercentPlan = portfolioPercentPlan,
+    _quantity = quantity,
+    _averagePrice = averagePrice,
+    _value = value,
+    _operationCount = operationCount;
 
   Instrument.from(Instrument source):
-        this.id = source.id,
-        this.isin = source.isin,
-        this.ticker = source.ticker,
-        this.name = source.name,
-        this.currency = source.currency,
-        this.type = source.type,
-        this.image = source.image,
-        this.additional = source.additional,
-        this.exchange = source.exchange,
-        this.portfolioPercentPlan = source.portfolioPercentPlan,
-        this.quantity = source.quantity,
-        this.averagePrice = source.averagePrice,
-        this.value = source.value,
-        this.operationCount = source.operationCount;
+    this._id = source.id,
+    this._isin = source.isin,
+    this._ticker = source.ticker,
+    this._name = source.name,
+    this._currency = source.currency,
+    this._type = source.type,
+    this._image = source.image,
+    this._additional = source.additional,
+    this._exchange = source.exchange,
+    this._portfolioPercentPlan = source.portfolioPercentPlan,
+    this._quantity = source.quantity,
+    this._averagePrice = source.averagePrice,
+    this._value = source.value,
+    this._operationCount = source.operationCount;
 
-  Instrument.empty() {
-    this.id = null;
-    this.exchange = Exchange.MCX;
-    this.quantity = 0;
-    this.averagePrice = 0;
-    this.value = 0;
-    this.operationCount = 0;
-  }
+  Instrument.empty():
+    this._id = null,
+    this._exchange = Exchange.MCX,
+    this._quantity = 0,
+    this._averagePrice = 0,
+    this._value = 0,
+    this._operationCount = 0;
+
 
   factory Instrument.fromMap(Map<String, dynamic> json) =>
       Instrument(json["id"],
@@ -71,7 +99,7 @@ class Instrument extends ChangeNotifier{
   String profitString(double currentPrice, {Currency currency}) => (profit(currentPrice) == 0) ? '' : formatCurrency(profit(currentPrice), currency: currency == null ? this.currency : currency);
 
   Map<String, dynamic> toMap() => {
-    "id": id,
+    "id": _id,
     "isin": isin,
     "ticker": ticker,
     "name": name,
@@ -88,20 +116,20 @@ class Instrument extends ChangeNotifier{
   };
 
   Instrument assign(Instrument source) {
-    this.id = source.id;
-    this.isin = source.isin;
-    this.ticker = source.ticker;
-    this.name = source.name;
-    this.currency = source.currency;
-    this.type = source.type;
-    this.exchange = source.exchange;
-    this.image = source.image;
-    this.additional = source.additional;
-    this.portfolioPercentPlan = source.portfolioPercentPlan;
-    this.quantity = source.quantity;
-    this.averagePrice = source.averagePrice;
-    this.value = source.value;
-    this.operationCount = source.operationCount;
+    this._id = source.id;
+    this._isin = source.isin;
+    this._ticker = source.ticker;
+    this._name = source.name;
+    this._currency = source.currency;
+    this._type = source.type;
+    this._exchange = source.exchange;
+    this._image = source.image;
+    this._additional = source.additional;
+    this._portfolioPercentPlan = source.portfolioPercentPlan;
+    this._quantity = source.quantity;
+    this._averagePrice = source.averagePrice;
+    this._value = source.value;
+    this._operationCount = source.operationCount;
 
     notifyListeners();
 

@@ -10,5 +10,7 @@
   "instrumentTypeShare": "Share",
   "instrumentTypeEtf": "Etf",
   "instrumentTypeBond": "Bond",
-  "pcs": "pcs"
+  "pcs": "pcs",
+
+  "portfolioCreated": "Сreated"
 }

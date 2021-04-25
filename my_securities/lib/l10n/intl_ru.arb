@@ -9,5 +9,7 @@
   "instrumentTypeShare": "Акция",
   "instrumentTypeEtf": "Фонд",
   "instrumentTypeBond": "Облигация",
-  "pcs": "шт"
+  "pcs": "шт",
+
+  "portfolioCreated": "Создан"
 }

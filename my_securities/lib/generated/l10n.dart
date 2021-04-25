@@ -144,6 +144,16 @@ class S {
       args: [],
     );
   }
+
+  /// `Сreated`
+  String get portfolioCreated {
+    return Intl.message(
+      'Сreated',
+      name: 'portfolioCreated',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -4,6 +4,7 @@ enum OperationType {buy, sell}
 
 class Operation{
   int id;
+  int portfolioInstrumentId;
   int instrumentId;
   DateTime date;
   OperationType type;
@@ -17,10 +18,11 @@ class Operation{
 
   String priceString() => price == null ? '' : formatCurrency(price);
 
-  Operation({this.id, this.instrumentId, this.date, this.type, this.quantity, this.price, this.commission});
+  Operation({this.id, this.portfolioInstrumentId, this.instrumentId, this.date, this.type, this.quantity, this.price, this.commission});
 
   Operation.from(Operation op) :
         this.id = op.id,
+        this.portfolioInstrumentId = op.portfolioInstrumentId,
         this.instrumentId = op.instrumentId,
         this.date = op.date,
         this.type = op.type,
@@ -32,6 +34,7 @@ class Operation{
     DateTime now = DateTime.now();
 
     this.id = null;
+    this.portfolioInstrumentId = null;
     this.instrumentId = null;
     this.date = DateTime(now.year, now.month, now.day);
     this.type = OperationType.buy;
@@ -42,7 +45,8 @@ class Operation{
 
   factory Operation.fromMap(Map<String, dynamic> json) =>
       Operation(id: json["id"],
-          instrumentId: json["item_id"],
+          portfolioInstrumentId: json["portfolio_instrument_id"],
+          instrumentId: json["instrument_id"],
           date: DateTime.parse(json["date"]),
           type: OperationType.values[json["type"]],
           quantity: json["quantity"],
@@ -52,6 +56,7 @@ class Operation{
 
   Operation assign(Operation op) {
     id = op.id;
+    portfolioInstrumentId = op.portfolioInstrumentId;
     instrumentId = op.instrumentId;
     date = op.date;
     type = op.type;
