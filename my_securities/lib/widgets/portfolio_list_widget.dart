@@ -27,7 +27,7 @@ class PortfolioListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     String created;
 
-    showPortfolioInstuments() {
+    showPortfolioInstruments() {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => PortfolioInstrumentsPage(_portfolio)
@@ -46,7 +46,7 @@ class PortfolioListItem extends StatelessWidget {
           ),
           subtitle: Text(created),
         ),
-        onTap: showPortfolioInstuments(),
+        onTap: showPortfolioInstruments(),
       )
     ;
   }

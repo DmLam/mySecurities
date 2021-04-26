@@ -1,21 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:my_securities/models/instrument.dart';
 import 'package:provider/provider.dart';
-import 'package:my_securities/models/portfolio.dart';
 
 class PortfolioInstrumentList extends StatelessWidget {
-  final Portfolio _portfolio;
+  final InstrumentList _instruments;
 
-  PortfolioInstrumentList(this._portfolio);
+  PortfolioInstrumentList(this._instruments);
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-        value: _portfolio.instruments,
-        child: ListView.builder(
-          itemCount: _portfolio.instruments.length,
-          itemBuilder: (BuildContext context, int index) => PortfolioInstrumentListItem(_portfolio.instruments[index])
-        )
+    return ListView.builder(
+      itemCount: _instruments.length,
+      itemBuilder: (BuildContext context, int index) => PortfolioInstrumentListItem(_instruments[index])
     );
   }
 }

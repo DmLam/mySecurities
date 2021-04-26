@@ -76,15 +76,15 @@ class OperationList extends ChangeNotifier {
   int _portfolioId;
 
   OperationList(this._portfolioId) {
-    _loadFromDb(_portfolioId);
+    _loadFromDb();
   }
 
   int get length => _items.length;
 
   Operation operator [](int index) => _items[index];
 
-  _loadFromDb(int portfolioInstrumentId) async {
+  _loadFromDb() async {
     _items = await DBProvider.db.getPortfolioOperations(_portfolioId);
-    notifyListeners();
+//    notifyListeners();
   }
 }

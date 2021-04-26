@@ -2,7 +2,6 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/common/exchange.dart';
-import 'package:sqflite/sqflite.dart';
 
 import '../common/database.dart';
 
@@ -154,15 +153,15 @@ class InstrumentList extends ChangeNotifier {
   int _portfolioId;
 
   InstrumentList(this._portfolioId) {
-    _loadFromDb(_portfolioId);
+    _loadFromDb();
   }
 
   int get length => _items.length;
 
   Instrument operator [](int index) => _items[index];
 
-  _loadFromDb(int portfolioInstrumentId) async {
+  _loadFromDb() async {
     _items = await DBProvider.db.getPortfolioInstruments(_portfolioId);
-    notifyListeners();
+//      notifyListeners();
   }
 }
