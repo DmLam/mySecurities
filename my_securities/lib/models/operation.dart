@@ -1,4 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:my_securities/common/exchange.dart';
+
+import '../common/database.dart';
 
 enum OperationType {buy, sell}
 
@@ -65,5 +68,23 @@ class Operation{
     commission= op.commission;
 
     return op;
+  }
+}
+
+class OperationList extends ChangeNotifier {
+  List<Operation> _items = [];
+  int _portfolioId;
+
+  OperationList(this._portfolioId) {
+    _loadFromDb(_portfolioId);
+  }
+
+  int get length => _items.length;
+
+  Operation operator [](int index) => _items[index];
+
+  _loadFromDb(int portfolioInstrumentId) async {
+    _items = await DBProvider.db.getPortfolioOperations(_portfolioId);
+    notifyListeners();
   }
 }

@@ -11,10 +11,10 @@ class PortfolioInstrumentList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
-        value: _portfolio,
+        value: _portfolio.instruments,
         child: ListView.builder(
-          itemCount: _portfolio.operationCount,
-          itemBuilder: (BuildContext context, int index) => PortfolioInstrumentListItem(_portfolio.instrument(index))
+          itemCount: _portfolio.instruments.length,
+          itemBuilder: (BuildContext context, int index) => PortfolioInstrumentListItem(_portfolio.instruments[index])
         )
     );
   }

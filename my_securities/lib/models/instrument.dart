@@ -2,6 +2,9 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/common/exchange.dart';
+import 'package:sqflite/sqflite.dart';
+
+import '../common/database.dart';
 
 class Instrument extends ChangeNotifier{
   int _id;
@@ -146,3 +149,20 @@ extension InstrumentExtension on Instrument {
   String averagePriceString({Currency currency}) => averagePrice == null ? '' : formatCurrency(averagePrice, currency: currency == null ? this.currency : currency) ;
 }
 
+class InstrumentList extends ChangeNotifier {
+  List<Instrument> _items = [];
+  int _portfolioId;
+
+  InstrumentList(this._portfolioId) {
+    _loadFromDb(_portfolioId);
+  }
+
+  int get length => _items.length;
+
+  Instrument operator [](int index) => _items[index];
+
+  _loadFromDb(int portfolioInstrumentId) async {
+    _items = await DBProvider.db.getPortfolioInstruments(_portfolioId);
+    notifyListeners();
+  }
+}
