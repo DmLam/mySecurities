@@ -6,88 +6,79 @@ import 'package:my_securities/common/common.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/models/portfolio.dart';
 import 'package:my_securities/widgets/appbar.dart';
+import 'package:provider/provider.dart';
 
-class PortfolioEditDialog extends StatefulWidget {
+class PortfolioEditDialog extends StatelessWidget {
   final Portfolio _portfolio;
+  final TextEditingController _nameEditController = TextEditingController();
 
   PortfolioEditDialog(this._portfolio, {Key key}) : super(key: key) {
-    if (_portfolio.id == null)
-      _portfolio.startDate = DateTime.now();
-  }
-
-  @override
-  _PortfolioEditDialogState createState() => _PortfolioEditDialogState();
-}
-
-class _PortfolioEditDialogState extends State<PortfolioEditDialog> {
-  final TextEditingController _nameEditController = TextEditingController();
-  final TextEditingController _startDateEditController = TextEditingController();
-
-  _PortfolioEditDialogState() {
-    _nameEditController.text = widget._portfolio?.name;
-    _startDateEditController.text = DateFormat.yMd(ui.window.locale.languageCode).format(widget._portfolio.startDate);
+    _nameEditController.text = _portfolio?.name;
   }
 
   @override
   Widget build(BuildContext context) {
+
+    bool _fabEnabled() {
+      return _portfolio.name != null;
+    }
+
+    onFABPressed() async {
+      bool result;
+
+      if (_portfolio.id == null) {
+        result = await context.read<PortfolioList>().add(_portfolio);
+      }
+      else {
+        result = await _portfolio.update();
+      }
+
+      if (result)
+        Navigator.pop(context, true);
+    }
+
     return Scaffold(
       appBar: MySecuritiesAppBar(),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            dialogPanel(children: [
-              Expanded(
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                          controller: _nameEditController,
-                          decoration: InputDecoration(
-                            icon: Icon(Icons.perm_identity),
-                            labelText: S.of(context).portfolioEditDialog_Name,
-                            contentPadding: EdgeInsets.all(3.0)
-                          )),
-                        ),
-                      ]),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            textAlign: TextAlign.end,
-                            controller: _startDateEditController,
-                            readOnly: true,
+      body: ChangeNotifierProvider<Portfolio>.value(
+        value: _portfolio,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              dialogPanel(children: [
+                Expanded(
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                            controller: _nameEditController,
+                            onChanged: (value) {_portfolio.name = value;},
                             decoration: InputDecoration(
-                                icon: Icon(Icons.event),
-                                labelText: S.of(context).portfolioEditDialog_startDate,
-                                contentPadding: EDIT_UNDERLINE_PADDING
-                            ),
-                            onTap: () {
-                              showDatePicker(
-                                  context: context,
-                                  initialDate: widget._portfolio.startDate,
-                                  firstDate: DateTime(2000),
-                                  lastDate: DateTime.now()).then((date) =>
-                              {
-                                if (date != null) {
-                                  setState(() {
-                                    widget._portfolio.startDate = date;
-                                    _startDateEditController.text = DateFormat.yMd(ui.window.locale.languageCode).format(date);
-                                  })
-                                }
-                              });
-                            }
+                              icon: Icon(Icons.perm_identity),
+                              labelText: S.of(context).portfolioEditDialog_Name,
+                              contentPadding: EdgeInsets.all(3.0)
+                            )),
                           ),
-                        )
-                      ],
-                    ),
-                  ],
+                        ]),
+                    ],
+                  ),
                 ),
-              ),
-            ])
-          ]
-        )
+              ])
+            ]
+          )
+        ),
+      ),
+      // don't show FAB if keyboard is opened, because the FAB overflows most bottom editor
+      floatingActionButton:
+      Visibility(
+          visible: isKeyboardOpen(context), // check keyboard is open
+          child: FloatingActionButton(
+              child: Icon(Icons.done),
+              // if not all data is entered ok then disable FAB: make it grey and null as 'onPressed'
+              onPressed: _fabEnabled() ? onFABPressed : null,
+              backgroundColor: _fabEnabled() ? Colors.lightBlueAccent : Colors.grey[100]
+          )
       )
     );
   }

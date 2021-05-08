@@ -19,8 +19,12 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'ru';
 
+  static m0(name) => "Портфолио ${name} уже существует";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
+    "appBar_settings" : MessageLookupByLibrary.simpleMessage("Настройки"),
+    "db_portfolioAlreadyExists" : m0,
     "defaultPortfolioName" : MessageLookupByLibrary.simpleMessage("Мой портфель"),
     "instrumentTypeBond" : MessageLookupByLibrary.simpleMessage("Облигация"),
     "instrumentTypeCurrency" : MessageLookupByLibrary.simpleMessage("Валюта"),
@@ -31,9 +35,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "operationTypeBuy" : MessageLookupByLibrary.simpleMessage("Покупка"),
     "operationTypeSell" : MessageLookupByLibrary.simpleMessage("Продажа"),
     "pcs" : MessageLookupByLibrary.simpleMessage("шт"),
-    "portfolioCreated" : MessageLookupByLibrary.simpleMessage("Создан"),
     "portfolioEditDialog_Name" : MessageLookupByLibrary.simpleMessage("Наименование"),
     "portfolioEditDialog_startDate" : MessageLookupByLibrary.simpleMessage("Дата создания"),
-    "settings" : MessageLookupByLibrary.simpleMessage("Настройки")
+    "portfolioListView_menuDelete" : MessageLookupByLibrary.simpleMessage("Удалить"),
+    "portfolioListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Редактировать"),
+    "portfolioListView_portfolioStarted" : MessageLookupByLibrary.simpleMessage("Начат")
   };
 }

@@ -27,7 +27,7 @@ class _MySecuritiesAppBarState extends State<MySecuritiesAppBar>{
       actions: [
         PopupMenuButton(
           itemBuilder: (BuildContext context) {
-            return {S.of(context).settings}.map((String choice) {
+            return {S.of(context).appBar_settings}.map((String choice) {
               return PopupMenuItem<String>(
                 value: choice,
                 child: Text(choice),

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'dart:typed_data';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:sqflite/sqflite.dart';
@@ -24,8 +25,9 @@ class DBProvider {
   DBProvider._();
 
   static final DBProvider db = DBProvider._();
-
   static Database _database;
+
+  static final int error_SQLITE_CONSTRAINT_UNIQUE = 2067;
 
   Future<Database> get database async {
     if (_database != null)
@@ -33,6 +35,18 @@ class DBProvider {
 
     await initDB();
     return _database;
+  }
+
+  int extractErrorCodeFromErrorMessage(String message) {
+    int result = -1;
+    RegExp re = RegExp(r"code (\d+)");
+
+    RegExpMatch match = re.firstMatch(message);
+    if (match != null) {
+      result = int.parse(match[1]);
+    }
+
+    return result;
   }
 
   Future<void> _createTableCurrency(Database db) async {
@@ -241,7 +255,7 @@ class DBProvider {
   initDB() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, "MyPortfolio.db");
-    await deleteDatabase(path); // пока идет отладка
+//    await deleteDatabase(path); // пока идет отладка
     await openDatabase(path, version: CURRENT_DB_VERSION,
       onOpen: (db) async {
         _database = db;
@@ -584,9 +598,9 @@ class DBProvider {
     List<Portfolio> result;
 
     List<Map<String, dynamic>> portfolios = await db.rawQuery(
-        '''SELECT p.id, p.name, min(o.date) start_date 
-           FROM portfolio p LEFT JOIN portfolio_instrument pi ON pi.portfolio_id = p.id 
-                            LEFT JOIN operation o ON o.portfolio_instrument_id = pi.id'''
+        '''SELECT p.id, p.name, 
+             (SELECT min(o.date) FROM operation o, portfolio_instrument pi WHERE o.portfolio_instrument_id = pi.id  AND pi.portfolio_id = p.id) start_date 
+           FROM portfolio p'''
     );
     if (portfolios.isNotEmpty) {
       result = portfolios.map((p) => Portfolio.fromMap(p)).toList();
@@ -594,4 +608,64 @@ class DBProvider {
 
     return result;
   }
+
+  Future<bool> addPortfolio(Portfolio portfolio) async {
+    bool result = false;
+    final Database db = await database;
+
+    if (portfolio.id != null)
+      Fluttertoast.showToast(msg: "Internal error: adding portfolio with id");
+    else {
+      try {
+        await db.insert('portfolio', {'name': portfolio.name});
+        result = true;
+      }
+      catch (e) {
+        int code = extractErrorCodeFromErrorMessage(e.message);
+        if (code == error_SQLITE_CONSTRAINT_UNIQUE) {
+          Fluttertoast.showToast(
+              msg: S.current.db_portfolioAlreadyExists(portfolio.name));
+        }
+      }
+    }
+
+    return Future.value(result);
+  }
+
+  Future<bool> updatePortfolio(Portfolio portfolio) async {
+    bool result = false;
+    final Database db = await database;
+
+    if (portfolio.id == null)
+      Fluttertoast.showToast(msg: "Internal error: updating portfolio without id");
+    else {
+      try {
+        await db.update('portfolio', {'name': portfolio.name}, where: 'id = ?', whereArgs: [portfolio.id]);
+        result = true;
+      }
+      catch(e) {
+        int code = extractErrorCodeFromErrorMessage(e.message);
+        if (code == error_SQLITE_CONSTRAINT_UNIQUE) {
+          Fluttertoast.showToast(
+              msg: S.current.db_portfolioAlreadyExists(portfolio.name));
+        }
+      }
+    }
+
+    return Future.value(result);
+  }
+
+  Future<bool> deletePortfolio(Portfolio portfolio) async {
+    bool result = false;
+    final Database db = await database;
+
+    if (portfolio.id != null)
+      Fluttertoast.showToast(msg: "Internal error: deleting portfolio without id");
+    else {
+      db.delete('portfolio', where: 'id = ?', whereArgs: [portfolio.id]);
+    }
+
+    return Future.value(result);
+  }
 }
+

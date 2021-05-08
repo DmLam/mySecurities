@@ -12,10 +12,14 @@
   "instrumentTypeBond": "Bond",
   "pcs": "pcs",
 
-  "settings": "Settings",
+  "db_portfolioAlreadyExists": "Portfolio {name} already exists",
 
-  "portfolioCreated": "Сreated",
+  "appBar_settings": "Settings",
+  "portfolioListView_portfolioStarted": "Started",
+  "portfolioListView_menuEdit": "Edit",
+  "portfolioListView_menuDelete": "Delete",
 
   "portfolioEditDialog_Name": "Name",
   "portfolioEditDialog_startDate": "Creation date"
+
 }

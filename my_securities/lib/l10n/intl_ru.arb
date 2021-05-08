@@ -11,9 +11,12 @@
   "instrumentTypeBond": "Облигация",
   "pcs": "шт",
 
-  "settings": "Настройки",
+  "db_portfolioAlreadyExists": "Портфолио {name} уже существует",
 
-  "portfolioCreated": "Создан",
+  "appBar_settings": "Настройки",
+  "portfolioListView_portfolioStarted": "Начат",
+  "portfolioListView_menuEdit": "Редактировать",
+  "portfolioListView_menuDelete": "Удалить",
 
   "portfolioEditDialog_Name": "Наименование",
   "portfolioEditDialog_startDate": "Дата создания"

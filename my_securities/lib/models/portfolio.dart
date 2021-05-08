@@ -18,10 +18,6 @@ class Portfolio extends ChangeNotifier {
     notifyListeners();
   }
   DateTime get startDate => _startDate;
-  set startDate(DateTime startDate) {
-    _startDate = startDate;
-    notifyListeners();
-  }
 
   InstrumentList get instruments => _instruments;
   OperationList get operations => _operations;
@@ -40,8 +36,20 @@ class Portfolio extends ChangeNotifier {
     Portfolio(
       json["id"],
       json["name"],
-      DateTime.parse(json["start_date"])
+      json["start_date"] == null ? null : DateTime.parse(json["start_date"])
     );
+
+  Future<bool> update() async {
+    bool result = await DBProvider.db.updatePortfolio(this);
+
+    if (result){
+      result = true;
+    }
+
+    notifyListeners();
+
+    return Future.value(result);
+  }
 }
 
 class PortfolioList extends ChangeNotifier {
@@ -59,5 +67,31 @@ class PortfolioList extends ChangeNotifier {
   Future _init() async{
     final data = await DBProvider.db.getPortfolios();
     _portfolios = data;
+  }
+
+  Future<bool> add(Portfolio portfolio) async {
+    bool result = await DBProvider.db.addPortfolio(portfolio);
+
+    if (result){
+      _portfolios = await DBProvider.db.getPortfolios();
+      result = true;
+    }
+
+    notifyListeners();
+
+    return Future.value(result);
+  }
+
+  Future<bool> delete(Portfolio portfolio) async {
+    bool result = await DBProvider.db.deletePortfolio(portfolio);
+
+    if (result){
+      _portfolios = await DBProvider.db.getPortfolios();
+      result = true;
+    }
+
+    notifyListeners();
+
+    return Future.value(result);
   }
 }

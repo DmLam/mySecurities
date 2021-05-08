@@ -19,9 +19,13 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'en';
 
+  static m0(name) => "Portfolio ${name} already exists";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
+    "appBar_settings" : MessageLookupByLibrary.simpleMessage("Settings"),
     "applicationTitle" : MessageLookupByLibrary.simpleMessage("My securities"),
+    "db_portfolioAlreadyExists" : m0,
     "defaultPortfolioName" : MessageLookupByLibrary.simpleMessage("My portfolio"),
     "instrumentTypeBond" : MessageLookupByLibrary.simpleMessage("Bond"),
     "instrumentTypeCurrency" : MessageLookupByLibrary.simpleMessage("Currency"),
@@ -32,9 +36,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "operationTypeBuy" : MessageLookupByLibrary.simpleMessage("Buy"),
     "operationTypeSell" : MessageLookupByLibrary.simpleMessage("Sell"),
     "pcs" : MessageLookupByLibrary.simpleMessage("pcs"),
-    "portfolioCreated" : MessageLookupByLibrary.simpleMessage("Сreated"),
     "portfolioEditDialog_Name" : MessageLookupByLibrary.simpleMessage("Name"),
     "portfolioEditDialog_startDate" : MessageLookupByLibrary.simpleMessage("Creation date"),
-    "settings" : MessageLookupByLibrary.simpleMessage("Settings")
+    "portfolioListView_menuDelete" : MessageLookupByLibrary.simpleMessage("Delete"),
+    "portfolioListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Edit"),
+    "portfolioListView_portfolioStarted" : MessageLookupByLibrary.simpleMessage("Started")
   };
 }

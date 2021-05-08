@@ -145,21 +145,51 @@ class S {
     );
   }
 
+  /// `Portfolio {name} already exists`
+  String db_portfolioAlreadyExists(Object name) {
+    return Intl.message(
+      'Portfolio $name already exists',
+      name: 'db_portfolioAlreadyExists',
+      desc: '',
+      args: [name],
+    );
+  }
+
   /// `Settings`
-  String get settings {
+  String get appBar_settings {
     return Intl.message(
       'Settings',
-      name: 'settings',
+      name: 'appBar_settings',
       desc: '',
       args: [],
     );
   }
 
-  /// `Сreated`
-  String get portfolioCreated {
+  /// `Started`
+  String get portfolioListView_portfolioStarted {
     return Intl.message(
-      'Сreated',
-      name: 'portfolioCreated',
+      'Started',
+      name: 'portfolioListView_portfolioStarted',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Edit`
+  String get portfolioListView_menuEdit {
+    return Intl.message(
+      'Edit',
+      name: 'portfolioListView_menuEdit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Delete`
+  String get portfolioListView_menuDelete {
+    return Intl.message(
+      'Delete',
+      name: 'portfolioListView_menuDelete',
       desc: '',
       args: [],
     );

@@ -1,8 +1,10 @@
+import 'package:my_securities/models/portfolio.dart';
+
 import '../common/exchange.dart';
 import '../common/common.dart';
 
 class Model {
-  
+  PortfolioList portfolios;
 }
 
 class Quote {
