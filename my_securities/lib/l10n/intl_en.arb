@@ -12,5 +12,10 @@
   "instrumentTypeBond": "Bond",
   "pcs": "pcs",
 
-  "portfolioCreated": "Сreated"
+  "settings": "Settings",
+
+  "portfolioCreated": "Сreated",
+
+  "portfolioEditDialog_Name": "Name",
+  "portfolioEditDialog_startDate": "Creation date"
 }

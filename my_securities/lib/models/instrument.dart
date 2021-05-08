@@ -133,7 +133,7 @@ class Instrument extends ChangeNotifier{
     this._value = source.value;
     this._operationCount = source.operationCount;
 
-    notifyListeners();
+    //notifyListeners();
 
     return source;
   }

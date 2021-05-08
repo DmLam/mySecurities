@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:my_securities/models/instrument.dart';
-import 'package:provider/provider.dart';
 
-class PortfolioInstrumentList extends StatelessWidget {
+
+class PortfolioInstrumentsListView extends StatelessWidget {
   final InstrumentList _instruments;
 
-  PortfolioInstrumentList(this._instruments);
+  PortfolioInstrumentsListView(this._instruments);
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class PortfolioInstrumentListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(_instrument.ticker + _instrument.name == null ? "" : "($_instrument.name)"),
+      title: Text(_instrument.ticker + (_instrument.name == null ? "" : " (${_instrument.name})")),
     );
   }
 }

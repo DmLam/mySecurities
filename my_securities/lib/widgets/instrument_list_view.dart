@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class InstrumentList extends ListView {
+class InstrumentListView extends ListView {
 
   @override
   Widget build(BuildContext context) {

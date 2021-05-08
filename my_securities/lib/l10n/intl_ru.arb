@@ -11,5 +11,10 @@
   "instrumentTypeBond": "Облигация",
   "pcs": "шт",
 
-  "portfolioCreated": "Создан"
+  "settings": "Настройки",
+
+  "portfolioCreated": "Создан",
+
+  "portfolioEditDialog_Name": "Наименование",
+  "portfolioEditDialog_startDate": "Дата создания"
 }

@@ -7,12 +7,22 @@ class Portfolio extends ChangeNotifier {
   int _id;
   String _name;
   DateTime _startDate;
+
   InstrumentList _instruments;
   OperationList _operations;
 
   int get id => _id;
   String get name => _name;
+  set name(String name) {
+    _name = name;
+    notifyListeners();
+  }
   DateTime get startDate => _startDate;
+  set startDate(DateTime startDate) {
+    _startDate = startDate;
+    notifyListeners();
+  }
+
   InstrumentList get instruments => _instruments;
   OperationList get operations => _operations;
 
@@ -21,28 +31,33 @@ class Portfolio extends ChangeNotifier {
     _operations = OperationList(_id);
   }
 
+  Portfolio.empty() :
+    _id = null,
+    _name = "",
+    _startDate = null;
+
   factory Portfolio.fromMap(Map<String, dynamic> json) =>
     Portfolio(
       json["id"],
       json["name"],
       DateTime.parse(json["start_date"])
     );
-
 }
 
-class Portfolios extends ChangeNotifier {
-  List<Portfolio> items = [];
+class PortfolioList extends ChangeNotifier {
+  List<Portfolio> _portfolios;
+  Future _ready;
 
-  int get length => items.length;
+  Future get ready => _ready;
 
-  Portfolio operator [](int index) => items[index];
+  List<Portfolio> get portfolios => [..._portfolios];
 
-  Future<void> _init() async{
-    items = await DBProvider.db.getPortfolios();
-    notifyListeners();
+  PortfolioList() {
+    _ready = _init();
   }
 
-  Portfolios()  {
-    _init();
+  Future _init() async{
+    final data = await DBProvider.db.getPortfolios();
+    _portfolios = data;
   }
 }

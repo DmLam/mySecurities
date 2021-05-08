@@ -31,6 +31,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "operationTypeBuy" : MessageLookupByLibrary.simpleMessage("Покупка"),
     "operationTypeSell" : MessageLookupByLibrary.simpleMessage("Продажа"),
     "pcs" : MessageLookupByLibrary.simpleMessage("шт"),
-    "portfolioCreated" : MessageLookupByLibrary.simpleMessage("Создан")
+    "portfolioCreated" : MessageLookupByLibrary.simpleMessage("Создан"),
+    "portfolioEditDialog_Name" : MessageLookupByLibrary.simpleMessage("Наименование"),
+    "portfolioEditDialog_startDate" : MessageLookupByLibrary.simpleMessage("Дата создания"),
+    "settings" : MessageLookupByLibrary.simpleMessage("Настройки")
   };
 }

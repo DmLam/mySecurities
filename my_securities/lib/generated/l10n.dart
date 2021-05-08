@@ -145,11 +145,41 @@ class S {
     );
   }
 
+  /// `Settings`
+  String get settings {
+    return Intl.message(
+      'Settings',
+      name: 'settings',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Сreated`
   String get portfolioCreated {
     return Intl.message(
       'Сreated',
       name: 'portfolioCreated',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Name`
+  String get portfolioEditDialog_Name {
+    return Intl.message(
+      'Name',
+      name: 'portfolioEditDialog_Name',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Creation date`
+  String get portfolioEditDialog_startDate {
+    return Intl.message(
+      'Creation date',
+      name: 'portfolioEditDialog_startDate',
       desc: '',
       args: [],
     );
