@@ -11,7 +11,8 @@
   "instrumentTypeBond": "Облигация",
   "pcs": "шт",
 
-  "db_portfolioAlreadyExists": "Портфолио {name} уже существует",
+  "db_portfolioAlreadyExists": "Портфель {name} уже существует",
+  "db_portfolioNotEmpty": "Портфель не пуст",
 
   "appBar_settings": "Настройки",
   "portfolioListView_portfolioStarted": "Начат",

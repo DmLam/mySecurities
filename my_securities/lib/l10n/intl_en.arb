@@ -13,6 +13,7 @@
   "pcs": "pcs",
 
   "db_portfolioAlreadyExists": "Portfolio {name} already exists",
+  "db_portfolioNotEmpty": "Portfolio is not empty",
 
   "appBar_settings": "Settings",
   "portfolioListView_portfolioStarted": "Started",

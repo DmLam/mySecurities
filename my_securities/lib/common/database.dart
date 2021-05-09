@@ -27,7 +27,8 @@ class DBProvider {
   static final DBProvider db = DBProvider._();
   static Database _database;
 
-  static final int error_SQLITE_CONSTRAINT_UNIQUE = 2067;
+  final int error_SQLITE_CONSTRAINT_UNIQUE = 2067; // ignore: non_constant_identifier_names
+  final int error_SQLITE_CONSTRAINT_TRIGGER = 1811; // ignore: non_constant_identifier_names
 
   Future<Database> get database async {
     if (_database != null)
@@ -100,9 +101,12 @@ class DBProvider {
           image BLOB,
           portfolio_percent_plan INTEGER,
           last_quote_update TEXT,
-          FOREIGN KEY (currency_id) REFERENCES currency(id),
-          FOREIGN KEY (instrument_type_id) REFERENCES instrument_type(id),
-          FOREIGN KEY (exchange_id) REFERENCES exchange(id))''');
+          FOREIGN KEY (currency_id) REFERENCES currency(id)
+            ON DELETE RESTRICT ON UPDATE RESTRICT,
+          FOREIGN KEY (instrument_type_id) REFERENCES instrument_type(id)
+            ON DELETE RESTRICT ON UPDATE RESTRICT,
+          FOREIGN KEY (exchange_id) REFERENCES exchange(id))
+            ON DELETE RESTRICT ON UPDATE RESTRICT''');
   }
   Future<void> _createTablePortfolioInstrument(Database db) async {
     await db.execute(
@@ -111,8 +115,10 @@ class DBProvider {
          portfolio_id INTEGER NOT NULL,
          instrument_id INTEGER NOT NULL,
          percent REAL,
-         FOREIGN KEY (portfolio_id) REFERENCES portfolio(id),
-         FOREIGN KEY (instrument_id) REFERENCES instrument(id))''');
+         FOREIGN KEY (portfolio_id) REFERENCES portfolio(id) 
+          ON DELETE RESTRICT ON UPDATE RESTRICT,
+         FOREIGN KEY (instrument_id) REFERENCES instrument(id)) 
+          ON DELETE RESTRICT ON UPDATE RESTRICT''');
   }
   Future<void> _createTableMoney(Database db) async {
     await db.execute(
@@ -124,9 +130,12 @@ class DBProvider {
           type INTEGER NOT NULL,  
           amount REAL NOT NULL,
           operation_id INTEGER,
-          FOREIGN KEY (portfolio_id) REFERENCES portfolio(id),
-          FOREIGN KEY (currency_id) REFERENCES currency(id),
-          FOREIGN KEY (operation_id) REFERENCES operation(id))''');
+          FOREIGN KEY (portfolio_id) REFERENCES portfolio(id)
+            ON DELETE RESTRICT ON UPDATE RESTRICT,
+          FOREIGN KEY (currency_id) REFERENCES currency(id)
+            ON DELETE RESTRICT ON UPDATE RESTRICT,
+          FOREIGN KEY (operation_id) REFERENCES operation(id)
+            ON DELETE RESTRICT ON UPDATE RESTRICT)''');
     await db.execute('CREATE INDEX idx_money_portfolio_id ON money (portfolio_id)');
     await db.execute('CREATE INDEX idx_money_currency_id ON money (currency_id)');
     await db.execute('CREATE INDEX idx_money_date ON money (date)');
@@ -143,7 +152,8 @@ class DBProvider {
           price REAL NOT NULL,
           value REAL NOT NULL,
           commission REAL DEFAULT 0,
-          FOREIGN KEY (portfolio_instrument_id) REFERENCES portfolio_instrument(id))''');
+          FOREIGN KEY (portfolio_instrument_id) REFERENCES portfolio_instrument(id)
+            ON DELETE RESTRICT ON UPDATE RESTRICT)''');
     await db.execute(
         'CREATE INDEX idx_operation_portfolio_instrument_id ON operation (portfolio_instrument_id)');
   }
@@ -158,7 +168,8 @@ class DBProvider {
           close double NOT NULL,
           low double NOT NULL,
           high double NOT NULL,
-          FOREIGN KEY (instrument_id) REFERENCES instrument(id),
+          FOREIGN KEY (instrument_id) REFERENCES instrument(id)
+            ON DELETE RESTRICT ON UPDATE RESTRICT,
           UNIQUE (instrument_id, date))''');
     await db.execute(
         'CREATE INDEX idx_quote ON quote (instrument_id, date)');
@@ -171,7 +182,8 @@ class DBProvider {
           date INTEGER NOT NULL,  
           currency_id INTEGER NOT NULL,
           rate double NOT NULL,
-          FOREIGN KEY (currency_id) REFERENCES currency(id),
+          FOREIGN KEY (currency_id) REFERENCES currency(id)
+            ON DELETE RESTRICT ON UPDATE RESTRICT,
           UNIQUE (currency_id, date))''');
     await db.execute(
         'CREATE INDEX idx_rate ON rate (currency_id, date)');
@@ -180,12 +192,13 @@ class DBProvider {
     await db.execute('''CREATE TABLE preference (
                         id INTEGER PRIMARY KEY,
                         main_currency_id INTEGER,
-                        FOREIGN KEY (main_currency_id) REFERENCES currency(id))''');
+                        FOREIGN KEY (main_currency_id) REFERENCES currency(id)
+                          ON DELETE RESTRICT ON UPDATE RESTRICT)''');
     await db.insert('preference', {'id': 1});
   }
 
   Future createTables(Database db) async {
-    await db.execute('PRAGMA foreign_keys = ON');
+    await initDatabase(db);
     // справочник валют
     await _createTableCurrency(db);
     // справочник бирж
@@ -210,13 +223,13 @@ class DBProvider {
     await _createTableMoney(db);
   }
 
+  Future initDatabase(Database db) async {
+    await db.execute('PRAGMA foreign_keys = ON');
+//    await db.execute('PRAGMA user_version = 1');
+  }
+
   Future initTables(Database db) async {
     await db.insert("portfolio", {"name": S.current.defaultPortfolioName}, );
-    await db.insert("portfolio_instrument",
-      {
-        "portfolio_id": 1,
-        "instrument_id": 1
-      });
     await db.insert("instrument",
       {
         "isin": "bla-bla-bla",
@@ -226,6 +239,11 @@ class DBProvider {
         "instrument_type_id": 3,
         "exchange_id": 54
       });
+    await db.insert("portfolio_instrument",
+        {
+          "portfolio_id": 1,
+          "instrument_id": 1
+        });
     await db.insert("operation",
       {
         "portfolio_instrument_id": 1,
@@ -259,7 +277,7 @@ class DBProvider {
     await openDatabase(path, version: CURRENT_DB_VERSION,
       onOpen: (db) async {
         _database = db;
-        db.execute('PRAGMA user_version = 4');
+        initDatabase(db);
       },
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
@@ -646,8 +664,7 @@ class DBProvider {
       catch(e) {
         int code = extractErrorCodeFromErrorMessage(e.message);
         if (code == error_SQLITE_CONSTRAINT_UNIQUE) {
-          Fluttertoast.showToast(
-              msg: S.current.db_portfolioAlreadyExists(portfolio.name));
+          Fluttertoast.showToast(msg: S.current.db_portfolioAlreadyExists(portfolio.name));
         }
       }
     }
@@ -659,10 +676,19 @@ class DBProvider {
     bool result = false;
     final Database db = await database;
 
-    if (portfolio.id != null)
+    if (portfolio.id == null)
       Fluttertoast.showToast(msg: "Internal error: deleting portfolio without id");
     else {
-      db.delete('portfolio', where: 'id = ?', whereArgs: [portfolio.id]);
+      try {
+        await db.delete('portfolio', where: 'id = ?', whereArgs: [portfolio.id]);
+        result = true;
+      }
+      catch(e) {
+        int code = extractErrorCodeFromErrorMessage(e.message);
+        if (code == error_SQLITE_CONSTRAINT_TRIGGER) {
+          Fluttertoast.showToast(msg: S.current.db_portfolioNotEmpty);
+        }
+      }
     }
 
     return Future.value(result);

@@ -66,25 +66,26 @@ class PortfolioListViewItem extends StatelessWidget {
         value: _portfolio,
         builder: (context, _) {
           if (_portfolio.startDate != null)
-            started = S.of(context).portfolioListView_portfolioStarted + ": "+
-                DateFormat("dd.MM.yyyy").format(context.read<Portfolio>().startDate);
+            started = S.of(context).portfolioListView_portfolioStarted + ': '+
+                DateFormat('dd.MM.yyyy').format(context.read<Portfolio>().startDate);
 
           return GestureDetector(
             child: ListTile(
               title: Text(context.watch<Portfolio>().name,
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
-              subtitle: Text(started ?? ""),
+              subtitle: Text(started ?? ''),
               trailing: PopupMenuButton(
                   itemBuilder: (_) =>
                   <PopupMenuItem<String>>[
                     PopupMenuItem<String>(
-                      value: "edit",
+                      value: 'edit',
                       child: Text(S.of(context).portfolioListView_menuEdit),
                     ),
                     PopupMenuItem<String>(
-                      value: "delete",
+                      value: 'delete',
                       child: Text(S.of(context).portfolioListView_menuDelete),
+                      enabled: _portfolio.operations.length == 0,
                     )
                   ],
                   onSelected: (value) {

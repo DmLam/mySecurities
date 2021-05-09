@@ -87,10 +87,8 @@ class PortfolioList extends ChangeNotifier {
 
     if (result){
       _portfolios = await DBProvider.db.getPortfolios();
-      result = true;
+      notifyListeners();
     }
-
-    notifyListeners();
 
     return Future.value(result);
   }

@@ -155,6 +155,16 @@ class S {
     );
   }
 
+  /// `Portfolio is not empty`
+  String get db_portfolioNotEmpty {
+    return Intl.message(
+      'Portfolio is not empty',
+      name: 'db_portfolioNotEmpty',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Settings`
   String get appBar_settings {
     return Intl.message(

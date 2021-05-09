@@ -19,12 +19,13 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'ru';
 
-  static m0(name) => "Портфолио ${name} уже существует";
+  static m0(name) => "Портфель ${name} уже существует";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
     "appBar_settings" : MessageLookupByLibrary.simpleMessage("Настройки"),
     "db_portfolioAlreadyExists" : m0,
+    "db_portfolioNotEmpty" : MessageLookupByLibrary.simpleMessage("Портфель не пуст"),
     "defaultPortfolioName" : MessageLookupByLibrary.simpleMessage("Мой портфель"),
     "instrumentTypeBond" : MessageLookupByLibrary.simpleMessage("Облигация"),
     "instrumentTypeCurrency" : MessageLookupByLibrary.simpleMessage("Валюта"),

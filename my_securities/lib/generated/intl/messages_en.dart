@@ -26,6 +26,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "appBar_settings" : MessageLookupByLibrary.simpleMessage("Settings"),
     "applicationTitle" : MessageLookupByLibrary.simpleMessage("My securities"),
     "db_portfolioAlreadyExists" : m0,
+    "db_portfolioNotEmpty" : MessageLookupByLibrary.simpleMessage("Portfolio is not empty"),
     "defaultPortfolioName" : MessageLookupByLibrary.simpleMessage("My portfolio"),
     "instrumentTypeBond" : MessageLookupByLibrary.simpleMessage("Bond"),
     "instrumentTypeCurrency" : MessageLookupByLibrary.simpleMessage("Currency"),
