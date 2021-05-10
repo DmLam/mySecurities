@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'dart:ui' as ui;
-import 'package:my_securities/common/classes.dart';
-import 'package:my_securities/common/common.dart';
+import 'package:provider/provider.dart';
+import 'package:my_securities/common/dialog_panel.dart';
+import 'package:my_securities/common/utils.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/models/portfolio.dart';
 import 'package:my_securities/widgets/appbar.dart';
-import 'package:provider/provider.dart';
 
 class PortfolioEditDialog extends StatelessWidget {
   final Portfolio _portfolio;

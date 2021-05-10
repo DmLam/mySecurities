@@ -35,6 +35,66 @@ class S {
     return Localizations.of<S>(context, S);
   }
 
+  /// `Settings`
+  String get appBar_settings {
+    return Intl.message(
+      'Settings',
+      name: 'appBar_settings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Yes`
+  String get dialogAction_yes {
+    return Intl.message(
+      'Yes',
+      name: 'dialogAction_yes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No`
+  String get dialogAction_no {
+    return Intl.message(
+      'No',
+      name: 'dialogAction_no',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `OK`
+  String get dialogAction_Ok {
+    return Intl.message(
+      'OK',
+      name: 'dialogAction_Ok',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cancel`
+  String get dialogAction_Cancel {
+    return Intl.message(
+      'Cancel',
+      name: 'dialogAction_Cancel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Continue`
+  String get dialogAction_Continue {
+    return Intl.message(
+      'Continue',
+      name: 'dialogAction_Continue',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `My securities`
   String get applicationTitle {
     return Intl.message(
@@ -145,10 +205,10 @@ class S {
     );
   }
 
-  /// `Portfolio {name} already exists`
+  /// `Portfolio '{name}' already exists`
   String db_portfolioAlreadyExists(Object name) {
     return Intl.message(
-      'Portfolio $name already exists',
+      'Portfolio \'$name\' already exists',
       name: 'db_portfolioAlreadyExists',
       desc: '',
       args: [name],
@@ -160,16 +220,6 @@ class S {
     return Intl.message(
       'Portfolio is not empty',
       name: 'db_portfolioNotEmpty',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Settings`
-  String get appBar_settings {
-    return Intl.message(
-      'Settings',
-      name: 'appBar_settings',
       desc: '',
       args: [],
     );
@@ -202,6 +252,26 @@ class S {
       name: 'portfolioListView_menuDelete',
       desc: '',
       args: [],
+    );
+  }
+
+  /// `Portfolio deletion`
+  String get portfolioListView_confirmDeleteDialogTitle {
+    return Intl.message(
+      'Portfolio deletion',
+      name: 'portfolioListView_confirmDeleteDialogTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Are you sure you want to delete portfolio '{name}'?`
+  String portfolioListView_confirmDeleteDialogContent(Object name) {
+    return Intl.message(
+      'Are you sure you want to delete portfolio \'$name\'?',
+      name: 'portfolioListView_confirmDeleteDialogContent',
+      desc: '',
+      args: [name],
     );
   }
 

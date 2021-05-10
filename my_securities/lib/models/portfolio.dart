@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_securities/models/operation.dart';
 import 'instrument.dart';
-import 'package:my_securities/common/database.dart';
+import 'package:my_securities/database.dart';
 
 class Portfolio extends ChangeNotifier {
   int _id;

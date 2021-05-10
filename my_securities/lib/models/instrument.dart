@@ -1,9 +1,11 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:my_securities/generated/l10n.dart';
-import 'package:my_securities/common/exchange.dart';
+import 'package:my_securities/exchange.dart';
 
-import '../common/database.dart';
+import '../database.dart';
+
+enum InstrumentType {currency, share, etf, federalBond, subfederalBond, corporateBond, futures, stockIndex}
 
 class Instrument extends ChangeNotifier{
   int _id;

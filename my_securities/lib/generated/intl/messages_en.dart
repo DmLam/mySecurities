@@ -19,7 +19,9 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'en';
 
-  static m0(name) => "Portfolio ${name} already exists";
+  static m0(name) => "Portfolio \'${name}\' already exists";
+
+  static m1(name) => "Are you sure you want to delete portfolio \'${name}\'?";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -28,6 +30,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "db_portfolioAlreadyExists" : m0,
     "db_portfolioNotEmpty" : MessageLookupByLibrary.simpleMessage("Portfolio is not empty"),
     "defaultPortfolioName" : MessageLookupByLibrary.simpleMessage("My portfolio"),
+    "dialogAction_Cancel" : MessageLookupByLibrary.simpleMessage("Cancel"),
+    "dialogAction_Continue" : MessageLookupByLibrary.simpleMessage("Continue"),
+    "dialogAction_Ok" : MessageLookupByLibrary.simpleMessage("OK"),
+    "dialogAction_no" : MessageLookupByLibrary.simpleMessage("No"),
+    "dialogAction_yes" : MessageLookupByLibrary.simpleMessage("Yes"),
     "instrumentTypeBond" : MessageLookupByLibrary.simpleMessage("Bond"),
     "instrumentTypeCurrency" : MessageLookupByLibrary.simpleMessage("Currency"),
     "instrumentTypeEtf" : MessageLookupByLibrary.simpleMessage("Etf"),
@@ -39,6 +46,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "pcs" : MessageLookupByLibrary.simpleMessage("pcs"),
     "portfolioEditDialog_Name" : MessageLookupByLibrary.simpleMessage("Name"),
     "portfolioEditDialog_startDate" : MessageLookupByLibrary.simpleMessage("Creation date"),
+    "portfolioListView_confirmDeleteDialogContent" : m1,
+    "portfolioListView_confirmDeleteDialogTitle" : MessageLookupByLibrary.simpleMessage("Portfolio deletion"),
     "portfolioListView_menuDelete" : MessageLookupByLibrary.simpleMessage("Delete"),
     "portfolioListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Edit"),
     "portfolioListView_portfolioStarted" : MessageLookupByLibrary.simpleMessage("Started")

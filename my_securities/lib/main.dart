@@ -4,8 +4,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:http_proxy/http_proxy.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'constants.dart';
 import 'generated/l10n.dart';
-import 'common/common.dart';
+import 'exchange.dart';
 import 'models/portfolio.dart';
 import 'pages/home_page.dart';
 
@@ -16,7 +17,8 @@ void main() async {
 
   // initialize constants
   await S.load(Locale(Intl.getCurrentLocale()));  // init localization
-  commonInit();
+  exchangeInit();
+  constantsInit();
 
   runApp(MySecuritiesApp());
 }

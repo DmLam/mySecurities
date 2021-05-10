@@ -1,7 +1,7 @@
-import 'package:flutter/cupertino.dart';
-import 'package:my_securities/common/exchange.dart';
+import 'package:flutter/material.dart';
+import 'package:my_securities/exchange.dart';
 
-import '../common/database.dart';
+import '../database.dart';
 
 enum OperationType {buy, sell}
 

@@ -1,7 +1,6 @@
 import 'package:my_securities/models/portfolio.dart';
 
-import '../common/exchange.dart';
-import '../common/common.dart';
+import '../exchange.dart';
 
 class Model {
   PortfolioList portfolios;
@@ -49,48 +48,4 @@ class Money {
       Money(currency: Currency.values[json["currency_id"] - 1],
         amount: json["amount"]
       );
-}
-
-class MoneyOperation {
-  int id;
-  Currency currency;
-  DateTime date;
-  MoneyOperationType type;
-  double amount;
-
-  MoneyOperation({this.id, this.currency, this.date, this.type, this.amount});
-
-  factory MoneyOperation.fromMap(Map<String, dynamic> json) =>
-      MoneyOperation(
-        id: json["id"],
-        currency: Currency.values[json["currency_id"] - 1],
-        date: DateTime.parse(json["date"]),
-        type: MoneyOperationType.values[json["type"] - 1],
-        amount: json["amount"]
-      );
-
-  MoneyOperation.empty() {
-    //DateTime now = DateTime.now();
-
-    id = null;
-    currency = null;
-    date = null; //DateTime(now.year, now.month, now.day);
-    type = null;
-    amount = 0;
-  }
-
-  MoneyOperation.from(MoneyOperation op) :
-    currency = op.currency,
-    date = op.date,
-    type = op.type,
-    amount = op.amount;
-
-  MoneyOperation assign(MoneyOperation op) {
-    currency = op.currency;
-    date = op.date;
-    type = op.type;
-    amount = op.amount;
-
-    return op;
-  }
 }

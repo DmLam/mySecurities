@@ -96,6 +96,8 @@ Map<String, Map<String, String>> EXCHANGES = { // ignore: non_constant_identifie
   'HSX': {'country': 'Vietnam', 'name': 'HoChiMinh Stock Exchange'},
 };
 
+final List CurrencyNames = Currency.values.map((currency) => currency.name()).toList(); // ignore: non_constant_identifier_names
+
 extension ExchangeExtenstion on Exchange {
   String name() {
     return this.toString().split('.').last;
@@ -142,6 +144,6 @@ String formatCurrency(double d, {Currency currency}) {
   return s;
 }
 
-enum InstrumentType {currency, share, etf, federalBond, subfederalBond, corporateBond, futures, stockIndex}
-
-
+void exchangeInit() {
+  // dummy function to init variables in the module
+}

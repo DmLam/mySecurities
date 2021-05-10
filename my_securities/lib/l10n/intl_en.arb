@@ -1,4 +1,12 @@
 {
+  "appBar_settings": "Settings",
+
+  "dialogAction_yes": "Yes",
+  "dialogAction_no": "No",
+  "dialogAction_Ok": "OK",
+  "dialogAction_Cancel": "Cancel",
+  "dialogAction_Continue": "Continue",
+
   "applicationTitle": "My securities",
   "defaultPortfolioName": "My portfolio",
 
@@ -12,13 +20,14 @@
   "instrumentTypeBond": "Bond",
   "pcs": "pcs",
 
-  "db_portfolioAlreadyExists": "Portfolio {name} already exists",
+  "db_portfolioAlreadyExists": "Portfolio '{name}' already exists",
   "db_portfolioNotEmpty": "Portfolio is not empty",
 
-  "appBar_settings": "Settings",
   "portfolioListView_portfolioStarted": "Started",
   "portfolioListView_menuEdit": "Edit",
   "portfolioListView_menuDelete": "Delete",
+  "portfolioListView_confirmDeleteDialogTitle": "Portfolio deletion",
+  "portfolioListView_confirmDeleteDialogContent": "Are you sure you want to delete portfolio '{name}'?",
 
   "portfolioEditDialog_Name": "Name",
   "portfolioEditDialog_startDate": "Creation date"

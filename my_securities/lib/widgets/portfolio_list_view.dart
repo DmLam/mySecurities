@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:my_securities/common/classes.dart';
+import 'package:my_securities/common/future_builder.dart';
+import 'package:my_securities/common/message_dialog.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/pages/portfolio_edit_dialog.dart';
 import 'package:my_securities/pages/portfolio_instruments_page.dart';
@@ -13,9 +14,7 @@ class PortfolioListView extends ListView {
   Widget build(BuildContext context) {
 
     return futureBuilder(
-        future: context
-            .watch<PortfolioList>()
-            .ready,
+        future: context.watch<PortfolioList>().ready,
         resultWidget: (_) {
           return ListView.builder(
               itemCount: context
@@ -37,29 +36,35 @@ class PortfolioListViewItem extends StatelessWidget {
 
   PortfolioListViewItem(this._portfolio);
 
+  _showPortfolioInstruments(BuildContext context) {
+    Navigator.of(context).push(
+        MaterialPageRoute(
+            builder: (_) => PortfolioInstrumentsPage(_portfolio)
+        )
+    );
+  }
+
+  _editPortfolio(BuildContext context) async {
+    Navigator.of(context).push(
+        MaterialPageRoute(
+            builder:(_) => PortfolioEditDialog(_portfolio)
+        )
+    );
+  }
+
+  _deletePortfolio(BuildContext context) async {
+    String portfolioName = context.read<Portfolio>().name;
+    String confirmation = await messageDialog(context,
+        S.of(context).portfolioListView_confirmDeleteDialogTitle,
+        S.of(context).portfolioListView_confirmDeleteDialogContent(portfolioName),
+        [S.of(context).dialogAction_Continue, S.of(context).dialogAction_Cancel]);
+
+    if (confirmation == S.of(context).dialogAction_Continue)
+      context.read<PortfolioList>().delete(_portfolio);
+  }
   @override
   Widget build(BuildContext context) {
     String started;
-
-    showPortfolioInstruments() {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => PortfolioInstrumentsPage(_portfolio)
-        )
-      );
-    }
-
-    editPortfolio() async {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder:(_) => PortfolioEditDialog(_portfolio)
-        )
-      );
-    }
-
-    deletePortfolio() async {
-      context.read<PortfolioList>().delete(_portfolio);
-    }
 
     return
       ChangeNotifierProvider<Portfolio>.value(
@@ -85,16 +90,15 @@ class PortfolioListViewItem extends StatelessWidget {
                     PopupMenuItem<String>(
                       value: 'delete',
                       child: Text(S.of(context).portfolioListView_menuDelete),
-                      enabled: _portfolio.operations.length == 0,
                     )
                   ],
                   onSelected: (value) {
                     switch (value) {
                       case 'edit':
-                        editPortfolio();
+                        _editPortfolio(context);
                         break;
                       case 'delete':
-                        deletePortfolio();
+                        _deletePortfolio(context);
                         break;
                       default:
                         throw Exception("Unknown instrument menu item");
@@ -103,7 +107,7 @@ class PortfolioListViewItem extends StatelessWidget {
               ),
               //          onLongPress: editOperation,
             ),
-            onTap: showPortfolioInstruments,
+            onTap: () {_showPortfolioInstruments(context);},
           );
         }
       );

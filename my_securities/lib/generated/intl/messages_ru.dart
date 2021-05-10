@@ -21,12 +21,20 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m0(name) => "Портфель ${name} уже существует";
 
+  static m1(name) => "Вы уверены, что хотите удалить портфель \'${name}\'?";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
     "appBar_settings" : MessageLookupByLibrary.simpleMessage("Настройки"),
+    "applicationTitle" : MessageLookupByLibrary.simpleMessage("My securities"),
     "db_portfolioAlreadyExists" : m0,
     "db_portfolioNotEmpty" : MessageLookupByLibrary.simpleMessage("Портфель не пуст"),
     "defaultPortfolioName" : MessageLookupByLibrary.simpleMessage("Мой портфель"),
+    "dialogAction_Cancel" : MessageLookupByLibrary.simpleMessage("Отмена"),
+    "dialogAction_Continue" : MessageLookupByLibrary.simpleMessage("Продолжить"),
+    "dialogAction_Ok" : MessageLookupByLibrary.simpleMessage("OK"),
+    "dialogAction_no" : MessageLookupByLibrary.simpleMessage("Нет"),
+    "dialogAction_yes" : MessageLookupByLibrary.simpleMessage("Да"),
     "instrumentTypeBond" : MessageLookupByLibrary.simpleMessage("Облигация"),
     "instrumentTypeCurrency" : MessageLookupByLibrary.simpleMessage("Валюта"),
     "instrumentTypeEtf" : MessageLookupByLibrary.simpleMessage("Фонд"),
@@ -38,6 +46,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "pcs" : MessageLookupByLibrary.simpleMessage("шт"),
     "portfolioEditDialog_Name" : MessageLookupByLibrary.simpleMessage("Наименование"),
     "portfolioEditDialog_startDate" : MessageLookupByLibrary.simpleMessage("Дата создания"),
+    "portfolioListView_confirmDeleteDialogContent" : m1,
+    "portfolioListView_confirmDeleteDialogTitle" : MessageLookupByLibrary.simpleMessage("Удаление портфеля"),
     "portfolioListView_menuDelete" : MessageLookupByLibrary.simpleMessage("Удалить"),
     "portfolioListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Редактировать"),
     "portfolioListView_portfolioStarted" : MessageLookupByLibrary.simpleMessage("Начат")

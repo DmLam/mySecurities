@@ -1,4 +1,13 @@
 {
+  "appBar_settings": "Настройки",
+
+  "dialogAction_yes": "Да",
+  "dialogAction_no": "Нет",
+  "dialogAction_Ok": "OK",
+  "dialogAction_Cancel": "Отмена",
+  "dialogAction_Continue": "Продолжить",
+
+  "applicationTitle": "My securities",
   "defaultPortfolioName": "Мой портфель",
 
   "operationTypeBuy": "Покупка",
@@ -14,10 +23,11 @@
   "db_portfolioAlreadyExists": "Портфель {name} уже существует",
   "db_portfolioNotEmpty": "Портфель не пуст",
 
-  "appBar_settings": "Настройки",
   "portfolioListView_portfolioStarted": "Начат",
   "portfolioListView_menuEdit": "Редактировать",
   "portfolioListView_menuDelete": "Удалить",
+  "portfolioListView_confirmDeleteDialogTitle": "Удаление портфеля",
+  "portfolioListView_confirmDeleteDialogContent": "Вы уверены, что хотите удалить портфель '{name}'?",
 
   "portfolioEditDialog_Name": "Наименование",
   "portfolioEditDialog_startDate": "Дата создания"
