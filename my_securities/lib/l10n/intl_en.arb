@@ -26,6 +26,7 @@
   "portfolioListView_portfolioStarted": "Started",
   "portfolioListView_menuEdit": "Edit",
   "portfolioListView_menuDelete": "Delete",
+  "portfolioListView_menuVisible": "Visible",
   "portfolioListView_confirmDeleteDialogTitle": "Portfolio deletion",
   "portfolioListView_confirmDeleteDialogContent": "Are you sure you want to delete portfolio '{name}'?",
 

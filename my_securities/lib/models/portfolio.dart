@@ -6,6 +6,7 @@ import 'package:my_securities/database.dart';
 class Portfolio extends ChangeNotifier {
   int _id;
   String _name;
+  bool _visible;
   DateTime _startDate;
 
   InstrumentList _instruments;
@@ -15,6 +16,13 @@ class Portfolio extends ChangeNotifier {
   String get name => _name;
   set name(String name) {
     _name = name;
+    DBProvider.db.updatePortfolio(this);
+    notifyListeners();
+  }
+  bool get visible => _visible;
+  set visible(bool visible) {
+    _visible = visible;
+    DBProvider.db.updatePortfolio(this);
     notifyListeners();
   }
   DateTime get startDate => _startDate;
@@ -22,7 +30,7 @@ class Portfolio extends ChangeNotifier {
   InstrumentList get instruments => _instruments;
   OperationList get operations => _operations;
 
-  Portfolio(this._id, this._name, this._startDate) {
+  Portfolio(this._id, this._name, this._visible, this._startDate) {
     _instruments = InstrumentList(_id);
     _operations = OperationList(_id);
   }
@@ -30,12 +38,14 @@ class Portfolio extends ChangeNotifier {
   Portfolio.empty() :
     _id = null,
     _name = "",
+    _visible = true,
     _startDate = null;
 
   factory Portfolio.fromMap(Map<String, dynamic> json) =>
     Portfolio(
       json["id"],
       json["name"],
+      json["visible"] == 1,
       json["start_date"] == null ? null : DateTime.parse(json["start_date"])
     );
 
@@ -59,6 +69,7 @@ class PortfolioList extends ChangeNotifier {
   Future get ready => _ready;
 
   List<Portfolio> get portfolios => [..._portfolios];
+  List<Portfolio> get visiblePortfolios => [..._portfolios].where((item) => item.visible);
 
   PortfolioList() {
     _ready = _init();
@@ -74,10 +85,8 @@ class PortfolioList extends ChangeNotifier {
 
     if (result){
       _portfolios = await DBProvider.db.getPortfolios();
-      result = true;
+      notifyListeners();
     }
-
-    notifyListeners();
 
     return Future.value(result);
   }

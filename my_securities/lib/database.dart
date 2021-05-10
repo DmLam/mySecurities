@@ -78,7 +78,8 @@ class DBProvider {
     await db.execute(
       '''CREATE TABLE portfolio (
          id INTEGER PRIMARY KEY AUTOINCREMENT,
-         name TEXT NOT NULL UNIQUE)''');
+         name TEXT NOT NULL UNIQUE,
+         visible BOOLEAN NOT NULL CHECK (visible IN (0, 1)))''');
   }
   Future<void> _createTableInstrumentType(Database db) async {
     await db.execute('CREATE TABLE instrument_type (id INTEGER PRIMARY KEY, name TEXT NOT NULL);');
@@ -622,7 +623,7 @@ class DBProvider {
     List<Portfolio> result;
 
     List<Map<String, dynamic>> portfolios = await db.rawQuery(
-        '''SELECT p.id, p.name, 
+        '''SELECT p.id, p.name, p.visible,
              (SELECT min(o.date) FROM operation o, portfolio_instrument pi WHERE o.portfolio_instrument_id = pi.id  AND pi.portfolio_id = p.id) start_date 
            FROM portfolio p'''
     );
@@ -666,7 +667,14 @@ class DBProvider {
       Fluttertoast.showToast(msg: "Internal error: updating portfolio without id");
     else {
       try {
-        await db.update('portfolio', {'name': portfolio.name}, where: 'id = ?', whereArgs: [portfolio.id]);
+        await db.update(
+            'portfolio',
+            {
+              'name': portfolio.name,
+              'visible': portfolio.visible ? 1 : 0,
+            },
+            where: 'id = ?',
+            whereArgs: [portfolio.id]);
         result = true;
       }
       catch(e) {

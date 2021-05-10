@@ -50,6 +50,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "portfolioListView_confirmDeleteDialogTitle" : MessageLookupByLibrary.simpleMessage("Удаление портфеля"),
     "portfolioListView_menuDelete" : MessageLookupByLibrary.simpleMessage("Удалить"),
     "portfolioListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Редактировать"),
+    "portfolioListView_menuVisible" : MessageLookupByLibrary.simpleMessage("Видимый"),
     "portfolioListView_portfolioStarted" : MessageLookupByLibrary.simpleMessage("Начат")
   };
 }

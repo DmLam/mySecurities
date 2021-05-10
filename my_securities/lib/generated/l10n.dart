@@ -255,6 +255,16 @@ class S {
     );
   }
 
+  /// `Visible`
+  String get portfolioListView_menuVisible {
+    return Intl.message(
+      'Visible',
+      name: 'portfolioListView_menuVisible',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Portfolio deletion`
   String get portfolioListView_confirmDeleteDialogTitle {
     return Intl.message(

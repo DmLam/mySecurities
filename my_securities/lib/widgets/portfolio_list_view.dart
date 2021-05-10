@@ -62,6 +62,11 @@ class PortfolioListViewItem extends StatelessWidget {
     if (confirmation == S.of(context).dialogAction_Continue)
       context.read<PortfolioList>().delete(_portfolio);
   }
+
+  _updatePortfolioVisibility(BuildContext context) {
+    _portfolio.visible = !_portfolio.visible;
+  }
+
   @override
   Widget build(BuildContext context) {
     String started;
@@ -90,7 +95,11 @@ class PortfolioListViewItem extends StatelessWidget {
                     PopupMenuItem<String>(
                       value: 'delete',
                       child: Text(S.of(context).portfolioListView_menuDelete),
-                    )
+                    ),
+                    PopupMenuItem<String>(
+                      value: 'visible',
+                      child: Text(S.of(context).portfolioListView_menuVisible),
+                    ),
                   ],
                   onSelected: (value) {
                     switch (value) {
@@ -99,6 +108,9 @@ class PortfolioListViewItem extends StatelessWidget {
                         break;
                       case 'delete':
                         _deletePortfolio(context);
+                        break;
+                      case 'visible':
+                        _updatePortfolioVisibility(context);
                         break;
                       default:
                         throw Exception("Unknown instrument menu item");
