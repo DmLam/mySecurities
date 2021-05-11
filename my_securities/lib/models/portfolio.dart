@@ -4,6 +4,7 @@ import 'instrument.dart';
 import 'package:my_securities/database.dart';
 
 class Portfolio extends ChangeNotifier {
+  PortfolioList _owner;
   int _id;
   String _name;
   bool _visible;
@@ -23,7 +24,7 @@ class Portfolio extends ChangeNotifier {
   set visible(bool visible) {
     _visible = visible;
     DBProvider.db.updatePortfolio(this);
-    notifyListeners();
+    _owner.notifyListeners();
   }
   DateTime get startDate => _startDate;
 
@@ -75,16 +76,20 @@ class PortfolioList extends ChangeNotifier {
     _ready = _init();
   }
 
+  _getPortfolios() async {
+    _portfolios = await DBProvider.db.getPortfolios();
+    _portfolios.forEach((element) {element._owner = this;});
+  }
+
   Future _init() async{
-    final data = await DBProvider.db.getPortfolios();
-    _portfolios = data;
+    await _getPortfolios();
   }
 
   Future<bool> add(Portfolio portfolio) async {
     bool result = await DBProvider.db.addPortfolio(portfolio);
 
     if (result){
-      _portfolios = await DBProvider.db.getPortfolios();
+      await _getPortfolios();
       notifyListeners();
     }
 
@@ -95,7 +100,7 @@ class PortfolioList extends ChangeNotifier {
     bool result = await DBProvider.db.deletePortfolio(portfolio);
 
     if (result){
-      _portfolios = await DBProvider.db.getPortfolios();
+      await _getPortfolios();
       notifyListeners();
     }
 

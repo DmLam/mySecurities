@@ -16,15 +16,12 @@ class PortfolioListView extends ListView {
     return futureBuilder(
         future: context.watch<PortfolioList>().ready,
         resultWidget: (_) {
+          PortfolioList list = context.read<PortfolioList>();
+
           return ListView.builder(
-              itemCount: context
-                  .read<PortfolioList>()
-                  .portfolios
-                  .length,
+              itemCount: list.portfolios.length,
               itemBuilder: (context, index) =>
-                  PortfolioListViewItem(context
-                      .read<PortfolioList>()
-                      .portfolios[index])
+                  PortfolioListViewItem(list.portfolios[index])
           );
         }
     );
@@ -79,10 +76,15 @@ class PortfolioListViewItem extends StatelessWidget {
             started = S.of(context).portfolioListView_portfolioStarted + ': '+
                 DateFormat('dd.MM.yyyy').format(context.read<Portfolio>().startDate);
 
+
           return GestureDetector(
             child: ListTile(
               title: Text(context.watch<Portfolio>().name,
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: _portfolio.visible ? Theme.of(context).textTheme.subtitle1.color : Theme.of(context).disabledColor
+                ),
               ),
               subtitle: Text(started ?? ''),
               trailing: PopupMenuButton(
@@ -96,9 +98,10 @@ class PortfolioListViewItem extends StatelessWidget {
                       value: 'delete',
                       child: Text(S.of(context).portfolioListView_menuDelete),
                     ),
-                    PopupMenuItem<String>(
+                    CheckedPopupMenuItem<String>(
                       value: 'visible',
                       child: Text(S.of(context).portfolioListView_menuVisible),
+                      checked: _portfolio.visible,
                     ),
                   ],
                   onSelected: (value) {

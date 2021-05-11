@@ -76,10 +76,10 @@ class DBProvider {
   }
   Future<void> _createTablePortfolio(Database db) async{
     await db.execute(
-      '''CREATE TABLE portfolio (
-         id INTEGER PRIMARY KEY AUTOINCREMENT,
-         name TEXT NOT NULL UNIQUE,
-         visible BOOLEAN NOT NULL CHECK (visible IN (0, 1)))''');
+        '''CREATE TABLE portfolio (
+           id INTEGER PRIMARY KEY AUTOINCREMENT,
+           name TEXT NOT NULL UNIQUE,
+           visible BOOLEAN NOT NULL CHECK (visible IN (0, 1)) DEFAULT 1)''');
   }
   Future<void> _createTableInstrumentType(Database db) async {
     await db.execute('CREATE TABLE instrument_type (id INTEGER PRIMARY KEY, name TEXT NOT NULL);');
@@ -193,6 +193,7 @@ class DBProvider {
     await db.execute('''CREATE TABLE preference (
                         id INTEGER PRIMARY KEY,
                         main_currency_id INTEGER,
+                        show_hidden_portfolios BOOLEAN NOT NULL CHECK (visible IN (0, 1)) DEFAULT 0), 
                         FOREIGN KEY (main_currency_id) REFERENCES currency(id)
                           ON DELETE RESTRICT ON UPDATE RESTRICT)''');
     await db.insert('preference', {'id': 1});
@@ -292,24 +293,31 @@ class DBProvider {
     );
   }
 
-  Future<Currency> setPreferenceMainCurrency(Currency mainCurrency) async {
+  _setPreference(final String preference, final dynamic value) async {
     final Database db = await database;
-    await db.update('preference', {'main_currency_id': Currency.values.indexOf(mainCurrency) + 1}, where: 'id = 1');
+    await db.update('preference', {preference: value}, where: 'id = 1');
+  }
 
-    return Future.value(mainCurrency);
+  setPreferenceMainCurrency(final Currency mainCurrency) async {
+    await _setPreference('main_currency_id', Currency.values.indexOf(mainCurrency) + 1);
+  }
+
+  Future<dynamic> _getPreference(final String preference) async {
+    final Database db = await database;
+    dynamic result;
+    List<Map<String, dynamic>> q = await db.query('preference', columns: [preference], where: 'id = 1');
+
+    result = q[0][preference];
+
+    return Future.value(result);
   }
 
   Future<Currency> getPreferenceMainCurrency() async {
-    final Database db = await database;
+    int idx = await _getPreference('main_currency_id');
     Currency result;
 
-    List<Map<String, dynamic>> q = await db.query('preference', columns: ['main_currency_id'], where: 'id = 1');
-    if (q.isNotEmpty) {
-      int idx = q[0]['main_currency_id'];
-
-      if (idx != null) {
-        result = Currency.values[idx - 1];
-      }
+    if (idx != null) {
+      result = Currency.values[idx - 1];
     }
 
     return Future.value(result);
