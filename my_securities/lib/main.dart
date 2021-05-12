@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:http_proxy/http_proxy.dart';
 import 'package:intl/intl.dart';
+import 'package:my_securities/preferences.dart';
 import 'package:provider/provider.dart';
 import 'constants.dart';
 import 'generated/l10n.dart';
@@ -27,8 +28,11 @@ class MySecuritiesApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return
-      ChangeNotifierProvider<PortfolioList>(
-        create: (_) => PortfolioList(),
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<PortfolioList>(create: (_) => PortfolioList()),
+          ChangeNotifierProvider<Preferences>(create: (_) => Preferences())
+        ],
         child: MaterialApp(
           localizationsDelegates: [
             S.delegate,
@@ -40,7 +44,6 @@ class MySecuritiesApp extends StatelessWidget {
           title: "My securities",
           home: HomePage()
         )
-      );
+    );
   }
 }
-

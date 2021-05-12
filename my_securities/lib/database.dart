@@ -199,11 +199,6 @@ class DBProvider {
     await db.insert('preference', {'id': 1});
   }
 
-  Future initDatabase(Database db) async {
-    await db.execute('PRAGMA foreign_keys = ON');
-//    await db.execute('PRAGMA user_version = 1');
-  }
-
   Future createTables(Database db) async {
     // справочник валют
     await _createTableCurrency(db);
@@ -259,6 +254,7 @@ class DBProvider {
   void _onConfigure(Database db) async {
     // Add support for cascade delete
     await db.execute("PRAGMA foreign_keys = ON");
+//    await db.execute('PRAGMA user_version = 1');
   }
   void _onCreate(Database db, int version) async {
     _database = db;
@@ -281,7 +277,7 @@ class DBProvider {
 
   initDB() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, "MyPortfolio.db");
+    String path = join(documentsDirectory.path, "mysecurities.db");
     await deleteDatabase(path); // пока идет отладка
     await openDatabase(path,
       version: CURRENT_DB_VERSION,
