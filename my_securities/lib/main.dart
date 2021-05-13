@@ -30,8 +30,8 @@ class MySecuritiesApp extends StatelessWidget {
     return
       MultiProvider(
         providers: [
-          ChangeNotifierProvider<PortfolioList>(create: (_) => PortfolioList()),
-          ChangeNotifierProvider<Preferences>(create: (_) => Preferences())
+          ChangeNotifierProvider<Preferences>(create: (_) => Preferences()),
+          ChangeNotifierProvider<PortfolioList>(create: (_) => PortfolioList())
         ],
         child: MaterialApp(
           localizationsDelegates: [

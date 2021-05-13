@@ -51,6 +51,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "portfolioListView_menuDelete" : MessageLookupByLibrary.simpleMessage("Delete"),
     "portfolioListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Edit"),
     "portfolioListView_menuVisible" : MessageLookupByLibrary.simpleMessage("Visible"),
-    "portfolioListView_portfolioStarted" : MessageLookupByLibrary.simpleMessage("Started")
+    "portfolioListView_portfolioStarted" : MessageLookupByLibrary.simpleMessage("Started"),
+    "prefMainCurrencyTitle" : MessageLookupByLibrary.simpleMessage("Main currency"),
+    "prefShowHiddenPortfoliosTitle" : MessageLookupByLibrary.simpleMessage("Show hidden portfolios")
   };
 }

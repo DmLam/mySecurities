@@ -31,6 +31,9 @@
   "portfolioListView_confirmDeleteDialogContent": "Are you sure you want to delete portfolio '{name}'?",
 
   "portfolioEditDialog_Name": "Name",
-  "portfolioEditDialog_startDate": "Creation date"
+  "portfolioEditDialog_startDate": "Creation date",
+
+  "prefShowHiddenPortfoliosTitle": "Show hidden portfolios",
+  "prefMainCurrencyTitle": "Main currency"
 
 }

@@ -8,6 +8,8 @@ import 'package:my_securities/pages/portfolio_instruments_page.dart';
 import 'package:provider/provider.dart';
 import 'package:my_securities/models/portfolio.dart';
 
+import '../preferences.dart';
+
 // https://stackoverflow.com/questions/64936531/provider-integration-with-sqflite-in-flutter-app
 class PortfolioListView extends ListView {
   @override
@@ -15,15 +17,19 @@ class PortfolioListView extends ListView {
 
     return futureBuilder(
         future: context.watch<PortfolioList>().ready,
-        resultWidget: (_) {
-          PortfolioList list = context.read<PortfolioList>();
+        resultWidget: (_) => futureBuilder(
+          future: context.watch<Preferences>().ready,
+          resultWidget: (_)
+          {
+            PortfolioList list = context.read<PortfolioList>();
 
-          return ListView.builder(
-              itemCount: list.portfolios.length,
-              itemBuilder: (context, index) =>
-                  PortfolioListViewItem(list.portfolios[index])
-          );
-        }
+            return ListView.builder(
+                itemCount: list.portfolios.length,
+                itemBuilder: (context, index) =>
+                    PortfolioListViewItem(list.portfolios[index])
+            );
+          }
+        )
     );
   }
 }

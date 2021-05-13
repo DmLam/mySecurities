@@ -5,33 +5,36 @@ import 'exchange.dart';
 
 class Preferences extends ChangeNotifier {
   // names for preferences
-  static final String _pref_MAIN_CURRENCY_ID = 'main_currency_id'; // ignore: non_constant_identifier_names
-  static final String _pref_SHOW_HIDDEN_PORTFOLIOS = 'show_hidden_portfolios'; // ignore: non_constant_identifier_names
+  static final String prefMAIN_CURRENCY_ID = 'main_currency_id'; // ignore: non_constant_identifier_names
+  static final String prefSHOW_HIDDEN_PORTFOLIOS = 'show_hidden_portfolios'; // ignore: non_constant_identifier_names
 
   static PrefServiceShared _service;
+  Future _ready;
+
+  Future get ready => _ready;
 
   Preferences() {
     if (_service == null)
-      _initService();
+      _ready = _init();
   }
 
-  _initService() async {
+  Future _init() async {
     _service = await PrefServiceShared.init(
         defaults: {
-          _pref_MAIN_CURRENCY_ID: Currency.USD.index,
-          _pref_SHOW_HIDDEN_PORTFOLIOS: false
+          prefMAIN_CURRENCY_ID: Currency.USD.index,
+          prefSHOW_HIDDEN_PORTFOLIOS: false
         }
     );
   }
 
-  Currency get mainCurrency => Currency.values[_service.sharedPreferences.getInt(_pref_MAIN_CURRENCY_ID)];
+  Currency get mainCurrency => Currency.values[_service.sharedPreferences.getInt(prefMAIN_CURRENCY_ID)];
   set mainCurrency(Currency currency) {
-    _service.sharedPreferences.setInt(_pref_MAIN_CURRENCY_ID, currency.index);
+    _service.sharedPreferences.setInt(prefMAIN_CURRENCY_ID, currency.index);
     notifyListeners();
   }
-  bool get showHiddenPortfolio => _service.sharedPreferences.getBool(_pref_SHOW_HIDDEN_PORTFOLIOS);
+  bool get showHiddenPortfolio => _service.sharedPreferences.getBool(prefSHOW_HIDDEN_PORTFOLIOS);
   set showHiddenPortfolio(bool show) {
-    _service.sharedPreferences.setBool(_pref_SHOW_HIDDEN_PORTFOLIOS, show);
+    _service.sharedPreferences.setBool(prefSHOW_HIDDEN_PORTFOLIOS, show);
     notifyListeners();
   }
 }

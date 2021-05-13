@@ -193,7 +193,7 @@ class DBProvider {
     await db.execute('''CREATE TABLE preference (
                         id INTEGER PRIMARY KEY,
                         main_currency_id INTEGER,
-                        show_hidden_portfolios BOOLEAN NOT NULL CHECK (visible IN (0, 1)) DEFAULT 0), 
+                        show_hidden_portfolios BOOLEAN NOT NULL CHECK (show_hidden_portfolios IN (0, 1)) DEFAULT 0, 
                         FOREIGN KEY (main_currency_id) REFERENCES currency(id)
                           ON DELETE RESTRICT ON UPDATE RESTRICT)''');
     await db.insert('preference', {'id': 1});

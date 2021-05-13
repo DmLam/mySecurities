@@ -304,6 +304,26 @@ class S {
       args: [],
     );
   }
+
+  /// `Show hidden portfolios`
+  String get prefShowHiddenPortfoliosTitle {
+    return Intl.message(
+      'Show hidden portfolios',
+      name: 'prefShowHiddenPortfoliosTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Main currency`
+  String get prefMainCurrencyTitle {
+    return Intl.message(
+      'Main currency',
+      name: 'prefMainCurrencyTitle',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
