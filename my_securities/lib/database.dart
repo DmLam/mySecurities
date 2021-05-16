@@ -278,7 +278,7 @@ class DBProvider {
   initDB() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, "mysecurities.db");
-    await deleteDatabase(path); // пока идет отладка
+//    await deleteDatabase(path); // пока идет отладка
     await openDatabase(path,
       version: CURRENT_DB_VERSION,
       onConfigure: _onConfigure,

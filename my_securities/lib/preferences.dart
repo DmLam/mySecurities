@@ -12,6 +12,7 @@ class Preferences extends ChangeNotifier {
   Future _ready;
 
   Future get ready => _ready;
+  PrefServiceShared get service => _service;
 
   Preferences() {
     if (_service == null)
@@ -25,16 +26,10 @@ class Preferences extends ChangeNotifier {
           prefSHOW_HIDDEN_PORTFOLIOS: false
         }
     );
+    _service.addKeyListener(prefMAIN_CURRENCY_ID, () {notifyListeners();});
+    _service.addKeyListener(prefSHOW_HIDDEN_PORTFOLIOS, () {notifyListeners();});
   }
 
   Currency get mainCurrency => Currency.values[_service.sharedPreferences.getInt(prefMAIN_CURRENCY_ID)];
-  set mainCurrency(Currency currency) {
-    _service.sharedPreferences.setInt(prefMAIN_CURRENCY_ID, currency.index);
-    notifyListeners();
-  }
-  bool get showHiddenPortfolio => _service.sharedPreferences.getBool(prefSHOW_HIDDEN_PORTFOLIOS);
-  set showHiddenPortfolio(bool show) {
-    _service.sharedPreferences.setBool(prefSHOW_HIDDEN_PORTFOLIOS, show);
-    notifyListeners();
-  }
+  bool get showHiddenPortfolios => _service.sharedPreferences.getBool(prefSHOW_HIDDEN_PORTFOLIOS);
 }

@@ -36,7 +36,8 @@ class Portfolio extends ChangeNotifier {
     _operations = OperationList(_id);
   }
 
-  Portfolio.empty() :
+  Portfolio.empty(PortfolioList owner) :
+    _owner = owner,
     _id = null,
     _name = "",
     _visible = true,

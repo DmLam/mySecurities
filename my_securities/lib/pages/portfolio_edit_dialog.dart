@@ -11,8 +11,8 @@ class PortfolioEditDialog extends StatelessWidget {
   final TextEditingController _nameEditController = TextEditingController();
 
   PortfolioEditDialog(this._portfolio, {Key key}) : super(key: key) {
-    if (_portfolio.id == null)
-      _portfolio.visible = true;
+    assert(_portfolio != null);
+    _portfolio.visible = true;
     _nameEditController.text = _portfolio?.name;
   }
 

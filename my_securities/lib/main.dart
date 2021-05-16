@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:http_proxy/http_proxy.dart';
 import 'package:intl/intl.dart';
 import 'package:my_securities/preferences.dart';
+import 'package:pref/pref.dart';
 import 'package:provider/provider.dart';
 import 'constants.dart';
 import 'generated/l10n.dart';
@@ -16,12 +17,20 @@ void main() async {
   HttpProxy httpProxy = await HttpProxy.createHttpProxy();
   HttpOverrides.global = httpProxy;
 
+  Preferences preferences = Preferences();
+  await preferences.ready;
+
   // initialize constants
   await S.load(Locale(Intl.getCurrentLocale()));  // init localization
   exchangeInit();
   constantsInit();
 
-  runApp(MySecuritiesApp());
+  runApp(
+    PrefService(
+      service: preferences.service,
+      child: MySecuritiesApp()
+    )
+  );
 }
 
 class MySecuritiesApp extends StatelessWidget {
