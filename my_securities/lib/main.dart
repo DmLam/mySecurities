@@ -28,18 +28,23 @@ void main() async {
   runApp(
     PrefService(
       service: preferences.service,
-      child: MySecuritiesApp()
+      child: MySecuritiesApp(preferences)
     )
   );
 }
 
 class MySecuritiesApp extends StatelessWidget {
+  final Preferences _preferences;
+
+
+  MySecuritiesApp(this._preferences);
+
   @override
   Widget build(BuildContext context) {
     return
       MultiProvider(
         providers: [
-          ChangeNotifierProvider<Preferences>(create: (_) => Preferences()),
+          ChangeNotifierProvider<Preferences>.value(value: _preferences),
           ChangeNotifierProvider<PortfolioList>(create: (_) => PortfolioList())
         ],
         child: MaterialApp(

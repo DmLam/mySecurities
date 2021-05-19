@@ -71,7 +71,7 @@ class PortfolioList extends ChangeNotifier {
   Future get ready => _ready;
 
   List<Portfolio> get portfolios => [..._portfolios];
-  List<Portfolio> get visiblePortfolios => [..._portfolios].where((item) => item.visible);
+  List<Portfolio> get visiblePortfolios => [..._portfolios.where((item) => item.visible)];
 
   PortfolioList() {
     _ready = _init();

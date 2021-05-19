@@ -26,8 +26,12 @@ class Preferences extends ChangeNotifier {
           prefSHOW_HIDDEN_PORTFOLIOS: false
         }
     );
-    _service.addKeyListener(prefMAIN_CURRENCY_ID, () {notifyListeners();});
-    _service.addKeyListener(prefSHOW_HIDDEN_PORTFOLIOS, () {notifyListeners();});
+    _service.addKeyListener(prefMAIN_CURRENCY_ID, () {
+      notifyListeners();
+    });
+    _service.addKeyListener(prefSHOW_HIDDEN_PORTFOLIOS, () {
+      notifyListeners();
+    });
   }
 
   Currency get mainCurrency => Currency.values[_service.sharedPreferences.getInt(prefMAIN_CURRENCY_ID)];

@@ -20,7 +20,7 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
       appBar: MySecuritiesAppBar(),
-      body: PortfolioListView(context.read<Preferences>()),
+      body:  PortfolioListView(context.watch<Preferences>()),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: addPortfolio,
