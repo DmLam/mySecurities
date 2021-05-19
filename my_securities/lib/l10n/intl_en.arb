@@ -33,9 +33,10 @@
   "portfolioEditDialog_Name": "Name",
   "portfolioEditDialog_startDate": "Creation date",
 
+  "prefTitleMain": "Main",
+  "prefMainCurrencyTitle": "Main currency",
   "prefTitleAppearance": "Appearance",
   "prefDarkTheme": "Dark theme",
-  "prefShowHiddenPortfoliosTitle": "Show hidden portfolios",
-  "prefMainCurrencyTitle": "Main currency"
+  "prefShowHiddenPortfoliosTitle": "Show hidden portfolios"
 
 }

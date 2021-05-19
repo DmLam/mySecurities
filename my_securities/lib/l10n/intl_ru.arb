@@ -33,8 +33,9 @@
   "portfolioEditDialog_Name": "Наименование",
   "portfolioEditDialog_startDate": "Дата создания",
 
+  "prefTitleMain": "Основные",
+  "prefMainCurrencyTitle": "Основная валюта",
   "prefTitleAppearance": "Внешний вид",
   "prefDarkTheme": "Темная тема",
-  "prefShowHiddenPortfoliosTitle": "Показывать скрытые портфели",
-  "prefMainCurrencyTitle": "Основная валюта"
+  "prefShowHiddenPortfoliosTitle": "Показывать скрытые портфели"
 }

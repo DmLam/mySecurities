@@ -55,6 +55,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "prefDarkTheme" : MessageLookupByLibrary.simpleMessage("Темная тема"),
     "prefMainCurrencyTitle" : MessageLookupByLibrary.simpleMessage("Основная валюта"),
     "prefShowHiddenPortfoliosTitle" : MessageLookupByLibrary.simpleMessage("Показывать скрытые портфели"),
-    "prefTitleAppearance" : MessageLookupByLibrary.simpleMessage("Внешний вид")
+    "prefTitleAppearance" : MessageLookupByLibrary.simpleMessage("Внешний вид"),
+    "prefTitleMain" : MessageLookupByLibrary.simpleMessage("Основные")
   };
 }

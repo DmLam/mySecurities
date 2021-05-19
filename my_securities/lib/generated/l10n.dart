@@ -305,6 +305,26 @@ class S {
     );
   }
 
+  /// `Main`
+  String get prefTitleMain {
+    return Intl.message(
+      'Main',
+      name: 'prefTitleMain',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Main currency`
+  String get prefMainCurrencyTitle {
+    return Intl.message(
+      'Main currency',
+      name: 'prefMainCurrencyTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Appearance`
   String get prefTitleAppearance {
     return Intl.message(
@@ -330,16 +350,6 @@ class S {
     return Intl.message(
       'Show hidden portfolios',
       name: 'prefShowHiddenPortfoliosTitle',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Main currency`
-  String get prefMainCurrencyTitle {
-    return Intl.message(
-      'Main currency',
-      name: 'prefMainCurrencyTitle',
       desc: '',
       args: [],
     );
