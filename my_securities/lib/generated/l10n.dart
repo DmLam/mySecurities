@@ -305,6 +305,26 @@ class S {
     );
   }
 
+  /// `Appearance`
+  String get prefTitleAppearance {
+    return Intl.message(
+      'Appearance',
+      name: 'prefTitleAppearance',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Dark theme`
+  String get prefDarkTheme {
+    return Intl.message(
+      'Dark theme',
+      name: 'prefDarkTheme',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Show hidden portfolios`
   String get prefShowHiddenPortfoliosTitle {
     return Intl.message(

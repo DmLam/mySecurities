@@ -36,28 +36,33 @@ void main() async {
 class MySecuritiesApp extends StatelessWidget {
   final Preferences _preferences;
 
-
   MySecuritiesApp(this._preferences);
 
   @override
   Widget build(BuildContext context) {
     return
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider<Preferences>.value(value: _preferences),
-          ChangeNotifierProvider<PortfolioList>(create: (_) => PortfolioList())
-        ],
-        child: MaterialApp(
-          localizationsDelegates: [
-            S.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: S.delegate.supportedLocales,
-          title: "My securities",
-          home: HomePage()
-        )
-    );
+      ChangeNotifierProvider<Preferences>.value(
+        value: _preferences,
+        builder: (context, widget) {
+          return
+            ChangeNotifierProvider<PortfolioList>(
+                    create: (_) => PortfolioList(),
+              child: MaterialApp(
+                  localizationsDelegates: [
+                    S.delegate,
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                  ],
+                  supportedLocales: S.delegate.supportedLocales,
+                  title: "My securities",
+                  theme: context
+                      .watch<Preferences>()
+                      .darkTheme ? ThemeData.dark() : ThemeData.light(),
+                  home: HomePage()
+              )
+          );
+        });
   }
 }
+

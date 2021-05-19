@@ -52,7 +52,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "portfolioListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Edit"),
     "portfolioListView_menuVisible" : MessageLookupByLibrary.simpleMessage("Visible"),
     "portfolioListView_portfolioStarted" : MessageLookupByLibrary.simpleMessage("Started"),
+    "prefDarkTheme" : MessageLookupByLibrary.simpleMessage("Dark theme"),
     "prefMainCurrencyTitle" : MessageLookupByLibrary.simpleMessage("Main currency"),
-    "prefShowHiddenPortfoliosTitle" : MessageLookupByLibrary.simpleMessage("Show hidden portfolios")
+    "prefShowHiddenPortfoliosTitle" : MessageLookupByLibrary.simpleMessage("Show hidden portfolios"),
+    "prefTitleAppearance" : MessageLookupByLibrary.simpleMessage("Appearance")
   };
 }

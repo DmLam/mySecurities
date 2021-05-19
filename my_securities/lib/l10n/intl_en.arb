@@ -33,6 +33,8 @@
   "portfolioEditDialog_Name": "Name",
   "portfolioEditDialog_startDate": "Creation date",
 
+  "prefTitleAppearance": "Appearance",
+  "prefDarkTheme": "Dark theme",
   "prefShowHiddenPortfoliosTitle": "Show hidden portfolios",
   "prefMainCurrencyTitle": "Main currency"
 

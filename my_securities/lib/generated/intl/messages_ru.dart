@@ -51,6 +51,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "portfolioListView_menuDelete" : MessageLookupByLibrary.simpleMessage("Удалить"),
     "portfolioListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Редактировать"),
     "portfolioListView_menuVisible" : MessageLookupByLibrary.simpleMessage("Видимый"),
-    "portfolioListView_portfolioStarted" : MessageLookupByLibrary.simpleMessage("Начат")
+    "portfolioListView_portfolioStarted" : MessageLookupByLibrary.simpleMessage("Начат"),
+    "prefDarkTheme" : MessageLookupByLibrary.simpleMessage("Темная тема"),
+    "prefMainCurrencyTitle" : MessageLookupByLibrary.simpleMessage("Основная валюта"),
+    "prefShowHiddenPortfoliosTitle" : MessageLookupByLibrary.simpleMessage("Показывать скрытые портфели"),
+    "prefTitleAppearance" : MessageLookupByLibrary.simpleMessage("Внешний вид")
   };
 }

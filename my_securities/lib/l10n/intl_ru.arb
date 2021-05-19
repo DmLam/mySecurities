@@ -31,5 +31,10 @@
   "portfolioListView_confirmDeleteDialogContent": "Вы уверены, что хотите удалить портфель '{name}'?",
 
   "portfolioEditDialog_Name": "Наименование",
-  "portfolioEditDialog_startDate": "Дата создания"
+  "portfolioEditDialog_startDate": "Дата создания",
+
+  "prefTitleAppearance": "Внешний вид",
+  "prefDarkTheme": "Темная тема",
+  "prefShowHiddenPortfoliosTitle": "Показывать скрытые портфели",
+  "prefMainCurrencyTitle": "Основная валюта"
 }
