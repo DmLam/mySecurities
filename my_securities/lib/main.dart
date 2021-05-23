@@ -17,7 +17,7 @@ void main() async {
   HttpProxy httpProxy = await HttpProxy.createHttpProxy();
   HttpOverrides.global = httpProxy;
 
-  Preferences preferences = Preferences();
+  Preferences preferences = Preferences.preferences();
   await preferences.ready;
 
   // initialize constants

@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/exchange.dart';
+import 'package:my_securities/models/portfolio.dart';
 
 import '../database.dart';
 
@@ -31,6 +32,11 @@ class Instrument extends ChangeNotifier{
   InstrumentType get type => _type;
   Exchange get exchange => _exchange;
   Uint8List get image => _image;
+  set image(Uint8List value) {
+    _image = value;
+    DBProvider.db.setInstrumentImage(_id, _image);
+    notifyListeners();
+  }
   String get additional => _additional;
   int get portfolioPercentPlan => _portfolioPercentPlan;
   int get quantity => _quantity;
@@ -127,15 +133,13 @@ class Instrument extends ChangeNotifier{
     this._currency = source.currency;
     this._type = source.type;
     this._exchange = source.exchange;
-    this._image = source.image;
+    this._image = Uint8List.fromList(source.image);
     this._additional = source.additional;
     this._portfolioPercentPlan = source.portfolioPercentPlan;
     this._quantity = source.quantity;
     this._averagePrice = source.averagePrice;
     this._value = source.value;
     this._operationCount = source.operationCount;
-
-    //notifyListeners();
 
     return source;
   }
@@ -151,19 +155,30 @@ extension InstrumentExtension on Instrument {
 }
 
 class InstrumentList extends ChangeNotifier {
+  final Portfolio _portfolio;
   List<Instrument> _items = [];
-  int _portfolioId;
 
-  InstrumentList(this._portfolioId) {
+  InstrumentList(this._portfolio) {
     _loadFromDb();
   }
 
-  int get length => _items.length;
+  Portfolio get portfolio => _portfolio;
 
-  Instrument operator [](int index) => _items[index];
+  List<Instrument> get instruments => [..._items];
+
+  Instrument instrumentById(int id) {
+    Instrument result;
+    for(Instrument instrument in _items) {
+      if (instrument.id == id) {
+        result = instrument;
+        break;
+      }
+    }
+
+    return result;
+  }
 
   _loadFromDb() async {
-    _items = await DBProvider.db.getPortfolioInstruments(_portfolioId);
-//      notifyListeners();
+    _items = await DBProvider.db.getPortfolioInstruments(_portfolio.id);
   }
 }

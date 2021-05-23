@@ -1,15 +1,17 @@
 import 'package:flutter/foundation.dart';
+import 'package:my_securities/quote_provider.dart';
 import 'package:pref/pref.dart';
 
 import 'exchange.dart';
 
 class Preferences extends ChangeNotifier {
   // names for preferences
-  static final String prefDARK_THEME = 'dark_theme';
+  static final String prefDARK_THEME = 'dark_theme'; // ignore: non_constant_identifier_names
   static final String prefMAIN_CURRENCY_ID = 'main_currency_id'; // ignore: non_constant_identifier_names
   static final String prefSHOW_HIDDEN_PORTFOLIOS = 'show_hidden_portfolios'; // ignore: non_constant_identifier_names
 
   static PrefServiceShared _service;
+  static Preferences _preferences;
   Future _ready;
 
   Future get ready => _ready;
@@ -18,6 +20,13 @@ class Preferences extends ChangeNotifier {
   Preferences() {
     if (_service == null)
       _ready = _init();
+  }
+
+  factory Preferences.preferences() {
+    if (_preferences == null)
+      _preferences = Preferences();
+
+    return _preferences;
   }
 
   Future _init() async {
@@ -32,6 +41,7 @@ class Preferences extends ChangeNotifier {
       notifyListeners();
     });
     _service.addKeyListener(prefMAIN_CURRENCY_ID, () {
+      QuoteProvider.mainCurrency = mainCurrency;
       notifyListeners();
     });
     _service.addKeyListener(prefSHOW_HIDDEN_PORTFOLIOS, () {

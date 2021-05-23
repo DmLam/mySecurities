@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:my_securities/exchange.dart';
-
+import 'package:my_securities/models/portfolio.dart';
 import '../database.dart';
+import 'instrument.dart';
 
 enum OperationType {buy, sell}
 
-class Operation{
+class Operation extends ChangeNotifier{
+  Portfolio _portfolio;
+  Instrument _instrument;
   int id;
-  int portfolioInstrumentId;
-  int instrumentId;
+  int _portfolioId;
+  int _instrumentId;
   DateTime date;
   OperationType type;
   int quantity;
@@ -17,28 +20,22 @@ class Operation{
 
   double get value => (type == OperationType.buy ? 1 : -1) * (price * quantity * 10000).roundToDouble() / 10000;
 
+  Portfolio get portfolio => _portfolio;
+  Instrument get instrument => _instrument;
+
   String valueString() => value == null ? '' : formatCurrency(value);
 
   String priceString() => price == null ? '' : formatCurrency(price);
 
-  Operation({this.id, this.portfolioInstrumentId, this.instrumentId, this.date, this.type, this.quantity, this.price, this.commission});
-
-  Operation.from(Operation op) :
-        this.id = op.id,
-        this.portfolioInstrumentId = op.portfolioInstrumentId,
-        this.instrumentId = op.instrumentId,
-        this.date = op.date,
-        this.type = op.type,
-        this.quantity = op.quantity,
-        this.price = op.price,
-        this.commission = op.commission;
+  Operation({this.id, int instrumentId, this.date, this.type, this.quantity, this.price, this.commission}){
+    _instrumentId = instrumentId;
+  }
 
   Operation.empty() {
     DateTime now = DateTime.now();
 
     this.id = null;
-    this.portfolioInstrumentId = null;
-    this.instrumentId = null;
+    this._instrumentId = null;
     this.date = DateTime(now.year, now.month, now.day);
     this.type = OperationType.buy;
     this.quantity = 0;
@@ -48,7 +45,6 @@ class Operation{
 
   factory Operation.fromMap(Map<String, dynamic> json) =>
       Operation(id: json["id"],
-          portfolioInstrumentId: json["portfolio_instrument_id"],
           instrumentId: json["instrument_id"],
           date: DateTime.parse(json["date"]),
           type: OperationType.values[json["type"]],
@@ -56,35 +52,23 @@ class Operation{
           price: json["price"],
           commission: json["commission"]
       );
-
-  Operation assign(Operation op) {
-    id = op.id;
-    portfolioInstrumentId = op.portfolioInstrumentId;
-    instrumentId = op.instrumentId;
-    date = op.date;
-    type = op.type;
-    quantity = op.quantity;
-    price = op.price;
-    commission= op.commission;
-
-    return op;
-  }
 }
 
 class OperationList extends ChangeNotifier {
   List<Operation> _items = [];
-  int _portfolioId;
+  Portfolio _portfolio;
 
-  OperationList(this._portfolioId) {
+  OperationList(this._portfolio) {
     _loadFromDb();
   }
 
-  int get length => _items.length;
-
-  Operation operator [](int index) => _items[index];
+  List<Operation> get operations => [..._items];
 
   _loadFromDb() async {
-    _items = await DBProvider.db.getPortfolioOperations(_portfolioId);
-//    notifyListeners();
+    _items = await DBProvider.db.getPortfolioOperations(_portfolio.id);
+    _items.forEach((item) {
+      item._portfolio = _portfolio;
+      item._instrument = item._portfolio.instruments.instrumentById(item._instrumentId);
+    });
   }
 }

@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'generated/l10n.dart';
 
 const CURRENT_PRICE_CACHE_TIME = 60; // seconds

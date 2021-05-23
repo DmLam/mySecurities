@@ -4,18 +4,15 @@ import 'package:my_securities/pages/settings_page.dart';
 
 // идея взята https://stackoverflow.com/questions/53294006/how-to-create-a-custom-appbar-widget
 class MySecuritiesAppBar extends StatefulWidget implements PreferredSizeWidget {
-  String _pageName;
-  bool _showSettingsMenu;
-  MySecuritiesAppBar({Key key, String pageName, bool showSettingsMenu = true}) : preferredSize = Size.fromHeight(kToolbarHeight), super(key: key) {
-    _pageName = pageName;
-    _showSettingsMenu = showSettingsMenu;
-  }
+  final String pageName;
+  final bool showSettingsMenu;
+  MySecuritiesAppBar({Key key, this.pageName, this.showSettingsMenu = true}) : preferredSize = Size.fromHeight(kToolbarHeight), super(key: key);
 
   @override
   final Size preferredSize; // default is 56.0
 
   @override
-  _MySecuritiesAppBarState createState() => _MySecuritiesAppBarState(_pageName, _showSettingsMenu);
+  _MySecuritiesAppBarState createState() => _MySecuritiesAppBarState(pageName, showSettingsMenu);
 }
 
 class _MySecuritiesAppBarState extends State<MySecuritiesAppBar>{

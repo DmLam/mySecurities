@@ -46,6 +46,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "pcs" : MessageLookupByLibrary.simpleMessage("pcs"),
     "portfolioEditDialog_Name" : MessageLookupByLibrary.simpleMessage("Name"),
     "portfolioEditDialog_startDate" : MessageLookupByLibrary.simpleMessage("Creation date"),
+    "portfolioInstrumentListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Edit"),
     "portfolioListView_confirmDeleteDialogContent" : m1,
     "portfolioListView_confirmDeleteDialogTitle" : MessageLookupByLibrary.simpleMessage("Portfolio deletion"),
     "portfolioListView_menuDelete" : MessageLookupByLibrary.simpleMessage("Delete"),

@@ -32,9 +32,16 @@ class Portfolio extends ChangeNotifier {
   OperationList get operations => _operations;
 
   Portfolio(this._id, this._name, this._visible, this._startDate) {
-    _instruments = InstrumentList(_id);
-    _operations = OperationList(_id);
+    _instruments = InstrumentList(this);
+    _operations = OperationList(this);
   }
+
+  Portfolio.from(Portfolio portfolio) :
+    _owner = portfolio._owner,
+    _id = portfolio.id,
+    _name = portfolio.name,
+    _visible = portfolio.visible,
+    _startDate = portfolio.startDate;
 
   Portfolio.empty(PortfolioList owner) :
     _owner = owner,
@@ -65,21 +72,33 @@ class Portfolio extends ChangeNotifier {
 }
 
 class PortfolioList extends ChangeNotifier {
-  List<Portfolio> _portfolios;
+  List<Portfolio> _items;
   Future _ready;
 
   Future get ready => _ready;
 
-  List<Portfolio> get portfolios => [..._portfolios];
-  List<Portfolio> get visiblePortfolios => [..._portfolios.where((item) => item.visible)];
+  List<Portfolio> get portfolios => [..._items];
+  List<Portfolio> get visiblePortfolios => [..._items.where((item) => item.visible)];
 
   PortfolioList() {
     _ready = _init();
   }
 
+  Portfolio portfolioById(int id) {
+    Portfolio result;
+
+    for(Portfolio item in _items) {
+      if (item.id == id) {
+        result = item;
+        break;
+      }
+    }
+    return result;
+  }
+
   _getPortfolios() async {
-    _portfolios = await DBProvider.db.getPortfolios();
-    _portfolios.forEach((element) {element._owner = this;});
+    _items = await DBProvider.db.getPortfolios();
+    _items.forEach((element) {element._owner = this;});
   }
 
   Future _init() async{

@@ -305,6 +305,16 @@ class S {
     );
   }
 
+  /// `Edit`
+  String get portfolioInstrumentListView_menuEdit {
+    return Intl.message(
+      'Edit',
+      name: 'portfolioInstrumentListView_menuEdit',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Main`
   String get prefTitleMain {
     return Intl.message(
