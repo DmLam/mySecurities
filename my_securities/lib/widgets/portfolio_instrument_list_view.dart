@@ -40,9 +40,9 @@ class PortfolioInstrumentListItem extends StatelessWidget {
     Future<double> priceFuture =
       QuoteProvider.of(_instrument).getCurrentPrice();
 
-    void editInstrument() {}
+    void editPortfolioInstrument() {}
 
-    void showOperations() {
+    void showPortfolioOperations() {
       Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => PortfolioOperationPage(_portfolio)));
     }
@@ -128,7 +128,7 @@ class PortfolioInstrumentListItem extends StatelessWidget {
               onSelected: (value) {
                 switch (value) {
                   case 'edit':
-                    editInstrument();
+                    editPortfolioInstrument();
                     break;
                   // case 'delete':
                   //   DBProvider.db.deleteInstrument(_instrument.id);
@@ -137,7 +137,7 @@ class PortfolioInstrumentListItem extends StatelessWidget {
                     throw Exception("Unknown instrument menu item");
                 }
               })),
-      onTap: showOperations,
+      onTap: showPortfolioOperations,
     );
   }
 }
