@@ -41,6 +41,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "instrumentTypeShare" : MessageLookupByLibrary.simpleMessage("Share"),
     "moneyOperationTypeDeposit" : MessageLookupByLibrary.simpleMessage("Deposit"),
     "moneyOperationTypeWithdraw" : MessageLookupByLibrary.simpleMessage("Withdraw"),
+    "operationListViewItem_menuDelete" : MessageLookupByLibrary.simpleMessage("Delete"),
+    "operationListViewItem_menuEdit" : MessageLookupByLibrary.simpleMessage("Edit"),
     "operationTypeBuy" : MessageLookupByLibrary.simpleMessage("Buy"),
     "operationTypeSell" : MessageLookupByLibrary.simpleMessage("Sell"),
     "pcs" : MessageLookupByLibrary.simpleMessage("pcs"),

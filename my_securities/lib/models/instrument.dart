@@ -5,6 +5,7 @@ import 'package:my_securities/exchange.dart';
 import 'package:my_securities/models/portfolio.dart';
 
 import '../database.dart';
+import '../stock_exchange_interface.dart';
 
 enum InstrumentType {currency, share, etf, federalBond, subfederalBond, corporateBond, futures, stockIndex}
 
@@ -31,12 +32,13 @@ class Instrument extends ChangeNotifier{
   Currency get currency => _currency;
   InstrumentType get type => _type;
   Exchange get exchange => _exchange;
-  Uint8List get image => _image;
-  set image(Uint8List value) {
-    _image = value;
-    DBProvider.db.setInstrumentImage(_id, _image);
-    notifyListeners();
+  Uint8List get image {
+    if (_image == null)
+      _loadImage();
+
+    return _image;
   }
+
   String get additional => _additional;
   int get portfolioPercentPlan => _portfolioPercentPlan;
   int get quantity => _quantity;
@@ -62,20 +64,20 @@ class Instrument extends ChangeNotifier{
     _operationCount = operationCount;
 
   Instrument.from(Instrument source):
-    this._id = source.id,
-    this._isin = source.isin,
-    this._ticker = source.ticker,
-    this._name = source.name,
-    this._currency = source.currency,
-    this._type = source.type,
-    this._image = source.image,
-    this._additional = source.additional,
-    this._exchange = source.exchange,
-    this._portfolioPercentPlan = source.portfolioPercentPlan,
-    this._quantity = source.quantity,
-    this._averagePrice = source.averagePrice,
-    this._value = source.value,
-    this._operationCount = source.operationCount;
+    this._id = source._id,
+    this._isin = source._isin,
+    this._ticker = source._ticker,
+    this._name = source._name,
+    this._currency = source._currency,
+    this._type = source._type,
+    this._image = source._image,
+    this._additional = source._additional,
+    this._exchange = source._exchange,
+    this._portfolioPercentPlan = source._portfolioPercentPlan,
+    this._quantity = source._quantity,
+    this._averagePrice = source._averagePrice,
+    this._value = source._value,
+    this._operationCount = source._operationCount;
 
   Instrument.empty():
     this._id = null,
@@ -142,6 +144,16 @@ class Instrument extends ChangeNotifier{
     this._operationCount = source.operationCount;
 
     return source;
+  }
+
+  _loadImage() async {
+    Uint8List newImage = await StockExchangeProvider.stock().getInstrumentImage(this);
+    // comparing lengths is the dirty way to check that image had been changed
+    if ((_image == null && newImage != null) || (newImage?.length != _image?.length) ) {
+      _image = newImage;
+      DBProvider.db.setInstrumentImage(_id, _image);
+      notifyListeners();
+    }
   }
 }
 

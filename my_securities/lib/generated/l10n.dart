@@ -315,6 +315,26 @@ class S {
     );
   }
 
+  /// `Edit`
+  String get operationListViewItem_menuEdit {
+    return Intl.message(
+      'Edit',
+      name: 'operationListViewItem_menuEdit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Delete`
+  String get operationListViewItem_menuDelete {
+    return Intl.message(
+      'Delete',
+      name: 'operationListViewItem_menuDelete',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Main`
   String get prefTitleMain {
     return Intl.message(

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'exchange.dart';
@@ -14,7 +15,7 @@ class YahooFinanceDataProvider implements StockExchangeProvider {
 // https://query1.finance.yahoo.com/v1/finance/search?q=t&lang=en-US&region=US&quotesCount=6&newsCount=4&enableFuzzyQuery=false&quotesQueryId=tss_match_phrase_query&multiQuoteQueryId=multi_quote_single_token_query&newsQueryId=news_cie_vespa&enableCb=true&enableNavLinks=true&enableEnhancedTrivialQuery=true
 
   @override
-  Future<Image> getInstrumentImage(Instrument instrument) async {
+  Future<Uint8List> getInstrumentImage(Instrument instrument) async {
     return null;
   }
 

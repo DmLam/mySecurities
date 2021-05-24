@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'exchange.dart';
 import 'models/instrument.dart';
@@ -38,7 +40,7 @@ abstract class StockExchangeProvider {
   }
 
   Future<List> search({String ticker});
-  Future<Image> getInstrumentImage(Instrument instrument);
+  Future<Uint8List> getInstrumentImage(Instrument instrument);
   Future <List<Quote>> getInstrumentQuotes(String ticker, DateTime from, DateTime to);
   // last quote at previous trade session (yesterday)
   Future<double> getInstrumentLastQuote(String ticker);

@@ -35,6 +35,9 @@
 
   "portfolioInstrumentListView_menuEdit": "Edit",
 
+  "operationListViewItem_menuEdit": "Edit",
+  "operationListViewItem_menuDelete": "Delete",
+
   "prefTitleMain": "Main",
   "prefMainCurrencyTitle": "Main currency",
   "prefTitleAppearance": "Appearance",

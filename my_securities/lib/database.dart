@@ -13,6 +13,7 @@ import 'package:my_securities/models/instrument.dart';
 import 'package:my_securities/models/operation.dart';
 import 'constants.dart';
 import 'exchange.dart';
+import 'models/money.dart';
 import 'models/money_operation.dart';
 import 'models/quote.dart';
 import 'models/rate.dart';
@@ -191,15 +192,6 @@ class DBProvider {
     await db.execute(
         'CREATE INDEX idx_rate ON rate (currency_id, date)');
   }
-  Future<void> _createTablePreference(Database db) async {
-    await db.execute('''CREATE TABLE preference (
-                        id INTEGER PRIMARY KEY,
-                        main_currency_id INTEGER,
-                        show_hidden_portfolios BOOLEAN NOT NULL CHECK (show_hidden_portfolios IN (0, 1)) DEFAULT 0, 
-                        FOREIGN KEY (main_currency_id) REFERENCES currency(id)
-                          ON DELETE RESTRICT ON UPDATE RESTRICT)''');
-    await db.insert('preference', {'id': 1});
-  }
 
   Future createTables(Database db) async {
     // справочник валют
@@ -220,8 +212,6 @@ class DBProvider {
     await _createTableQuote(db);
     // курсы валют на дату (по отношению к рублю)
     await _createTableRate(db);
-    // настройки
-    await _createTablePreference(db);
     // ввод/вывод денег
     await _createTableMoney(db);
   }
@@ -267,6 +257,7 @@ class DBProvider {
 
   void _onOpen(Database db) async {
     _database = db;
+//    await db.update('instrument', {"image": null});
   }
 
   void _onUpgrade(Database db, int oldVersion, int newVersion) {
@@ -290,36 +281,6 @@ class DBProvider {
       onDowngrade: _onDowngrade
     );
   }
-
-  // _setPreference(final String preference, final dynamic value) async {
-  //   final Database db = await database;
-  //   await db.update('preference', {preference: value}, where: 'id = 1');
-  // }
-  //
-  // setPreferenceMainCurrency(final Currency mainCurrency) async {
-  //   await _setPreference('main_currency_id', Currency.values.indexOf(mainCurrency) + 1);
-  // }
-
-  // Future<dynamic> _getPreference(final String preference) async {
-  //   final Database db = await database;
-  //   dynamic result;
-  //   List<Map<String, dynamic>> q = await db.query('preference', columns: [preference], where: 'id = 1');
-  //
-  //   result = q[0][preference];
-  //
-  //   return Future.value(result);
-  // }
-
-  // Future<Currency> getPreferenceMainCurrency() async {
-  //   int idx = await _getPreference('main_currency_id');
-  //   Currency result;
-  //
-  //   if (idx != null) {
-  //     result = Currency.values[idx - 1];
-  //   }
-  //
-  //   return Future.value(result);
-  // }
 
   Future<int> addInstrument(Instrument instrument) async {
     final Database db = await database;
@@ -402,13 +363,13 @@ class DBProvider {
 
   static final String _sqlPortfolioInstruments =
   '''SELECT i.id, i.isin, i.ticker, i.name, i.currency_id, i.instrument_type_id, i.exchange_id, i.additional, i.portfolio_percent_plan, 
-                  i.additional, i.image, sum(o.quantity) quantity, sum(o.price * o.quantity) / sum(o.quantity) avgprice, sum(o.value) value, count(o.id) operation_count 
-             FROM currency c, instrument i, portfolio_instrument pi LEFT OUTER JOIN operation o ON o.portfolio_instrument_id = pi.id 
-            WHERE  
-              c.id = i.currency_id AND
-              pi.instrument_id = i.id
-           GROUP BY i.id   
-           HAVING i.id is not null''';
+            i.additional, i.image, sum(o.quantity) quantity, sum(o.price * o.quantity) / sum(o.quantity) avgprice, sum(o.value) value, count(o.id) operation_count 
+     FROM currency c, instrument i, portfolio_instrument pi LEFT OUTER JOIN operation o ON o.portfolio_instrument_id = pi.id 
+     WHERE  
+       c.id = i.currency_id AND
+       pi.instrument_id = i.id
+     GROUP BY i.id   
+     HAVING i.id is not null''';
 
   Future<List<Instrument>> getPortfolioInstruments(int portfolioId) async {
     final Database db = await database;
@@ -417,12 +378,12 @@ class DBProvider {
     return instruments.isEmpty ? null:  instruments.map((i) => Instrument.fromMap(i)).toList();
   }
 
-  // deleteInstrument(int id) async {
-  //   final Database db = await database;
-  //
-  //   db.delete('instrument', where: 'id = ?', whereArgs: [id]);
-  //   db.delete('quote', where: 'instrument_id = ?', whereArgs: [id]);
-  // }
+   deleteInstrument(int id) async {
+     final Database db = await database;
+
+     db.delete('instrument', where: 'id = ?', whereArgs: [id]);
+     db.delete('quote', where: 'instrument_id = ?', whereArgs: [id]);
+   }
 
   Future<int> _getPortfolioInstrumentId(int portfolioId, int instrumentId) async {
     final Database db = await database;
@@ -432,17 +393,17 @@ class DBProvider {
   }
 
   static final String _sqlPortfolioOperations =
-  '''SELECT o.id, po.instrument_id, o.date, o.type, o.quantity, o.price, o.value, o.commission
-       FROM operation o, portfolio_instrument po
-       WHERE o.portfolio_instrument_id = po.id
-         and po.portfolio_id = ?
+  '''SELECT o.id, pi.portfolio_id, pi.instrument_id, o.date, o.type, o.quantity, o.price, o.value, o.commission
+       FROM operation o, portfolio_instrument pi
+       WHERE o.portfolio_instrument_id = pi.id
+         and pi.portfolio_id = ?
     ''';
   static final String _sqlPortfolioInstrumentOperations =
-  '''SELECT o.id, po.instrument_id, o.date, o.type, o.quantity, o.price, o.value, o.commission
-       FROM operation o, portfolio_instrument po
-       WHERE o.portfolio_instrument_id = po.id
-         and po.portfolio_id = ?
-         and po.instrument_id = ?
+  '''SELECT o.id, pi.portfolio_id, pi.instrument_id, o.date, o.type, o.quantity, o.price, o.value, o.commission
+       FROM operation o, portfolio_instrument pi
+       WHERE o.portfolio_instrument_id = pi.id
+         and pi.portfolio_id = ?
+         and pi.instrument_id = ?
     ''';
 
   Future<List<Operation>> getPortfolioOperations(int portfolioId, {int instrumentId}) async {

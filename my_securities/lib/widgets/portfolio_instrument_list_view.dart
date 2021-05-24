@@ -1,12 +1,13 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:my_securities/common/future_builder.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/models/instrument.dart';
 import 'package:my_securities/models/portfolio.dart';
 import 'package:my_securities/pages/portfolio_operation_page.dart';
+import 'package:provider/provider.dart';
 import '../exchange.dart';
 import '../quote_provider.dart';
-import '../stock_exchange_interface.dart';
 
 
 class PortfolioInstrumentsListView extends StatelessWidget {
@@ -19,7 +20,8 @@ class PortfolioInstrumentsListView extends StatelessWidget {
     return ListView.builder(
       itemCount: _instruments.instruments.length,
       itemBuilder: (BuildContext context, int index) =>
-          PortfolioInstrumentListItem(_instruments.portfolio, _instruments.instruments[index])
+        ChangeNotifierProvider<Instrument>.value(value: _instruments.instruments[index],
+          child: PortfolioInstrumentListItem(_instruments.portfolio, _instruments.instruments[index]))
     );
   }
 }
@@ -32,11 +34,15 @@ class PortfolioInstrumentListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Uint8List imageBytes = context.watch<Instrument>().image;
+    Widget image = imageBytes == null ? Icon(Icons.attach_money) :
+                   Image.memory(imageBytes, width: 30, height: 30);
     Future<double> priceFuture =
-    QuoteProvider.of(_instrument).getCurrentPrice();
+      QuoteProvider.of(_instrument).getCurrentPrice();
+
+    void editInstrument() {}
 
     void showOperations() {
-
       Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => PortfolioOperationPage(_portfolio)));
     }
@@ -45,18 +51,18 @@ class PortfolioInstrumentListItem extends StatelessWidget {
       contentPadding: EdgeInsets.fromLTRB(2.0, 0.0, 8.0, 0.0),
       leading: Container(
           width: 36,
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Text(
-              _instrument.ticker,
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.teal, fontSize: 12),
-            ),
-            futureBuilder<Widget>(
-              future: StockExchangeProvider.stock().getInstrumentImage(_instrument),
-              resultWidget: (widget) => widget,
-              errorWidget: Icon(Icons.attach_money)),
-          ]
-          )),
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  _instrument.ticker,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.teal, fontSize: 12),
+                ),
+                image,
+              ]
+          )
+      ),
       title: Row(children: [
         Expanded(
             flex: 70,
@@ -84,7 +90,8 @@ class PortfolioInstrumentListItem extends StatelessWidget {
                         textAlign: TextAlign.right);
                   },
                   waitWidget: Text(''))
-            ])) // Column
+            ])
+        ) // Column
       ]),
       subtitle: Row(mainAxisSize: MainAxisSize.max, children: [
         Text(
@@ -133,7 +140,5 @@ class PortfolioInstrumentListItem extends StatelessWidget {
       onTap: showOperations,
     );
   }
-
-  void editInstrument() {}
 }
 

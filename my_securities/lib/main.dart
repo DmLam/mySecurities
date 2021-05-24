@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'constants.dart';
 import 'generated/l10n.dart';
 import 'exchange.dart';
+import 'models/model.dart';
 import 'models/portfolio.dart';
 import 'pages/home_page.dart';
 
@@ -46,7 +47,7 @@ class MySecuritiesApp extends StatelessWidget {
         builder: (context, widget) {
           return
             ChangeNotifierProvider<PortfolioList>(
-                    create: (_) => PortfolioList(),
+                    create: (_) => Model.portfolios(),
               child: MaterialApp(
                   localizationsDelegates: [
                     S.delegate,

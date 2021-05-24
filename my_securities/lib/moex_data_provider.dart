@@ -106,69 +106,63 @@ class MOEXDataProvider implements StockExchangeProvider {
   List<String> _noImageInstruments = [];
 
   @override
-  Future<Image> getInstrumentImage(Instrument instrument) async {
-    Image result;
+  Future<Uint8List> getInstrumentImage(Instrument instrument) async {
+    Uint8List result;
+    String type;
 
-    if (instrument.image != null)
-      result = Image.memory(instrument.image, width: 30, height: 30);
-    else {
-      String type;
+    // if we already have tried to get this image and didn't received -
+    // don't try again
+    if (!_noImageInstruments.contains(instrument.ticker)) {
+      switch (instrument.type) {
+        case InstrumentType.share:
+          type = 'shares';
+          break;
+        case InstrumentType.etf:
+          type = 'etfs';
+          break;
+        case InstrumentType.corporateBond:
+        case InstrumentType.federalBond:
+        case InstrumentType.subfederalBond:
+          type = 'bonds';
+          break;
+        case InstrumentType.currency:
+          type = 'currencies';
+          break;
+        default:
+          type = null;
+          break;
+      }
+      if (type != null) {
+        http.Response response;
+        Uri instrumentPageURI = Uri.https(
+            'place.moex.com', 'products/$type/${instrument.ticker}');
+        response = await http.get(instrumentPageURI);
+        if (response.statusCode == 200) {
+          // https://api-marketplace.moex.com//media/1238/yandex.svg
+          RegExp reImageURL = RegExp(
+              r"https://api-marketplace.moex.com//(media/\d+/\w+.svg)");
+          RegExpMatch matches = reImageURL.firstMatch(response.body);
 
-      // if we already have tried to get this image and didn't received -
-      // don't try again
-      if (!_noImageInstruments.contains(instrument.ticker)) {
-        switch (instrument.type) {
-          case InstrumentType.share:
-            type = 'shares';
-            break;
-          case InstrumentType.etf:
-            type = 'etfs';
-            break;
-          case InstrumentType.corporateBond:
-          case InstrumentType.federalBond:
-          case InstrumentType.subfederalBond:
-            type = 'bonds';
-            break;
-          case InstrumentType.currency:
-            type = 'currencies';
-            break;
-          default:
-            type = null;
-            break;
-        }
-        if (type != null) {
-          http.Response response;
-          Uri instrumentPageURI = Uri.https(
-              'place.moex.com', 'products/$type/${instrument.ticker}');
-          response = await http.get(instrumentPageURI);
-          if (response.statusCode == 200) {
-            // https://api-marketplace.moex.com//media/1238/yandex.svg
-            RegExp reImageURL = RegExp(
-                r"https://api-marketplace.moex.com//(media/\d+/\w+.svg)");
-            RegExpMatch matches = reImageURL.firstMatch(response.body);
+          if (matches.start < matches.end) {
+            Uri imageURI = Uri.https(
+                'api-marketplace.moex.com', matches.group(1));
 
-            if (matches.start < matches.end) {
-              Uri imageURI = Uri.https(
-                  'api-marketplace.moex.com', matches.group(1));
+            response = await http.get(imageURI);
+            if (response.statusCode == 200) {
+              Uint8List pngData = await _svgToPng(response.bodyBytes);
 
-              response = await http.get(imageURI);
-              if (response.statusCode == 200) {
-                Uint8List pngData = await _svgToPng(response.bodyBytes);
-                instrument.image = pngData;
-
-                result = Image.memory(pngData, width: 30, height: 30);
-              }
-              else if (response.statusCode == 404)
-                _noImageInstruments.add(instrument.ticker);
+              result = pngData;
             }
+            else if (response.statusCode == 404)
+              _noImageInstruments.add(instrument.ticker);
           }
         }
-        else
-          throw FormatException('Error loading ticker''s image');
       }
+      else
+        throw FormatException('Error loading ticker''s image');
     }
 
-    return Future<Image>.value(result);
+    return Future<Uint8List>.value(result);
   }
 
   @override

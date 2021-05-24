@@ -41,6 +41,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "instrumentTypeShare" : MessageLookupByLibrary.simpleMessage("Акция"),
     "moneyOperationTypeDeposit" : MessageLookupByLibrary.simpleMessage("Поступление"),
     "moneyOperationTypeWithdraw" : MessageLookupByLibrary.simpleMessage("Вывод"),
+    "operationListViewItem_menuDelete" : MessageLookupByLibrary.simpleMessage("Удалить"),
+    "operationListViewItem_menuEdit" : MessageLookupByLibrary.simpleMessage("Редактировать"),
     "operationTypeBuy" : MessageLookupByLibrary.simpleMessage("Покупка"),
     "operationTypeSell" : MessageLookupByLibrary.simpleMessage("Продажа"),
     "pcs" : MessageLookupByLibrary.simpleMessage("шт"),

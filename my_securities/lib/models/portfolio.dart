@@ -38,10 +38,10 @@ class Portfolio extends ChangeNotifier {
 
   Portfolio.from(Portfolio portfolio) :
     _owner = portfolio._owner,
-    _id = portfolio.id,
-    _name = portfolio.name,
-    _visible = portfolio.visible,
-    _startDate = portfolio.startDate;
+    _id = portfolio._id,
+    _name = portfolio._name,
+    _visible = portfolio._visible,
+    _startDate = portfolio._startDate;
 
   Portfolio.empty(PortfolioList owner) :
     _owner = owner,
@@ -57,6 +57,8 @@ class Portfolio extends ChangeNotifier {
       json["visible"] == 1,
       json["start_date"] == null ? null : DateTime.parse(json["start_date"])
     );
+
+  Instrument instrumentById(int id) => instruments.instrumentById(id);
 
   Future<bool> update() async {
     bool result = await DBProvider.db.updatePortfolio(this);

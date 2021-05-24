@@ -35,6 +35,9 @@
 
   "portfolioInstrumentListView_menuEdit": "Редактировать",
 
+  "operationListViewItem_menuEdit": "Редактировать",
+  "operationListViewItem_menuDelete": "Удалить",
+
   "prefTitleMain": "Основные",
   "prefMainCurrencyTitle": "Основная валюта",
   "prefTitleAppearance": "Внешний вид",
