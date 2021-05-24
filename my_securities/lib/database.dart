@@ -7,7 +7,6 @@ import 'package:my_securities/generated/l10n.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:my_securities/models/model.dart';
 import 'package:my_securities/models/portfolio.dart';
 import 'package:my_securities/models/instrument.dart';
 import 'package:my_securities/models/operation.dart';
