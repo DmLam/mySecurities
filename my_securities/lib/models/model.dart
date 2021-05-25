@@ -1,7 +1,5 @@
 import 'package:my_securities/models/portfolio.dart';
 
-import '../exchange.dart';
-
 class Model {
   static PortfolioList _portfolios;
 

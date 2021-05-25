@@ -13,10 +13,6 @@ class PortfolioInstrumentsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    void addOperation() {
-
-    }
-
     return
       ChangeNotifierProvider<InstrumentList>.value(
         value: _portfolio.instruments,
@@ -24,10 +20,7 @@ class PortfolioInstrumentsPage extends StatelessWidget {
           return Scaffold(
             appBar: MySecuritiesAppBar(),
             body: PortfolioInstrumentsListView(context.read<InstrumentList>()),
-            floatingActionButton: FloatingActionButton(
-              child: Icon(Icons.add),
-              onPressed: addOperation,
-            ));
+          );
         }
     );
   }

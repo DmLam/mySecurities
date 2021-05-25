@@ -21,7 +21,9 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m0(name) => "Портфель ${name} уже существует";
 
-  static m1(name) => "Вы уверены, что хотите удалить портфель \'${name}\'?";
+  static m1(portfolio_name) => "Процент в портфеле \'${portfolio_name}\'";
+
+  static m2(name) => "Вы уверены, что хотите удалить портфель \'${name}\'?";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -41,20 +43,28 @@ class MessageLookup extends MessageLookupByLibrary {
     "instrumentTypeShare" : MessageLookupByLibrary.simpleMessage("Акция"),
     "moneyOperationTypeDeposit" : MessageLookupByLibrary.simpleMessage("Поступление"),
     "moneyOperationTypeWithdraw" : MessageLookupByLibrary.simpleMessage("Вывод"),
-    "operationListViewItem_menuDelete" : MessageLookupByLibrary.simpleMessage("Удалить"),
-    "operationListViewItem_menuEdit" : MessageLookupByLibrary.simpleMessage("Редактировать"),
+    "operationEditDialog_Title_add" : MessageLookupByLibrary.simpleMessage("Добавить операцию"),
+    "operationEditDialog_Title_edit" : MessageLookupByLibrary.simpleMessage("Редактировать операцию"),
+    "operationEditDialog_date" : MessageLookupByLibrary.simpleMessage("Дата операции"),
+    "operationEditDialog_operationtype" : MessageLookupByLibrary.simpleMessage("Тип операции"),
     "operationTypeBuy" : MessageLookupByLibrary.simpleMessage("Покупка"),
     "operationTypeSell" : MessageLookupByLibrary.simpleMessage("Продажа"),
+    "operationsListViewItem_menuDelete" : MessageLookupByLibrary.simpleMessage("Удалить"),
+    "operationsListViewItem_menuEdit" : MessageLookupByLibrary.simpleMessage("Редактировать"),
     "pcs" : MessageLookupByLibrary.simpleMessage("шт"),
     "portfolioEditDialog_Name" : MessageLookupByLibrary.simpleMessage("Наименование"),
+    "portfolioEditDialog_Title" : MessageLookupByLibrary.simpleMessage("Редактировать портфель"),
     "portfolioEditDialog_startDate" : MessageLookupByLibrary.simpleMessage("Дата создания"),
+    "portfolioInstrumentEditDialog_Title" : MessageLookupByLibrary.simpleMessage("Настройка инструмента"),
+    "portfolioInstrumentEditDialog_percent" : m1,
     "portfolioInstrumentListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Редактировать"),
-    "portfolioListView_confirmDeleteDialogContent" : m1,
-    "portfolioListView_confirmDeleteDialogTitle" : MessageLookupByLibrary.simpleMessage("Удаление портфеля"),
-    "portfolioListView_menuDelete" : MessageLookupByLibrary.simpleMessage("Удалить"),
-    "portfolioListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Редактировать"),
-    "portfolioListView_menuVisible" : MessageLookupByLibrary.simpleMessage("Видимый"),
-    "portfolioListView_portfolioStarted" : MessageLookupByLibrary.simpleMessage("Начат"),
+    "portfolioOperations_Title" : MessageLookupByLibrary.simpleMessage("Операции в портфеле"),
+    "portfoliosListView_confirmDeleteDialogContent" : m2,
+    "portfoliosListView_confirmDeleteDialogTitle" : MessageLookupByLibrary.simpleMessage("Удаление портфеля"),
+    "portfoliosListView_menuDelete" : MessageLookupByLibrary.simpleMessage("Удалить"),
+    "portfoliosListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Редактировать"),
+    "portfoliosListView_menuVisible" : MessageLookupByLibrary.simpleMessage("Видимый"),
+    "portfoliosListView_portfolioStarted" : MessageLookupByLibrary.simpleMessage("Начат"),
     "prefDarkTheme" : MessageLookupByLibrary.simpleMessage("Темная тема"),
     "prefMainCurrencyTitle" : MessageLookupByLibrary.simpleMessage("Основная валюта"),
     "prefShowHiddenPortfoliosTitle" : MessageLookupByLibrary.simpleMessage("Показывать скрытые портфели"),

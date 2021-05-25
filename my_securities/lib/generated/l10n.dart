@@ -226,62 +226,72 @@ class S {
   }
 
   /// `Started`
-  String get portfolioListView_portfolioStarted {
+  String get portfoliosListView_portfolioStarted {
     return Intl.message(
       'Started',
-      name: 'portfolioListView_portfolioStarted',
+      name: 'portfoliosListView_portfolioStarted',
       desc: '',
       args: [],
     );
   }
 
   /// `Edit`
-  String get portfolioListView_menuEdit {
+  String get portfoliosListView_menuEdit {
     return Intl.message(
       'Edit',
-      name: 'portfolioListView_menuEdit',
+      name: 'portfoliosListView_menuEdit',
       desc: '',
       args: [],
     );
   }
 
   /// `Delete`
-  String get portfolioListView_menuDelete {
+  String get portfoliosListView_menuDelete {
     return Intl.message(
       'Delete',
-      name: 'portfolioListView_menuDelete',
+      name: 'portfoliosListView_menuDelete',
       desc: '',
       args: [],
     );
   }
 
   /// `Visible`
-  String get portfolioListView_menuVisible {
+  String get portfoliosListView_menuVisible {
     return Intl.message(
       'Visible',
-      name: 'portfolioListView_menuVisible',
+      name: 'portfoliosListView_menuVisible',
       desc: '',
       args: [],
     );
   }
 
   /// `Portfolio deletion`
-  String get portfolioListView_confirmDeleteDialogTitle {
+  String get portfoliosListView_confirmDeleteDialogTitle {
     return Intl.message(
       'Portfolio deletion',
-      name: 'portfolioListView_confirmDeleteDialogTitle',
+      name: 'portfoliosListView_confirmDeleteDialogTitle',
       desc: '',
       args: [],
     );
   }
 
   /// `Are you sure you want to delete portfolio '{name}'?`
-  String portfolioListView_confirmDeleteDialogContent(Object name) {
+  String portfoliosListView_confirmDeleteDialogContent(Object name) {
     return Intl.message(
       'Are you sure you want to delete portfolio \'$name\'?',
-      name: 'portfolioListView_confirmDeleteDialogContent',
+      name: 'portfoliosListView_confirmDeleteDialogContent',
       desc: '',
       args: [name],
+    );
+  }
+
+  /// `Edit portfolio`
+  String get portfolioEditDialog_Title {
+    return Intl.message(
+      'Edit portfolio',
+      name: 'portfolioEditDialog_Title',
+      desc: '',
+      args: [],
     );
   }
 
@@ -315,21 +325,91 @@ class S {
     );
   }
 
+  /// `Instrument settings`
+  String get portfolioInstrumentEditDialog_Title {
+    return Intl.message(
+      'Instrument settings',
+      name: 'portfolioInstrumentEditDialog_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Percent in '{portfolio_name}' portfolio`
+  String portfolioInstrumentEditDialog_percent(Object portfolio_name) {
+    return Intl.message(
+      'Percent in \'$portfolio_name\' portfolio',
+      name: 'portfolioInstrumentEditDialog_percent',
+      desc: '',
+      args: [portfolio_name],
+    );
+  }
+
   /// `Edit`
-  String get operationListViewItem_menuEdit {
+  String get operationsListViewItem_menuEdit {
     return Intl.message(
       'Edit',
-      name: 'operationListViewItem_menuEdit',
+      name: 'operationsListViewItem_menuEdit',
       desc: '',
       args: [],
     );
   }
 
   /// `Delete`
-  String get operationListViewItem_menuDelete {
+  String get operationsListViewItem_menuDelete {
     return Intl.message(
       'Delete',
-      name: 'operationListViewItem_menuDelete',
+      name: 'operationsListViewItem_menuDelete',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Portfolio operations`
+  String get portfolioOperations_Title {
+    return Intl.message(
+      'Portfolio operations',
+      name: 'portfolioOperations_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add operation`
+  String get operationEditDialog_Title_add {
+    return Intl.message(
+      'Add operation',
+      name: 'operationEditDialog_Title_add',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Edit operation`
+  String get operationEditDialog_Title_edit {
+    return Intl.message(
+      'Edit operation',
+      name: 'operationEditDialog_Title_edit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Operation date`
+  String get operationEditDialog_date {
+    return Intl.message(
+      'Operation date',
+      name: 'operationEditDialog_date',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Operation type`
+  String get operationEditDialog_operationtype {
+    return Intl.message(
+      'Operation type',
+      name: 'operationEditDialog_operationtype',
       desc: '',
       args: [],
     );

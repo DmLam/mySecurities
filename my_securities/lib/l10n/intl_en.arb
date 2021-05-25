@@ -23,20 +23,31 @@
   "db_portfolioAlreadyExists": "Portfolio '{name}' already exists",
   "db_portfolioNotEmpty": "Portfolio is not empty",
 
-  "portfolioListView_portfolioStarted": "Started",
-  "portfolioListView_menuEdit": "Edit",
-  "portfolioListView_menuDelete": "Delete",
-  "portfolioListView_menuVisible": "Visible",
-  "portfolioListView_confirmDeleteDialogTitle": "Portfolio deletion",
-  "portfolioListView_confirmDeleteDialogContent": "Are you sure you want to delete portfolio '{name}'?",
+  "portfoliosListView_portfolioStarted": "Started",
+  "portfoliosListView_menuEdit": "Edit",
+  "portfoliosListView_menuDelete": "Delete",
+  "portfoliosListView_menuVisible": "Visible",
+  "portfoliosListView_confirmDeleteDialogTitle": "Portfolio deletion",
+  "portfoliosListView_confirmDeleteDialogContent": "Are you sure you want to delete portfolio '{name}'?",
 
+  "portfolioEditDialog_Title": "Edit portfolio",
   "portfolioEditDialog_Name": "Name",
   "portfolioEditDialog_startDate": "Creation date",
 
   "portfolioInstrumentListView_menuEdit": "Edit",
 
-  "operationListViewItem_menuEdit": "Edit",
-  "operationListViewItem_menuDelete": "Delete",
+  "portfolioInstrumentEditDialog_Title": "Instrument settings",
+  "portfolioInstrumentEditDialog_percent": "Percent in '{portfolio_name}' portfolio",
+
+  "operationsListViewItem_menuEdit": "Edit",
+  "operationsListViewItem_menuDelete": "Delete",
+
+  "portfolioOperations_Title": "Portfolio operations",
+
+  "operationEditDialog_Title_add": "Add operation",
+  "operationEditDialog_Title_edit": "Edit operation",
+  "operationEditDialog_date": "Operation date",
+  "operationEditDialog_operationtype": "Operation type",
 
   "prefTitleMain": "Main",
   "prefMainCurrencyTitle": "Main currency",

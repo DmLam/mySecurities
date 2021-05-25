@@ -4,6 +4,7 @@ import 'package:my_securities/common/future_builder.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/models/instrument.dart';
 import 'package:my_securities/models/portfolio.dart';
+import 'package:my_securities/pages/portfolio_instrument_edit_dialog.dart';
 import 'package:my_securities/pages/portfolio_operation_page.dart';
 import 'package:provider/provider.dart';
 import '../exchange.dart';
@@ -40,7 +41,11 @@ class PortfolioInstrumentListItem extends StatelessWidget {
     Future<double> priceFuture =
       QuoteProvider.of(_instrument).getCurrentPrice();
 
-    void editPortfolioInstrument() {}
+    void editPortfolioInstrument() {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => PortfolioInstrumentEditDialog(_instrument))
+      );
+    }
 
     void showPortfolioOperations() {
       Navigator.of(context).push(

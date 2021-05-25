@@ -102,7 +102,6 @@ class DBProvider {
           exchange_id INTEGER NOT NULL,
           additional TEXT,
           image BLOB,
-          portfolio_percent_plan INTEGER,
           last_quote_update TEXT,
 		      FOREIGN KEY (currency_id) REFERENCES currency(id) 
 			      ON DELETE RESTRICT ON UPDATE RESTRICT,
@@ -117,7 +116,7 @@ class DBProvider {
          id INTEGER PRIMARY KEY AUTOINCREMENT,
          portfolio_id INTEGER NOT NULL,
          instrument_id INTEGER NOT NULL,
-         percent REAL,
+         percent INTEGER,
          FOREIGN KEY (portfolio_id) REFERENCES portfolio(id) 
            ON DELETE CASCADE ON UPDATE RESTRICT,
          FOREIGN KEY (instrument_id) REFERENCES instrument(id) 
@@ -283,9 +282,9 @@ class DBProvider {
 
   Future<int> addInstrument(Instrument instrument) async {
     final Database db = await database;
-    await db.execute("INSERT INTO instrument (isin, ticker, name, currency_id, instrument_type_id, exchange_id, additional, portfolio_percent_plan) values (?, ?, ?, ?, ?, ?, ?, ?)",
+    await db.execute("INSERT INTO instrument (isin, ticker, name, currency_id, instrument_type_id, exchange_id, additional) values (?, ?, ?, ?, ?, ?, ?)",
         [instrument.isin, instrument.ticker, instrument.name, Currency.values.indexOf(instrument.currency) + 1,
-         instrument.type.index + 1, instrument.exchange.index + 1, instrument.additional, instrument.portfolioPercentPlan]);
+         instrument.type.index + 1, instrument.exchange.index + 1, instrument.additional]);
     var result = await db.rawQuery("SELECT MAX(id) as id FROM instrument");
 
     return result.first["id"];
@@ -302,8 +301,11 @@ class DBProvider {
     row['exchange_id'] = instrument.exchange.index + 1;
     row['isin'] = instrument.isin;
     row['additional'] = instrument.additional;
-    row['portfolio_percent_plan'] = instrument.portfolioPercentPlan;
     await db.update('instrument', row, where: 'id = ?', whereArgs: [instrument.id]);
+    await db.update('portfolio_instrument',
+        {"percent": instrument.portfolioPercentPlan},
+        where: 'portfolio_id = ? and instrument_id = ?',
+        whereArgs: [instrument.portfolio.id, instrument.id]);
   }
 
   setInstrumentImage(int instrumentId, Uint8List image) async {
@@ -320,27 +322,6 @@ class DBProvider {
       result = r;
     }
     return Future.value(result);
-  }
-
-  static final String _sqlInstrument =
-      '''SELECT i.id, i.isin, i.ticker, i.name, i.currency_id, i.instrument_type_id, i.exchange_id, i.image, i.additional, i.portfolio_percent_plan, 
-                i.additional, i.image, sum(o.quantity) quantity, sum(o.price * o.quantity) / sum(o.quantity) avgprice, sum(o.value) value, count(o.id) operation_count
-         FROM instrument i LEFT JOIN operation o ON o.instrument_id = i.id , currency c 
-         WHERE c.id = i.currency_id
-           AND i.id = ?''';
-
-  Future<Instrument> getInstrument(int id) async {
-    final Database db = await database;
-    var instrument = await db.rawQuery(_sqlInstrument, [id]);
-
-    return instrument.isNotEmpty ? Instrument.fromMap(instrument.first) : null;
-  }
-
-  refreshInstrument(Instrument instrument) async {
-    final Database db = await database;
-    var inst = await db.rawQuery(_sqlInstrument, [instrument.id]);
-
-    instrument.assign(inst.isNotEmpty ? Instrument.fromMap(inst.first) : Instrument.empty());
   }
 
   static final String _sqlInstruments =
@@ -361,7 +342,7 @@ class DBProvider {
   }
 
   static final String _sqlPortfolioInstruments =
-  '''SELECT i.id, i.isin, i.ticker, i.name, i.currency_id, i.instrument_type_id, i.exchange_id, i.additional, i.portfolio_percent_plan, 
+  '''SELECT i.id, pi.portfolio_id, i.isin, i.ticker, i.name, i.currency_id, i.instrument_type_id, i.exchange_id, i.additional, pi.percent, 
             i.additional, i.image, sum(o.quantity) quantity, sum(o.price * o.quantity) / sum(o.quantity) avgprice, sum(o.value) value, count(o.id) operation_count 
      FROM currency c, instrument i, portfolio_instrument pi LEFT OUTER JOIN operation o ON o.portfolio_instrument_id = pi.id 
      WHERE  

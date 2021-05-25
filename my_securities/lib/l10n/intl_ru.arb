@@ -23,20 +23,31 @@
   "db_portfolioAlreadyExists": "Портфель {name} уже существует",
   "db_portfolioNotEmpty": "Портфель не пуст",
 
-  "portfolioListView_portfolioStarted": "Начат",
-  "portfolioListView_menuEdit": "Редактировать",
-  "portfolioListView_menuDelete": "Удалить",
-  "portfolioListView_menuVisible": "Видимый",
-  "portfolioListView_confirmDeleteDialogTitle": "Удаление портфеля",
-  "portfolioListView_confirmDeleteDialogContent": "Вы уверены, что хотите удалить портфель '{name}'?",
+  "portfoliosListView_portfolioStarted": "Начат",
+  "portfoliosListView_menuEdit": "Редактировать",
+  "portfoliosListView_menuDelete": "Удалить",
+  "portfoliosListView_menuVisible": "Видимый",
+  "portfoliosListView_confirmDeleteDialogTitle": "Удаление портфеля",
+  "portfoliosListView_confirmDeleteDialogContent": "Вы уверены, что хотите удалить портфель '{name}'?",
 
+  "portfolioEditDialog_Title": "Редактировать портфель",
   "portfolioEditDialog_Name": "Наименование",
   "portfolioEditDialog_startDate": "Дата создания",
 
   "portfolioInstrumentListView_menuEdit": "Редактировать",
 
-  "operationListViewItem_menuEdit": "Редактировать",
-  "operationListViewItem_menuDelete": "Удалить",
+  "portfolioInstrumentEditDialog_Title": "Настройка инструмента",
+  "portfolioInstrumentEditDialog_percent": "Процент в портфеле '{portfolio_name}'",
+
+  "operationsListViewItem_menuEdit": "Редактировать",
+  "operationsListViewItem_menuDelete": "Удалить",
+
+  "portfolioOperations_Title": "Операции в портфеле",
+
+  "operationEditDialog_Title_add": "Добавить операцию",
+  "operationEditDialog_Title_edit": "Редактировать операцию",
+  "operationEditDialog_date": "Дата операции",
+  "operationEditDialog_operationtype": "Тип операции",
 
   "prefTitleMain": "Основные",
   "prefMainCurrencyTitle": "Основная валюта",

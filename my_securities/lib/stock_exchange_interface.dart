@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:flutter/material.dart';
 import 'exchange.dart';
 import 'models/instrument.dart';
 import 'models/quote.dart';

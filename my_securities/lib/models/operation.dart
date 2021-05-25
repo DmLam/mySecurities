@@ -32,7 +32,7 @@ class Operation extends ChangeNotifier{
 
   String priceString() => _price == null ? '' : formatCurrency(_price);
 
-  Operation({@required int id, @required Portfolio portfolio, @required Instrument instrument,
+  Operation({@required int id, @required Portfolio portfolio, Instrument instrument,
       @required DateTime date, @required OperationType type, @required int quantity, @required double price,
       double commission}) :
     _id = id,
@@ -44,12 +44,12 @@ class Operation extends ChangeNotifier{
     _price = price,
     _commission = commission;
 
-  Operation.empty() {
+  Operation.empty({@required Portfolio portfolio, Instrument instrument}) {
     DateTime now = DateTime.now();
 
     this._id = null;
-    this._portfolio = null;
-    this._instrument = null;
+    this._portfolio = portfolio;
+    this._instrument = instrument;
     this._date = DateTime(now.year, now.month, now.day);
     this._type = OperationType.buy;
     this._quantity = 0;

@@ -21,7 +21,9 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m0(name) => "Portfolio \'${name}\' already exists";
 
-  static m1(name) => "Are you sure you want to delete portfolio \'${name}\'?";
+  static m1(portfolio_name) => "Percent in \'${portfolio_name}\' portfolio";
+
+  static m2(name) => "Are you sure you want to delete portfolio \'${name}\'?";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -41,20 +43,28 @@ class MessageLookup extends MessageLookupByLibrary {
     "instrumentTypeShare" : MessageLookupByLibrary.simpleMessage("Share"),
     "moneyOperationTypeDeposit" : MessageLookupByLibrary.simpleMessage("Deposit"),
     "moneyOperationTypeWithdraw" : MessageLookupByLibrary.simpleMessage("Withdraw"),
-    "operationListViewItem_menuDelete" : MessageLookupByLibrary.simpleMessage("Delete"),
-    "operationListViewItem_menuEdit" : MessageLookupByLibrary.simpleMessage("Edit"),
+    "operationEditDialog_Title_add" : MessageLookupByLibrary.simpleMessage("Add operation"),
+    "operationEditDialog_Title_edit" : MessageLookupByLibrary.simpleMessage("Edit operation"),
+    "operationEditDialog_date" : MessageLookupByLibrary.simpleMessage("Operation date"),
+    "operationEditDialog_operationtype" : MessageLookupByLibrary.simpleMessage("Operation type"),
     "operationTypeBuy" : MessageLookupByLibrary.simpleMessage("Buy"),
     "operationTypeSell" : MessageLookupByLibrary.simpleMessage("Sell"),
+    "operationsListViewItem_menuDelete" : MessageLookupByLibrary.simpleMessage("Delete"),
+    "operationsListViewItem_menuEdit" : MessageLookupByLibrary.simpleMessage("Edit"),
     "pcs" : MessageLookupByLibrary.simpleMessage("pcs"),
     "portfolioEditDialog_Name" : MessageLookupByLibrary.simpleMessage("Name"),
+    "portfolioEditDialog_Title" : MessageLookupByLibrary.simpleMessage("Edit portfolio"),
     "portfolioEditDialog_startDate" : MessageLookupByLibrary.simpleMessage("Creation date"),
+    "portfolioInstrumentEditDialog_Title" : MessageLookupByLibrary.simpleMessage("Instrument settings"),
+    "portfolioInstrumentEditDialog_percent" : m1,
     "portfolioInstrumentListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Edit"),
-    "portfolioListView_confirmDeleteDialogContent" : m1,
-    "portfolioListView_confirmDeleteDialogTitle" : MessageLookupByLibrary.simpleMessage("Portfolio deletion"),
-    "portfolioListView_menuDelete" : MessageLookupByLibrary.simpleMessage("Delete"),
-    "portfolioListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Edit"),
-    "portfolioListView_menuVisible" : MessageLookupByLibrary.simpleMessage("Visible"),
-    "portfolioListView_portfolioStarted" : MessageLookupByLibrary.simpleMessage("Started"),
+    "portfolioOperations_Title" : MessageLookupByLibrary.simpleMessage("Portfolio operations"),
+    "portfoliosListView_confirmDeleteDialogContent" : m2,
+    "portfoliosListView_confirmDeleteDialogTitle" : MessageLookupByLibrary.simpleMessage("Portfolio deletion"),
+    "portfoliosListView_menuDelete" : MessageLookupByLibrary.simpleMessage("Delete"),
+    "portfoliosListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Edit"),
+    "portfoliosListView_menuVisible" : MessageLookupByLibrary.simpleMessage("Visible"),
+    "portfoliosListView_portfolioStarted" : MessageLookupByLibrary.simpleMessage("Started"),
     "prefDarkTheme" : MessageLookupByLibrary.simpleMessage("Dark theme"),
     "prefMainCurrencyTitle" : MessageLookupByLibrary.simpleMessage("Main currency"),
     "prefShowHiddenPortfoliosTitle" : MessageLookupByLibrary.simpleMessage("Show hidden portfolios"),

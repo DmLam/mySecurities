@@ -8,11 +8,11 @@ import 'package:my_securities/models/operation.dart';
 import 'package:my_securities/models/portfolio.dart';
 import '../constants.dart';
 
-class OperationListView extends StatelessWidget {
+class OperationsListView extends StatelessWidget {
   final Portfolio portfolio;
   final Instrument instrument;
 
-  const OperationListView(this.portfolio, {this.instrument, Key key}) : super(key: key);
+  const OperationsListView(this.portfolio, {this.instrument, Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,14 +22,14 @@ class OperationListView extends StatelessWidget {
         return ChangeNotifierProvider<Instrument>.value(
           value: portfolio.operations.operations[index].instrument,
           builder: (context, widget) {
-            return operationListItem(context, portfolio.operations.operations[index]);
+            return operationsListItem(context, portfolio.operations.operations[index]);
           }
         );
       });
   }
 }
 
-Widget operationListItem(BuildContext context, Operation operation) {
+Widget operationsListItem(BuildContext context, Operation operation) {
   final String languageCode = Localizations.localeOf(context).languageCode;
   Instrument instrument = context.watch<Instrument>();
 
@@ -53,11 +53,11 @@ Widget operationListItem(BuildContext context, Operation operation) {
           itemBuilder: (_) => <PopupMenuItem<String>>[
             PopupMenuItem<String>(
               value: "edit",
-              child: Text(S.of(context).operationListViewItem_menuEdit),
+              child: Text(S.of(context).operationsListViewItem_menuEdit),
             ),
             PopupMenuItem<String>(
               value: "delete",
-              child: Text(S.of(context).operationListViewItem_menuDelete),
+              child: Text(S.of(context).operationsListViewItem_menuDelete),
             )
           ],
           onSelected: (value) {

@@ -6,11 +6,13 @@ import 'package:my_securities/models/portfolio.dart';
 
 import '../database.dart';
 import '../stock_exchange_interface.dart';
+import 'model.dart';
 
 enum InstrumentType {currency, share, etf, federalBond, subfederalBond, corporateBond, futures, stockIndex}
 
-class Instrument extends ChangeNotifier{
+class Instrument extends ChangeNotifier {
   int _id;
+  Portfolio _portfolio;
   String _isin;
   String _ticker;
   String _name;
@@ -26,6 +28,7 @@ class Instrument extends ChangeNotifier{
   int _operationCount;
 
   int get id => _id;
+  Portfolio get portfolio => _portfolio;
   String get isin => _isin;
   String get ticker => _ticker;
   String get name => _name;
@@ -41,14 +44,21 @@ class Instrument extends ChangeNotifier{
 
   String get additional => _additional;
   int get portfolioPercentPlan => _portfolioPercentPlan;
+  set portfolioPercentPlan(int value) {
+    _portfolioPercentPlan = value;
+    DBProvider.db.updateInstrument(this);
+    notifyListeners();
+  }
   int get quantity => _quantity;
   double get averagePrice => _averagePrice;
   double get value => _value;
   int get operationCount => _operationCount;
 
-  Instrument(this._id, {isin = '', @required ticker, name = '', currency, type,
+  Instrument(this._id, {@required Portfolio portfolio, isin = '', @required ticker, name = '', currency, type,
     exchange = Exchange.MCX, image, additional, portfolioPercentPlan, quantity = 0,
     averagePrice = 0, value = 0, operationCount = 0}):
+    assert(portfolio != null),
+    _portfolio = portfolio,
     _isin = isin,
     _ticker = ticker,
     _name = name,
@@ -65,6 +75,7 @@ class Instrument extends ChangeNotifier{
 
   Instrument.from(Instrument source):
     this._id = source._id,
+    this._portfolio = source._portfolio,
     this._isin = source._isin,
     this._ticker = source._ticker,
     this._name = source._name,
@@ -90,6 +101,7 @@ class Instrument extends ChangeNotifier{
 
   factory Instrument.fromMap(Map<String, dynamic> json) =>
       Instrument(json["id"],
+          portfolio: Model.portfolios().portfolioById(json["portfolio_id"]),
           isin: json["isin"],
           ticker: json["ticker"],
           name: json["name"],
@@ -98,7 +110,7 @@ class Instrument extends ChangeNotifier{
           exchange: Exchange.values[json["exchange_id"] - 1],
           image: json['image'],
           additional: json['additional'],
-          portfolioPercentPlan: json['portfolio_percent_plan'],
+          portfolioPercentPlan: json['percent'],
           quantity: json["quantity"],
           averagePrice: json["avgprice"],
           value: json["value"],
@@ -129,6 +141,7 @@ class Instrument extends ChangeNotifier{
 
   Instrument assign(Instrument source) {
     this._id = source.id;
+    this._portfolio = source._portfolio;
     this._isin = source.isin;
     this._ticker = source.ticker;
     this._name = source.name;

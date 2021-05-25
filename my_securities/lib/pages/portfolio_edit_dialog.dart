@@ -12,8 +12,8 @@ class PortfolioEditDialog extends StatelessWidget {
 
   PortfolioEditDialog(this._portfolio, {Key key}) : super(key: key) {
     assert(_portfolio != null);
-    _portfolio.visible = true;
-    _nameEditController.text = _portfolio?.name;
+
+    _nameEditController.text = _portfolio.name;
   }
 
   @override
@@ -38,7 +38,7 @@ class PortfolioEditDialog extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: MySecuritiesAppBar(),
+      appBar: MySecuritiesAppBar(pageName: S.of(context).portfolioEditDialog_Title,),
       body: ChangeNotifierProvider<Portfolio>.value(
         value: _portfolio,
         child: SingleChildScrollView(
@@ -51,14 +51,14 @@ class PortfolioEditDialog extends StatelessWidget {
                       Row(
                         children: [
                           Expanded(
-                            child: TextField(
-                            controller: _nameEditController,
-                            onChanged: (value) {_portfolio.name = value;},
-                            decoration: InputDecoration(
-                              icon: Icon(Icons.perm_identity),
-                              labelText: S.of(context).portfolioEditDialog_Name,
-                              contentPadding: EdgeInsets.all(3.0)
-                            )),
+                            child:TextField(
+                              controller: _nameEditController,
+                              onChanged: (value) {_portfolio.name = value;},
+                              decoration: InputDecoration(
+                                icon: Icon(Icons.perm_identity),
+                                labelText: S.of(context).portfolioEditDialog_Name,
+                                contentPadding: EdgeInsets.all(3.0)
+                              )),
                           ),
                         ]),
                     ],

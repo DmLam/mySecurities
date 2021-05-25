@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:my_securities/models/portfolio.dart';
 import 'package:my_securities/pages/portfolio_edit_dialog.dart';
 import 'package:my_securities/widgets/appbar.dart';
-import 'package:my_securities/widgets/portfolio_list_view.dart';
+import 'package:my_securities/widgets/portfolios_list_view.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -20,7 +20,7 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
       appBar: MySecuritiesAppBar(),
-      body:  PortfolioListView(context.watch<Preferences>()),
+      body:  PortfoliosListView(context.watch<Preferences>()),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: addPortfolio,
