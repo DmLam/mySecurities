@@ -23,8 +23,6 @@ class Portfolio extends ChangeNotifier {
   bool get visible => _visible;
   set visible(bool visible) {
     _visible = visible;
-    DBProvider.db.updatePortfolio(this);
-    _owner.notifyListeners();
   }
   DateTime get startDate => _startDate;
 
@@ -43,8 +41,8 @@ class Portfolio extends ChangeNotifier {
     _visible = portfolio._visible,
     _startDate = portfolio._startDate;
 
-  Portfolio.empty(PortfolioList owner) :
-    _owner = owner,
+  Portfolio.empty() :
+    _owner = null,
     _id = null,
     _name = "",
     _visible = true,
@@ -58,14 +56,20 @@ class Portfolio extends ChangeNotifier {
       json["start_date"] == null ? null : DateTime.parse(json["start_date"])
     );
 
+  assign(Portfolio source) {
+    this._id = source._id;
+    this._owner = source._owner;
+    this._name = source._name;
+    this._visible = source._visible;
+    this._startDate = source._startDate;
+
+    notifyListeners();
+  }
+
   Instrument instrumentById(int id) => instruments.instrumentById(id);
 
   Future<bool> update() async {
     bool result = await DBProvider.db.updatePortfolio(this);
-
-    if (result){
-      result = true;
-    }
 
     notifyListeners();
 
@@ -98,20 +102,20 @@ class PortfolioList extends ChangeNotifier {
     return result;
   }
 
-  _getPortfolios() async {
+  _getPortfoliosFromDB() async {
     _items = await DBProvider.db.getPortfolios();
     _items.forEach((element) {element._owner = this;});
   }
 
   Future _init() async{
-    await _getPortfolios();
+    await _getPortfoliosFromDB();
   }
 
   Future<bool> add(Portfolio portfolio) async {
     bool result = await DBProvider.db.addPortfolio(portfolio);
 
     if (result){
-      await _getPortfolios();
+      await _getPortfoliosFromDB();
       notifyListeners();
     }
 
@@ -122,7 +126,7 @@ class PortfolioList extends ChangeNotifier {
     bool result = await DBProvider.db.deletePortfolio(portfolio);
 
     if (result){
-      await _getPortfolios();
+      await _getPortfoliosFromDB();
       notifyListeners();
     }
 

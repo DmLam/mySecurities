@@ -48,7 +48,8 @@ void handleMenuSelection(BuildContext context, String value) {
   if (value == S.of(context).appBar_settings) {
             Navigator.of(context).push(
           MaterialPageRoute(
-              builder: (context) => SettingsPage()
+            builder: (context) => SettingsPage(),
+            fullscreenDialog: true
           )
       );
   }

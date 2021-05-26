@@ -290,22 +290,36 @@ class DBProvider {
     return result.first["id"];
   }
 
-  Future<void> updateInstrument(Instrument instrument) async {
-    final Database db = await database;
-    Map<String, dynamic> row = {};
+  Future<bool> updateInstrument(Instrument instrument) async {
+    bool result = false;
 
-    row['ticker'] = instrument.ticker;
-    row['name'] = instrument.name;
-    row['currency_id'] = Currency.values.indexOf(instrument.currency) + 1;
-    row['instrument_type_id'] = instrument.type.index + 1;
-    row['exchange_id'] = instrument.exchange.index + 1;
-    row['isin'] = instrument.isin;
-    row['additional'] = instrument.additional;
-    await db.update('instrument', row, where: 'id = ?', whereArgs: [instrument.id]);
-    await db.update('portfolio_instrument',
-        {"percent": instrument.portfolioPercentPlan},
-        where: 'portfolio_id = ? and instrument_id = ?',
-        whereArgs: [instrument.portfolio.id, instrument.id]);
+    if (instrument.id == null)
+      Fluttertoast.showToast(msg: "Internal error: updating instrument without id");
+    else {
+      final Database db = await database;
+      final Batch batch = db.batch();
+      Map<String, dynamic> row = {};
+
+
+      row['ticker'] = instrument.ticker;
+      row['name'] = instrument.name;
+      row['currency_id'] = Currency.values.indexOf(instrument.currency) + 1;
+      row['instrument_type_id'] = instrument.type.index + 1;
+      row['exchange_id'] = instrument.exchange.index + 1;
+      row['isin'] = instrument.isin;
+      row['additional'] = instrument.additional;
+      batch.update(
+          'instrument', row, where: 'id = ?', whereArgs: [instrument.id]);
+      batch.update('portfolio_instrument',
+          {"percent": instrument.portfolioPercentPlan},
+          where: 'portfolio_id = ? and instrument_id = ?',
+          whereArgs: [instrument.portfolio.id, instrument.id]);
+      batch.commit(noResult: true);
+
+      result = true;
+    }
+
+    return Future.value(result);
   }
 
   setInstrumentImage(int instrumentId, Uint8List image) async {
@@ -414,9 +428,12 @@ class DBProvider {
     var operationId = await db.rawQuery("SELECT MAX(id) as id FROM operation");
     int result = operationId.first["id"];
     if (createMoneyOperation)
-      batch.execute(
-          "INSERT INTO money (currency_id, date, type, amount, operation_id) values (?, ?, ?, ?, ?)",
-          [currencyId, dbDateString(op.date), operationTypeToMoneyOperationType(op.type).index + 1, operationValue - op.commission, result]);
+      batch.insert('money',
+          {'currency_id': currencyId,
+            'date': dbDateString(op.date),
+            'type': operationTypeToMoneyOperationType(op.type).index + 1,
+            'amount': operationValue - op.commission,
+            'operation_id': result});
     batch.commit(noResult: true);
 
     return Future.value(result);
@@ -427,12 +444,22 @@ class DBProvider {
     int currencyId = await getInstrumentCurrencyId(op.instrument.id);
     final Batch batch = db.batch();
 
-    batch.execute(
-        "UPDATE operation SET date = ?, type = ?, quantity = ?, price = ?, value = ?, commission = ? WHERE id = ?",
-        [dbDateString(op.date), op.type.index, op.quantity, op.price, op.value, op.commission, op.id]);
-    batch.execute(
-        "UPDATE money SET currency_id = ?,  date = ?, type = ?, amount = ? WHERE id = ?",
-        [currencyId, dbDateString(op.date), operationTypeToMoneyOperationType(op.type).index + 1, op.value - op.commission]);
+    batch.update('operation',
+        {'date': dbDateString(op.date),
+          'type': op.type.index,
+          'quantity': op.quantity,
+          'price': op.price,
+          'value': op.value,
+          'comission': op.commission},
+        where: 'id = ?',
+        whereArgs: [op.id]);
+    batch.update('money',
+        {'currency_id': currencyId,
+          'date': dbDateString(op.date),
+          'type': operationTypeToMoneyOperationType(op.type).index + 1,
+          'amount': op.value - op.commission},
+        where: 'operation_id = ?',
+        whereArgs: [op.id]);
     batch.commit(noResult: true);
   }
 

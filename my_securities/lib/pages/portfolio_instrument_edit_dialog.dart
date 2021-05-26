@@ -22,7 +22,8 @@ class PortfolioInstrumentEditDialog extends StatelessWidget {
 
     onFabPressed() {
       _instrument.portfolioPercentPlan = int.parse(_percentEditController.text);
-      Navigator.of(context).pop();
+
+      Navigator.of(context).pop(true);
     }
     return Scaffold(
       appBar: MySecuritiesAppBar(pageName: S.of(context).portfolioInstrumentEditDialog_Title),

@@ -24,17 +24,7 @@ class PortfolioEditDialog extends StatelessWidget {
     }
 
     onFABPressed() async {
-      bool result;
-
-      if (_portfolio.id == null) {
-        result = await context.read<PortfolioList>().add(_portfolio);
-      }
-      else {
-        result = await _portfolio.update();
-      }
-
-      if (result)
-        Navigator.pop(context, true);
+      Navigator.pop(context, true);
     }
 
     return Scaffold(

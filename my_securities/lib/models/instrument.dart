@@ -21,7 +21,7 @@ class Instrument extends ChangeNotifier {
   Currency _currency;
   Uint8List _image;
   String _additional;
-  int _portfolioPercentPlan;
+  int portfolioPercentPlan;
   int _quantity;
   double _averagePrice;
   double _value;
@@ -43,12 +43,6 @@ class Instrument extends ChangeNotifier {
   }
 
   String get additional => _additional;
-  int get portfolioPercentPlan => _portfolioPercentPlan;
-  set portfolioPercentPlan(int value) {
-    _portfolioPercentPlan = value;
-    DBProvider.db.updateInstrument(this);
-    notifyListeners();
-  }
   int get quantity => _quantity;
   double get averagePrice => _averagePrice;
   double get value => _value;
@@ -67,7 +61,7 @@ class Instrument extends ChangeNotifier {
     _exchange = exchange,
     _image = image,
     _additional = additional,
-    _portfolioPercentPlan = portfolioPercentPlan,
+    portfolioPercentPlan = portfolioPercentPlan,
     _quantity = quantity,
     _averagePrice = averagePrice,
     _value = value,
@@ -84,7 +78,7 @@ class Instrument extends ChangeNotifier {
     this._image = source._image,
     this._additional = source._additional,
     this._exchange = source._exchange,
-    this._portfolioPercentPlan = source._portfolioPercentPlan,
+    this.portfolioPercentPlan = source.portfolioPercentPlan,
     this._quantity = source._quantity,
     this._averagePrice = source._averagePrice,
     this._value = source._value,
@@ -139,7 +133,7 @@ class Instrument extends ChangeNotifier {
     "operation_count": operationCount
   };
 
-  Instrument assign(Instrument source) {
+  assign(Instrument source) {
     this._id = source.id;
     this._portfolio = source._portfolio;
     this._isin = source.isin;
@@ -150,13 +144,11 @@ class Instrument extends ChangeNotifier {
     this._exchange = source.exchange;
     this._image = Uint8List.fromList(source.image);
     this._additional = source.additional;
-    this._portfolioPercentPlan = source.portfolioPercentPlan;
+    this.portfolioPercentPlan = source.portfolioPercentPlan;
     this._quantity = source.quantity;
     this._averagePrice = source.averagePrice;
     this._value = source.value;
     this._operationCount = source.operationCount;
-
-    return source;
   }
 
   _loadImage() async {
@@ -167,6 +159,14 @@ class Instrument extends ChangeNotifier {
       DBProvider.db.setInstrumentImage(_id, _image);
       notifyListeners();
     }
+  }
+
+  Future<bool> update() async {
+    bool result = await DBProvider.db.updateInstrument(this);
+
+    notifyListeners();
+
+    return Future.value(result);
   }
 }
 

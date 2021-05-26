@@ -14,7 +14,10 @@ class HomePage extends StatelessWidget {
       PortfolioList owner = context.read<PortfolioList>();
 
       Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => PortfolioEditDialog(Portfolio.empty(owner)))
+        MaterialPageRoute(
+          builder: (_) => PortfolioEditDialog(Portfolio.empty()),
+          fullscreenDialog: true
+        )
       );
     }
 

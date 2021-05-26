@@ -11,26 +11,21 @@ class Operation extends ChangeNotifier{
   int _id;
   Portfolio _portfolio;
   Instrument _instrument;
-  DateTime _date;
-  OperationType _type;
-  int _quantity;
-  double _price;
-  double _commission;
+  DateTime date;
+  OperationType type;
+  int quantity;
+  double price;
+  double commission;
 
-  double get value => (_type == OperationType.buy ? 1 : -1) * (_price * _quantity * 10000).roundToDouble() / 10000;
+  double get value => (type == OperationType.buy ? 1 : -1) * (price * quantity * 10000).roundToDouble() / 10000;
 
   int get id => _id;
   Portfolio get portfolio => _portfolio;
   Instrument get instrument => _instrument;
-  DateTime get date => _date;
-  OperationType get type => _type;
-  int get quantity => _quantity;
-  double get price => _price;
-  double get commission => _commission;
 
   String valueString() => value == null ? '' : formatCurrency(value);
 
-  String priceString() => _price == null ? '' : formatCurrency(_price);
+  String priceString() => price == null ? '' : formatCurrency(price);
 
   Operation({@required int id, @required Portfolio portfolio, Instrument instrument,
       @required DateTime date, @required OperationType type, @required int quantity, @required double price,
@@ -38,11 +33,11 @@ class Operation extends ChangeNotifier{
     _id = id,
     _portfolio = portfolio,
     _instrument = instrument,
-    _date = date,
-    _type = type,
-    _quantity = quantity,
-    _price = price,
-    _commission = commission;
+    date = date,
+    type = type,
+    quantity = quantity,
+    price = price,
+    commission = commission;
 
   Operation.empty({@required Portfolio portfolio, Instrument instrument}) {
     DateTime now = DateTime.now();
@@ -50,11 +45,24 @@ class Operation extends ChangeNotifier{
     this._id = null;
     this._portfolio = portfolio;
     this._instrument = instrument;
-    this._date = DateTime(now.year, now.month, now.day);
-    this._type = OperationType.buy;
-    this._quantity = 0;
-    this._price = 0;
-    this._commission = 0;
+    this.date = DateTime(now.year, now.month, now.day);
+    this.type = OperationType.buy;
+    this.quantity = 0;
+    this.price = 0;
+    this.commission = 0;
+  }
+
+  assign(Operation source) {
+    this._id = source.id;
+    this._portfolio = source._portfolio;
+    this._instrument = source._instrument;
+    this.date = source.date;
+    this.type = source.type;
+    this.quantity = source.quantity;
+    this.price = source.price;
+    this.commission = source.commission;
+
+    notifyListeners();
   }
 
   factory Operation.fromMap(Map<String, dynamic> json) =>
@@ -81,5 +89,9 @@ class OperationList extends ChangeNotifier {
 
   _loadFromDb() async {
     _items = await DBProvider.db.getPortfolioOperations(_portfolio.id);
+  }
+
+  addOperation (Operation operation, bool createMoneyOperation) {
+    DBProvider.db.addOperation(operation, createMoneyOperation);
   }
 }

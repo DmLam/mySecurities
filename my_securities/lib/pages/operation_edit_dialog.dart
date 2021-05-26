@@ -6,7 +6,6 @@ import 'package:my_securities/common/utils.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/models/operation.dart';
 import 'package:my_securities/widgets/appbar.dart';
-
 import '../constants.dart';
 
 class OperationEditDialog extends StatelessWidget {
@@ -59,8 +58,10 @@ class OperationEditDialog extends StatelessWidget {
                         firstDate: DateTime(2000),
                         lastDate: DateTime.now()).then((date) =>
                     {
-                      if (date != null)
-                        _dateEditController.text = DateFormat.yMd(ui.window.locale.languageCode).format(date)
+                      if (date != null) {
+                        _dateEditController.text =
+                            DateFormat.yMd(ui.window.locale.languageCode).format(date)
+                      }
                     });
                   }
                 )
