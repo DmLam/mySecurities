@@ -10,6 +10,8 @@
   "applicationTitle": "My securities",
   "defaultPortfolioName": "Мой портфель",
 
+  "errorInvalidValue": "Недопустимое значение",
+
   "operationTypeBuy": "Покупка",
   "operationTypeSell": "Продажа",
   "moneyOperationTypeDeposit": "Поступление",
@@ -48,6 +50,10 @@
   "operationEditDialog_Title_edit": "Редактировать операцию",
   "operationEditDialog_date": "Дата операции",
   "operationEditDialog_operationtype": "Тип операции",
+  "operationEditDialog_quantity": "Количество",
+  "operationEditDialog_price": "Цена",
+  "operationEditDialog_commission": "Комиссия",
+  "operationEditDialog_withdrawmoney": "Списать деньги",
 
   "prefTitleMain": "Основные",
   "prefMainCurrencyTitle": "Основная валюта",

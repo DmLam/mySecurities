@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:my_securities/common/dialog_panel.dart';
 import 'dart:ui' as ui;
@@ -27,13 +28,14 @@ class OperationEditDialog extends StatelessWidget {
     String pageName = _operation.id == null ?
       S.of(context).operationEditDialog_Title_add :
       S.of(context).operationEditDialog_Title_edit;
+    bool _createMoneyOperation = true;
 
     bool _fabEnabled() {
       return false;
     }
 
     onFabPressed() {
-
+      Navigator.of(context).pop(_createMoneyOperation);
     }
 
     return
@@ -41,6 +43,7 @@ class OperationEditDialog extends StatelessWidget {
         appBar: MySecuritiesAppBar(pageName: pageName),
         body: SingleChildScrollView(child:
           Column(children: [
+            // date, Operation type
             dialogPanel(children: [
               Expanded(flex: 45,
                 child: TextField(textAlign: TextAlign.end,
@@ -78,10 +81,110 @@ class OperationEditDialog extends StatelessWidget {
                           contentPadding: EdgeInsets.all(3.0)
                       ),
                       isExpanded: true,
-                      onChanged: (type) {}
+                      onChanged: (type) {_operation.type = OperationType.values[OPERATION_TYPE_NAMES.indexOf(type)];}
                   )
               )
             ]),
+            // quantity, price
+            dialogPanel(children: [
+              Expanded(flex: 45,
+                  child: TextFormField(
+                    textAlign: TextAlign.end,
+                    controller:  _quantityEditController,
+                    keyboardType: TextInputType.numberWithOptions(signed: false, decimal: false),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
+                    ],
+                    style: TextStyle(fontSize: 18),
+                    decoration: InputDecoration(
+                        icon: Icon(Icons.filter_1),
+                        labelText: S.of(context).operationEditDialog_quantity,
+                        contentPadding: EDIT_UNDERLINE_PADDING
+                    ),
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (value) {
+                      String result;
+                      if (value != null && value != '') {
+                        if (_operation.quantity == null) {
+                          result = S.of(context).errorInvalidValue;
+                        }
+                      }
+                      return result;
+                    },
+                    onChanged: (value) {
+                      _operation.quantity = int.tryParse(value);
+                    },
+                  )
+              ),
+              Expanded(flex: 10, child: Text('')),
+              Expanded(flex: 45,
+                  child: TextFormField(
+                    textAlign: TextAlign.end,
+                    controller:  _priceEditController,
+                    keyboardType: TextInputType.numberWithOptions(signed: false, decimal: true),
+                    inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9\.,]'))],
+                    style: TextStyle(fontSize: 18),
+                    decoration: InputDecoration(
+                        icon: Icon(Icons.attach_money),
+                        labelText: S.of(context).operationEditDialog_price,
+                        contentPadding: EDIT_UNDERLINE_PADDING
+                    ),
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (value) {
+                      String result;
+                      if (value != null && value != '') {
+                        if (_operation.price == null) {
+                          result = S.of(context).errorInvalidValue;
+                        }
+                      }
+                      return result;
+                    },
+                    onChanged: (value) {
+                      _operation.price = double.tryParse(value);
+                    },
+                  )
+              ),
+            ]),
+            // commission
+            dialogPanel(children: [
+              Expanded(flex: 50,
+                  child: TextFormField(
+                    textAlign: TextAlign.end,
+                    controller:  _commissionEditController,
+                    keyboardType: TextInputType.numberWithOptions(signed: false, decimal: true),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9\.,]'))
+                    ],
+                    style: TextStyle(fontSize: 18),
+                    decoration: InputDecoration(
+                        icon: Icon(Icons.monetization_on),
+                        labelText: S.of(context).operationEditDialog_commission,
+                        contentPadding: EDIT_UNDERLINE_PADDING
+                    ),
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (value) {
+                      String result;
+                      if (value != null && value != '') {
+                        if (_operation.commission == null) {
+                          result = S.of(context).errorInvalidValue;
+                        }
+                      }
+                      return result;
+                    },
+                    onChanged: (value) {
+                      _operation.commission = double.tryParse(value) ?? 0;
+                    },
+                  )
+              ),
+              Expanded(flex: 50,
+                  child: CheckboxListTile(
+                      title: Text(S.of(context).operationEditDialog_withdrawmoney),
+                      value: _createMoneyOperation,
+                      controlAffinity: ListTileControlAffinity.leading,
+                      onChanged: (value) => {_createMoneyOperation = value}
+                  )
+              )
+            ])
           ])
         ),
         floatingActionButton:       // don't show FAB if keyboard is opened, because the FAB overflows most bottom editor

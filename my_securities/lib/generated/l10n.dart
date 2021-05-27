@@ -95,6 +95,16 @@ class S {
     );
   }
 
+  /// `Invalid value`
+  String get errorInvalidValue {
+    return Intl.message(
+      'Invalid value',
+      name: 'errorInvalidValue',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `My securities`
   String get applicationTitle {
     return Intl.message(
@@ -410,6 +420,46 @@ class S {
     return Intl.message(
       'Operation type',
       name: 'operationEditDialog_operationtype',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Quantity`
+  String get operationEditDialog_quantity {
+    return Intl.message(
+      'Quantity',
+      name: 'operationEditDialog_quantity',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Price`
+  String get operationEditDialog_price {
+    return Intl.message(
+      'Price',
+      name: 'operationEditDialog_price',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Commission`
+  String get operationEditDialog_commission {
+    return Intl.message(
+      'Commission',
+      name: 'operationEditDialog_commission',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Withdraw money`
+  String get operationEditDialog_withdrawmoney {
+    return Intl.message(
+      'Withdraw money',
+      name: 'operationEditDialog_withdrawmoney',
       desc: '',
       args: [],
     );

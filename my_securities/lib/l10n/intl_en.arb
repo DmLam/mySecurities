@@ -7,6 +7,8 @@
   "dialogAction_Cancel": "Cancel",
   "dialogAction_Continue": "Continue",
 
+  "errorInvalidValue": "Invalid value",
+
   "applicationTitle": "My securities",
   "defaultPortfolioName": "My portfolio",
 
@@ -48,6 +50,10 @@
   "operationEditDialog_Title_edit": "Edit operation",
   "operationEditDialog_date": "Operation date",
   "operationEditDialog_operationtype": "Operation type",
+  "operationEditDialog_quantity": "Quantity",
+  "operationEditDialog_price": "Price",
+  "operationEditDialog_commission": "Commission",
+  "operationEditDialog_withdrawmoney": "Withdraw money",
 
   "prefTitleMain": "Main",
   "prefMainCurrencyTitle": "Main currency",
