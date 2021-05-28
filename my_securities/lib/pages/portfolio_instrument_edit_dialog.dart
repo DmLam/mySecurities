@@ -21,7 +21,7 @@ class PortfolioInstrumentEditDialog extends StatelessWidget {
     bool _fabEnabled() => int.tryParse(_percentEditController.text) != null;
 
     onFabPressed() {
-      _instrument.portfolioPercentPlan = int.parse(_percentEditController.text);
+      _instrument.update(portfolioPercentPlan: int.parse(_percentEditController.text));
 
       Navigator.of(context).pop(true);
     }

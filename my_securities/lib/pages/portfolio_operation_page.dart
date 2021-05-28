@@ -28,10 +28,6 @@ class PortfolioOperationPage extends StatelessWidget {
             fullscreenDialog: true
         )
       );
-
-      if (result != null) {
-        _portfolio.operations.addOperation(operation, result);
-      }
     }
 
     return

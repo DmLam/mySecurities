@@ -29,13 +29,23 @@ class OperationEditDialog extends StatelessWidget {
       S.of(context).operationEditDialog_Title_add :
       S.of(context).operationEditDialog_Title_edit;
     bool _createMoneyOperation = true;
+    DateTime date;
+    OperationType type;
+    int quantity;
+    double price;
+    double commission;
 
     bool _fabEnabled() {
       return false;
     }
 
     onFabPressed() {
-      Navigator.of(context).pop(_createMoneyOperation);
+      Navigator.of(context).pop(true);
+
+      if (_operation.id == null)
+        _operation.portfolio.operations.addOperation(_operation, _createMoneyOperation);
+      else
+        _operation.update(date: date, type: type, quantity: quantity, price: price, commission: commission);
     }
 
     return
@@ -59,19 +69,20 @@ class OperationEditDialog extends StatelessWidget {
                         context: context,
                         initialDate: _operation.date,
                         firstDate: DateTime(2000),
-                        lastDate: DateTime.now()).then((date) =>
-                    {
-                      if (date != null) {
-                        _dateEditController.text =
-                            DateFormat.yMd(ui.window.locale.languageCode).format(date)
-                      }
-                    });
+                        lastDate: DateTime.now()).then((value)
+                        {
+                          if (value != null) {
+                            date = value;
+                            _dateEditController.text =
+                                DateFormat.yMd(ui.window.locale.languageCode).format(value);
+                          }
+                        });
                   }
                 )
               ),
               Expanded(flex: 10, child: Text('')),
               Expanded(flex: 45,
-                  // operation type
+                   // operation type
                   child: DropdownButtonFormField(
                       value: OPERATION_TYPE_NAMES[_operation.type.index],
                       items: OperationType.values.map((type) => DropdownMenuItem(value: OPERATION_TYPE_NAMES[type.index], child: Text(OPERATION_TYPE_NAMES[type.index]))).toList(),
@@ -81,7 +92,7 @@ class OperationEditDialog extends StatelessWidget {
                           contentPadding: EdgeInsets.all(3.0)
                       ),
                       isExpanded: true,
-                      onChanged: (type) {_operation.type = OperationType.values[OPERATION_TYPE_NAMES.indexOf(type)];}
+                      onChanged: (type) {type = OperationType.values[OPERATION_TYPE_NAMES.indexOf(type)];}
                   )
               )
             ]),
@@ -112,7 +123,7 @@ class OperationEditDialog extends StatelessWidget {
                       return result;
                     },
                     onChanged: (value) {
-                      _operation.quantity = int.tryParse(value);
+                      quantity = int.tryParse(value);
                     },
                   )
               ),
@@ -140,7 +151,7 @@ class OperationEditDialog extends StatelessWidget {
                       return result;
                     },
                     onChanged: (value) {
-                      _operation.price = double.tryParse(value);
+                      price = double.tryParse(value);
                     },
                   )
               ),
@@ -172,7 +183,7 @@ class OperationEditDialog extends StatelessWidget {
                       return result;
                     },
                     onChanged: (value) {
-                      _operation.commission = double.tryParse(value) ?? 0;
+                      commission = double.tryParse(value) ?? 0;
                     },
                   )
               ),

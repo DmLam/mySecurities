@@ -65,19 +65,12 @@ class PortfolioListViewItem extends StatelessWidget {
   }
 
   _editPortfolio(BuildContext context) async {
-    Portfolio portfolio = Portfolio.from(_portfolio);
-
     bool result = await Navigator.of(context).push(
         MaterialPageRoute(
-          builder:(_) => PortfolioEditDialog(portfolio),
+          builder:(_) => PortfolioEditDialog(_portfolio),
           fullscreenDialog: true
         )
     );
-
-    if (result) {
-      _portfolio.assign(portfolio);
-      portfolio.update();
-    }
   }
 
   _deletePortfolio(BuildContext context) async {
@@ -92,8 +85,7 @@ class PortfolioListViewItem extends StatelessWidget {
   }
 
   _updatePortfolioVisibility(BuildContext context) {
-    _portfolio.visible = !_portfolio.visible;
-    _portfolio.update();
+    _portfolio.update(visible: !_portfolio.visible);
   }
 
   @override

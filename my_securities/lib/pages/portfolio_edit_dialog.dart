@@ -24,6 +24,7 @@ class PortfolioEditDialog extends StatelessWidget {
     }
 
     onFABPressed() async {
+      _portfolio.update(name: _nameEditController.text);
       Navigator.pop(context, true);
     }
 

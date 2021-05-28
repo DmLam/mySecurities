@@ -42,18 +42,12 @@ class PortfolioInstrumentListItem extends StatelessWidget {
       QuoteProvider.of(_instrument).getCurrentPrice();
 
     void editPortfolioInstrument() async {
-      Instrument inst = Instrument.from(_instrument);
       bool result = await Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (_) => PortfolioInstrumentEditDialog(inst),
+          builder: (_) => PortfolioInstrumentEditDialog(_instrument),
           fullscreenDialog: true
         )
       );
-
-      if (result) {
-        _instrument.assign(inst);
-        _instrument.update();
-      }
     }
 
     void showPortfolioOperations() {
@@ -134,10 +128,6 @@ class PortfolioInstrumentListItem extends StatelessWidget {
                 PopupMenuItem<String>(
                     value: "edit",
                     child: Text(S.of(context).portfolioInstrumentListView_menuEdit)),
-                // PopupMenuItem<String>(
-                //     value: "delete",
-                //     enabled: _instrument.operationCount == 0,
-                //     child: Text(S.of(context).instrumentListItemPopupMenuDeleteCaption))
               ],
               onSelected: (value) {
                 switch (value) {

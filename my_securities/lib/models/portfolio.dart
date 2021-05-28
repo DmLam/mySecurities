@@ -21,9 +21,6 @@ class Portfolio extends ChangeNotifier {
     notifyListeners();
   }
   bool get visible => _visible;
-  set visible(bool visible) {
-    _visible = visible;
-  }
   DateTime get startDate => _startDate;
 
   InstrumentList get instruments => _instruments;
@@ -68,7 +65,13 @@ class Portfolio extends ChangeNotifier {
 
   Instrument instrumentById(int id) => instruments.instrumentById(id);
 
-  Future<bool> update() async {
+  Future<bool> update({String name, bool visible, DateTime startDate}) async {
+    if (name != null)
+      _name = name;
+    if (visible != null)
+      _visible = visible;
+    if (startDate != null)
+      _startDate = startDate;
     bool result = await DBProvider.db.updatePortfolio(this);
 
     notifyListeners();

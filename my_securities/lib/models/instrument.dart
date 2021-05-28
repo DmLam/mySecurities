@@ -21,7 +21,7 @@ class Instrument extends ChangeNotifier {
   Currency _currency;
   Uint8List _image;
   String _additional;
-  int portfolioPercentPlan;
+  int _portfolioPercentPlan;
   int _quantity;
   double _averagePrice;
   double _value;
@@ -41,7 +41,7 @@ class Instrument extends ChangeNotifier {
 
     return _image;
   }
-
+  int get portfolioPercentPlan => _portfolioPercentPlan;
   String get additional => _additional;
   int get quantity => _quantity;
   double get averagePrice => _averagePrice;
@@ -61,7 +61,7 @@ class Instrument extends ChangeNotifier {
     _exchange = exchange,
     _image = image,
     _additional = additional,
-    portfolioPercentPlan = portfolioPercentPlan,
+    _portfolioPercentPlan = portfolioPercentPlan,
     _quantity = quantity,
     _averagePrice = averagePrice,
     _value = value,
@@ -78,7 +78,7 @@ class Instrument extends ChangeNotifier {
     this._image = source._image,
     this._additional = source._additional,
     this._exchange = source._exchange,
-    this.portfolioPercentPlan = source.portfolioPercentPlan,
+    this._portfolioPercentPlan = source.portfolioPercentPlan,
     this._quantity = source._quantity,
     this._averagePrice = source._averagePrice,
     this._value = source._value,
@@ -144,7 +144,7 @@ class Instrument extends ChangeNotifier {
     this._exchange = source.exchange;
     this._image = Uint8List.fromList(source.image);
     this._additional = source.additional;
-    this.portfolioPercentPlan = source.portfolioPercentPlan;
+    this._portfolioPercentPlan = source.portfolioPercentPlan;
     this._quantity = source.quantity;
     this._averagePrice = source.averagePrice;
     this._value = source.value;
@@ -161,7 +161,10 @@ class Instrument extends ChangeNotifier {
     }
   }
 
-  Future<bool> update() async {
+  Future<bool> update({int portfolioPercentPlan}) async {
+    if (portfolioPercentPlan != null)
+      _portfolioPercentPlan = portfolioPercentPlan;
+
     bool result = await DBProvider.db.updateInstrument(this);
 
     notifyListeners();
