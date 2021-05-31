@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:my_securities/generated/l10n.dart';
@@ -280,11 +281,11 @@ class DBProvider {
     );
   }
 
-  Future<int> addInstrument(Instrument instrument) async {
+  Future<int> addInstrument(String ticker, String isin, String name, Currency currency, InstrumentType type, Exchange exchange, String additional) async {
     final Database db = await database;
     await db.execute("INSERT INTO instrument (isin, ticker, name, currency_id, instrument_type_id, exchange_id, additional) values (?, ?, ?, ?, ?, ?, ?)",
-        [instrument.isin, instrument.ticker, instrument.name, Currency.values.indexOf(instrument.currency) + 1,
-         instrument.type.index + 1, instrument.exchange.index + 1, instrument.additional]);
+        [isin, ticker, name, Currency.values.indexOf(currency) + 1,
+         type.index + 1, exchange.index + 1, additional]);
     var result = await db.rawQuery("SELECT MAX(id) as id FROM instrument");
 
     return result.first["id"];
@@ -327,14 +328,25 @@ class DBProvider {
     await db.execute('UPDATE instrument SET image = ? WHERE id = ?', [image, instrumentId]);
   }
 
+  Future<int> getInstrumentId(String isin) async {
+    int result;
+    final Database db = await database;
+    var instrument = await db.rawQuery("SELECT id FROM instrument WHERE isin = ?", [isin]);
+    var r = instrument.isNotEmpty ? instrument.first['id'] : null;
+    if (r != null)
+      result = r;
+
+    return Future.value(result);
+  }
+
   Future<int> getInstrumentCurrencyId(int instrumentId) async {
     int result;
     final Database db = await database;
     var currency = await db.rawQuery("SELECT currency_id FROM instrument WHERE id = ?", [instrumentId]);
     var r = currency.isNotEmpty ? currency.first['currency_id'] : null;
-    if (r != null) {
+    if (r != null)
       result = r;
-    }
+
     return Future.value(result);
   }
 

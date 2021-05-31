@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:my_securities/common/message_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/exchange.dart';
@@ -37,8 +38,16 @@ Widget operationsListItem(BuildContext context, Operation operation) {
 
   }
 
-  deleteOperation() {
+  deleteOperation() async {
+    String date = operation.date.toString();
+    String description =  "{operation.instrument.ticker} * {operation.quantity} ({date})";
+    String confirmation = await messageDialog(context,
+        S.of(context).operationsListView_confirmDeleteDialogTitle,
+        S.of(context).operationsListView_confirmDeleteDialogContent(description),
+        [S.of(context).dialogAction_Continue, S.of(context).dialogAction_Cancel]);
 
+    if (confirmation == S.of(context).dialogAction_Continue)
+      operation.portfolio.operations.deleteOperation(operation);
   }
 
   return ListTile(
@@ -55,6 +64,7 @@ Widget operationsListItem(BuildContext context, Operation operation) {
               value: "edit",
               child: Text(S.of(context).operationsListViewItem_menuEdit),
             ),
+
             PopupMenuItem<String>(
               value: "delete",
               child: Text(S.of(context).operationsListViewItem_menuDelete),

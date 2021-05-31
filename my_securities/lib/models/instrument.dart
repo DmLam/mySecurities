@@ -209,4 +209,18 @@ class InstrumentList extends ChangeNotifier {
   _loadFromDb() async {
     _items = await DBProvider.db.getPortfolioInstruments(_portfolio.id);
   }
+
+  Future<Instrument> add(String ticker, String isin, String name, Currency currency, InstrumentType type, Exchange exchange, String additional) async {
+    int id = await DBProvider.db.getInstrumentId(isin);
+
+    if (id == null)
+      id = await DBProvider.db.addInstrument(ticker, isin, name, currency, type, exchange, additional);
+
+    Instrument result = Instrument(id, portfolio: _portfolio, ticker: ticker, isin: isin, name: name,
+        currency: currency, type: type, exchange: exchange, additional: additional);
+
+    notifyListeners();
+
+    return Future.value(result);
+  }
 }

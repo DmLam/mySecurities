@@ -375,6 +375,26 @@ class S {
     );
   }
 
+  /// `Operation deletion`
+  String get operationsListView_confirmDeleteDialogTitle {
+    return Intl.message(
+      'Operation deletion',
+      name: 'operationsListView_confirmDeleteDialogTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Are you sure you want to delete operation '{description}'?`
+  String operationsListView_confirmDeleteDialogContent(Object description) {
+    return Intl.message(
+      'Are you sure you want to delete operation \'$description\'?',
+      name: 'operationsListView_confirmDeleteDialogContent',
+      desc: '',
+      args: [description],
+    );
+  }
+
   /// `Portfolio operations`
   String get portfolioOperations_Title {
     return Intl.message(
@@ -400,6 +420,16 @@ class S {
     return Intl.message(
       'Edit operation',
       name: 'operationEditDialog_Title_edit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Ticker`
+  String get operationEditDialog_instrumentticker {
+    return Intl.message(
+      'Ticker',
+      name: 'operationEditDialog_instrumentticker',
       desc: '',
       args: [],
     );
@@ -460,6 +490,16 @@ class S {
     return Intl.message(
       'Withdraw money',
       name: 'operationEditDialog_withdrawmoney',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Match not found`
+  String get operationEditDialog_notickersuggestion {
+    return Intl.message(
+      'Match not found',
+      name: 'operationEditDialog_notickersuggestion',
       desc: '',
       args: [],
     );

@@ -43,17 +43,21 @@
 
   "operationsListViewItem_menuEdit": "Edit",
   "operationsListViewItem_menuDelete": "Delete",
+  "operationsListView_confirmDeleteDialogTitle": "Operation deletion",
+  "operationsListView_confirmDeleteDialogContent": "Are you sure you want to delete operation '{description}'?",
 
   "portfolioOperations_Title": "Portfolio operations",
 
   "operationEditDialog_Title_add": "Add operation",
   "operationEditDialog_Title_edit": "Edit operation",
+  "operationEditDialog_instrumentticker": "Ticker",
   "operationEditDialog_date": "Operation date",
   "operationEditDialog_operationtype": "Operation type",
   "operationEditDialog_quantity": "Quantity",
   "operationEditDialog_price": "Price",
   "operationEditDialog_commission": "Commission",
   "operationEditDialog_withdrawmoney": "Withdraw money",
+  "operationEditDialog_notickersuggestion": "Match not found",
 
   "prefTitleMain": "Main",
   "prefMainCurrencyTitle": "Main currency",

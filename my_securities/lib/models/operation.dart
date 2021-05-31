@@ -81,7 +81,10 @@ class Operation extends ChangeNotifier{
           commission: json["commission"]
       );
 
-  Future<bool> update ({DateTime date, OperationType type,  int quantity,  double price, double commission}) async {
+  Future<bool> update ({Instrument instrument, DateTime date, OperationType type,  int quantity,  double price, double commission}) async {
+    bool result = true;
+    if (Instrument != null)
+      _instrument = instrument;
     if (date != null)
       _date = date;
     if (type != null)
@@ -93,10 +96,10 @@ class Operation extends ChangeNotifier{
     if (commission != null)
       _commission = commission;
 
-    bool result = await DBProvider.db.updateOperation(this);
+    if (_id != null)
+      result = await DBProvider.db.updateOperation(this);
     return Future.value(result);
   }
-
 }
 
 class OperationList extends ChangeNotifier {
@@ -116,4 +119,9 @@ class OperationList extends ChangeNotifier {
   addOperation (Operation operation, bool createMoneyOperation) {
     DBProvider.db.addOperation(operation, createMoneyOperation);
   }
+
+  deleteOperation(Operation operation) async {
+    await DBProvider.db.deleteOperation(operation.id);
+  }
+
 }

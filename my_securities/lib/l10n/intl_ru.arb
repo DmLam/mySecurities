@@ -43,17 +43,21 @@
 
   "operationsListViewItem_menuEdit": "Редактировать",
   "operationsListViewItem_menuDelete": "Удалить",
+  "operationsListView_confirmDeleteDialogTitle": "Удаление операции",
+  "operationsListView_confirmDeleteDialogContent": "Вы уверены, что хотите удалить операцию '{description}'?",
 
   "portfolioOperations_Title": "Операции в портфеле",
 
   "operationEditDialog_Title_add": "Добавить операцию",
   "operationEditDialog_Title_edit": "Редактировать операцию",
+  "operationEditDialog_instrumentticker": "Тикер",
   "operationEditDialog_date": "Дата операции",
   "operationEditDialog_operationtype": "Тип операции",
   "operationEditDialog_quantity": "Количество",
   "operationEditDialog_price": "Цена",
   "operationEditDialog_commission": "Комиссия",
   "operationEditDialog_withdrawmoney": "Списать деньги",
+  "operationEditDialog_notickersuggestion": "Соответствие не найдено",
 
   "prefTitleMain": "Основные",
   "prefMainCurrencyTitle": "Основная валюта",
