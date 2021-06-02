@@ -116,12 +116,14 @@ class OperationList extends ChangeNotifier {
     _items = await DBProvider.db.getPortfolioOperations(_portfolio.id);
   }
 
-  addOperation (Operation operation, bool createMoneyOperation) {
-    DBProvider.db.addOperation(operation, createMoneyOperation);
+  addOperation (Operation operation, bool createMoneyOperation) async {
+    await DBProvider.db.addOperation(operation, createMoneyOperation);
+    notifyListeners();
   }
 
   deleteOperation(Operation operation) async {
     await DBProvider.db.deleteOperation(operation.id);
+    notifyListeners();
   }
 
 }

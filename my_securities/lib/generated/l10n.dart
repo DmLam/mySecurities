@@ -395,13 +395,13 @@ class S {
     );
   }
 
-  /// `Portfolio operations`
-  String get portfolioOperations_Title {
+  /// `{portfolio} operations`
+  String portfolioOperations_Title(Object portfolio) {
     return Intl.message(
-      'Portfolio operations',
+      '$portfolio operations',
       name: 'portfolioOperations_Title',
       desc: '',
-      args: [],
+      args: [portfolio],
     );
   }
 

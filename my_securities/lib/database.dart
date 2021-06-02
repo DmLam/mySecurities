@@ -395,7 +395,7 @@ class DBProvider {
     final Database db = await database;
     var pi = await db.query('portfolio_instrument', columns: ['id'], where: 'portfolio_id=? and instrument_id=?', whereArgs: [portfolioId, instrumentId] );
 
-    return Future.value(pi.isEmpty ? null : int.parse(pi[0]['id']));
+    return Future.value(pi.isEmpty ? null : pi[0]['id']);
   }
 
   static final String _sqlPortfolioOperations =

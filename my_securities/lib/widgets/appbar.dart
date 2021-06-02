@@ -26,7 +26,8 @@ class _MySecuritiesAppBarState extends State<MySecuritiesAppBar>{
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text(_pageName == null ? S.of(context).applicationTitle : _pageName),
+      title: Text(_pageName == null ? S.of(context).applicationTitle : _pageName,
+          style: TextStyle(fontStyle: _pageName == null ? FontStyle.normal : FontStyle.italic)),
       actions: [
         PopupMenuButton(
           itemBuilder: (BuildContext context) {

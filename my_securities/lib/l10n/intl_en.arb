@@ -46,7 +46,7 @@
   "operationsListView_confirmDeleteDialogTitle": "Operation deletion",
   "operationsListView_confirmDeleteDialogContent": "Are you sure you want to delete operation '{description}'?",
 
-  "portfolioOperations_Title": "Portfolio operations",
+  "portfolioOperations_Title": "{portfolio} operations",
 
   "operationEditDialog_Title_add": "Add operation",
   "operationEditDialog_Title_edit": "Edit operation",

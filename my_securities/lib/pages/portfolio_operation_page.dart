@@ -32,7 +32,7 @@ class PortfolioOperationPage extends StatelessWidget {
 
     return
       Scaffold(
-        appBar: MySecuritiesAppBar(pageName: S.of(context).portfolioOperations_Title),
+        appBar: MySecuritiesAppBar(pageName: S.of(context).portfolioOperations_Title(_portfolio.name)),
         body: OperationsListView(_portfolio),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),

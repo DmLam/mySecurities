@@ -25,7 +25,9 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m2(portfolio_name) => "Percent in \'${portfolio_name}\' portfolio";
 
-  static m3(name) => "Are you sure you want to delete portfolio \'${name}\'?";
+  static m3(portfolio) => "${portfolio} operations";
+
+  static m4(name) => "Are you sure you want to delete portfolio \'${name}\'?";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -69,8 +71,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "portfolioInstrumentEditDialog_Title" : MessageLookupByLibrary.simpleMessage("Instrument settings"),
     "portfolioInstrumentEditDialog_percent" : m2,
     "portfolioInstrumentListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Edit"),
-    "portfolioOperations_Title" : MessageLookupByLibrary.simpleMessage("Portfolio operations"),
-    "portfoliosListView_confirmDeleteDialogContent" : m3,
+    "portfolioOperations_Title" : m3,
+    "portfoliosListView_confirmDeleteDialogContent" : m4,
     "portfoliosListView_confirmDeleteDialogTitle" : MessageLookupByLibrary.simpleMessage("Portfolio deletion"),
     "portfoliosListView_menuDelete" : MessageLookupByLibrary.simpleMessage("Delete"),
     "portfoliosListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Edit"),

@@ -14,7 +14,7 @@ class Portfolio extends ChangeNotifier {
   OperationList _operations;
 
   int get id => _id;
-  String get name => _name;
+  String get name 1=> _name;
   set name(String name) {
     _name = name;
     DBProvider.db.updatePortfolio(this);

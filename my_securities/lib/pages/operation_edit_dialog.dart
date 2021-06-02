@@ -25,7 +25,8 @@ class OperationEditDialog extends StatelessWidget {
 
   final TextEditingController _instrumentNameEditController = TextEditingController();
 
-  OperationEditDialog(this._operation, {String instrumentTicker, Key key}) : super(key: key) {
+  OperationEditDialog(this._operation, {Key key}) : super(key: key)
+  {
     _dateEditController.text = DateFormat.yMd(ui.window.locale.languageCode).format(_operation.date);
     _priceEditController.text = (_operation.price ?? 0) == 0 ? '' : _operation.price.toString();
     _quantityEditController.text = (_operation.quantity ?? 0) == 0 ? '' : _operation.quantity.toString();
@@ -37,14 +38,14 @@ class OperationEditDialog extends StatelessWidget {
     String pageName = _operation.id == null ?
       S.of(context).operationEditDialog_Title_add :
       S.of(context).operationEditDialog_Title_edit;
-    String instrumentTicker;
-    DateTime date;
-    OperationType type;
-    int quantity;
-    double price;
-    double commission;
+    DateTime date = _operation.date;
+    OperationType type = _operation.type;
+    int quantity = _operation.quantity;
+    double price = _operation.price;
+    double commission = _operation.commission;
     bool _createMoneyOperation = true;
 
+    String instrumentTicker;
     String instrumentName;
     String instrumentIsin;
     InstrumentType instrumentType;
@@ -86,6 +87,13 @@ class OperationEditDialog extends StatelessWidget {
 
     Future<List> tickerSuggestions(String pattern) async {
       return StockExchangeProvider.stock().search(ticker: _tickerEditController.text);
+    }
+
+    if (_operation.instrument != null) {
+      instrumentTicker = _operation.instrument.ticker;
+      instrumentName = _operation.instrument.name;
+      _tickerEditController.text = instrumentTicker;
+      _instrumentNameEditController.text = instrumentName;
     }
 
     return

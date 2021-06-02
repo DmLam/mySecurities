@@ -18,7 +18,7 @@ class PortfolioInstrumentsPage extends StatelessWidget {
         value: _portfolio.instruments,
         builder: (context, widget ) {
           return Scaffold(
-            appBar: MySecuritiesAppBar(),
+            appBar: MySecuritiesAppBar(pageName: "${_portfolio.name}"),
             body: PortfolioInstrumentsListView(context.read<InstrumentList>()),
           );
         }

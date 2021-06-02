@@ -41,8 +41,8 @@ class PortfolioInstrumentListItem extends StatelessWidget {
     Future<double> priceFuture =
       QuoteProvider.of(_instrument).getCurrentPrice();
 
-    void editPortfolioInstrument() async {
-      bool result = await Navigator.of(context).push(
+    void editPortfolioInstrument() {
+      Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => PortfolioInstrumentEditDialog(_instrument),
           fullscreenDialog: true
@@ -52,7 +52,7 @@ class PortfolioInstrumentListItem extends StatelessWidget {
 
     void showPortfolioOperations() {
       Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => PortfolioOperationPage(_portfolio)));
+          MaterialPageRoute(builder: (_) => PortfolioOperationPage(_portfolio, instrument: context.read<Instrument>(),)));
     }
 
     return ListTile(
