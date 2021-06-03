@@ -116,7 +116,7 @@ class OperationList extends ChangeNotifier {
     _items = await DBProvider.db.getPortfolioOperations(_portfolio.id);
   }
 
-  addOperation (Operation operation, bool createMoneyOperation) async {
+  add (Operation operation, bool createMoneyOperation) async {
     await DBProvider.db.addOperation(operation, createMoneyOperation);
     notifyListeners();
   }

@@ -66,10 +66,9 @@ class OperationEditDialog extends StatelessWidget {
         _operation.update(instrument: instrument);
       }
 
+      _operation.update(date: date, type: type, quantity: quantity, price: price, commission: commission);
       if (_operation.id == null)
-        _operation.portfolio.operations.addOperation(_operation, _createMoneyOperation);
-      else
-        _operation.update(date: date, type: type, quantity: quantity, price: price, commission: commission);
+        _operation.portfolio.operations.add(_operation, _createMoneyOperation);
     }
     
     bool _fabEnabled() {
