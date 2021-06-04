@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:my_securities/common/dialog_panel.dart';
 import 'dart:ui' as ui;
 import 'package:my_securities/common/utils.dart';
-import 'package:my_securities/database.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/models/instrument.dart';
 import 'package:my_securities/models/operation.dart';
@@ -67,8 +66,7 @@ class OperationEditDialog extends StatelessWidget {
       }
 
       _operation.update(date: date, type: type, quantity: quantity, price: price, commission: commission);
-      if (_operation.id == null)
-        _operation.portfolio.operations.add(_operation, _createMoneyOperation);
+      _operation.portfolio.operations.add(_operation, _createMoneyOperation);
     }
     
     bool _fabEnabled() {
