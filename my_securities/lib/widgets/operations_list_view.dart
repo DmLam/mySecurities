@@ -10,13 +10,14 @@ import 'package:my_securities/models/portfolio.dart';
 import '../constants.dart';
 
 class OperationsListView extends StatelessWidget {
-  final Portfolio portfolio;
   final Instrument instrument;
 
-  const OperationsListView(this.portfolio, {this.instrument, Key key}) : super(key: key);
+  const OperationsListView({this.instrument, Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    Portfolio portfolio = context.watch<Portfolio>();
+
     return ListView.builder(
       itemCount: portfolio.operations.operations.length,
       itemBuilder: (context, index) {
@@ -39,15 +40,15 @@ Widget operationsListItem(BuildContext context, Operation operation) {
   }
 
   deleteOperation() async {
-    String date = operation.date.toString();
-    String description =  "{operation.instrument.ticker} * {operation.quantity} ({date})";
+    String date = DateFormat.yMd(Intl.getCurrentLocale()).format(operation.date);
+    String description =  "${operation.instrument.ticker} * ${operation.quantity} (${date})";
     String confirmation = await messageDialog(context,
         S.of(context).operationsListView_confirmDeleteDialogTitle,
         S.of(context).operationsListView_confirmDeleteDialogContent(description),
         [S.of(context).dialogAction_Continue, S.of(context).dialogAction_Cancel]);
 
     if (confirmation == S.of(context).dialogAction_Continue)
-      operation.portfolio.operations.deleteOperation(operation);
+      operation.delete();
   }
 
   return ListTile(

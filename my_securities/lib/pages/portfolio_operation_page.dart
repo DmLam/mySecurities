@@ -7,6 +7,7 @@ import 'package:my_securities/models/portfolio.dart';
 import 'package:my_securities/pages/operation_edit_dialog.dart';
 import 'package:my_securities/widgets/appbar.dart';
 import 'package:my_securities/widgets/operations_list_view.dart';
+import 'package:provider/provider.dart';
 
 class PortfolioOperationPage extends StatelessWidget {
   final Portfolio _portfolio;
@@ -33,7 +34,9 @@ class PortfolioOperationPage extends StatelessWidget {
     return
       Scaffold(
         appBar: MySecuritiesAppBar(pageName: S.of(context).portfolioOperations_Title(_portfolio.name)),
-        body: OperationsListView(_portfolio),
+        body: ChangeNotifierProvider<Portfolio>.value(
+            value: _portfolio,
+            child: OperationsListView(instrument: _instrument)),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),
           onPressed: addOperation,

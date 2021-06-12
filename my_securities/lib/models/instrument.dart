@@ -11,86 +11,76 @@ import 'model.dart';
 enum InstrumentType {currency, share, etf, federalBond, subfederalBond, corporateBond, futures, stockIndex}
 
 class Instrument extends ChangeNotifier {
-  int _id;
+  int id;
   Portfolio _portfolio;
-  String _isin;
-  String _ticker;
-  String _name;
-  InstrumentType _type;
-  Exchange _exchange;
-  Currency _currency;
+  String isin;
+  String ticker;
+  String name;
+  InstrumentType type;
+  Exchange exchange;
+  Currency currency;
   Uint8List _image;
-  String _additional;
-  int _portfolioPercentPlan;
-  int _quantity;
+  String additional;
+  int portfolioPercentPlan;
+  int quantity;
   double _averagePrice;
   double _value;
   int _operationCount;
 
-  int get id => _id;
   Portfolio get portfolio => _portfolio;
-  String get isin => _isin;
-  String get ticker => _ticker;
-  String get name => _name;
-  Currency get currency => _currency;
-  InstrumentType get type => _type;
-  Exchange get exchange => _exchange;
   Uint8List get image {
     if (_image == null)
       _loadImage();
 
     return _image;
   }
-  int get portfolioPercentPlan => _portfolioPercentPlan;
-  String get additional => _additional;
-  int get quantity => _quantity;
   double get averagePrice => _averagePrice;
   double get value => _value;
   int get operationCount => _operationCount;
 
-  Instrument(this._id, {@required Portfolio portfolio, isin = '', @required ticker, name = '', currency, type,
+  Instrument(this.id, {@required Portfolio portfolio, isin = '', @required ticker, name = '', currency, type,
     exchange = Exchange.MCX, image, additional, portfolioPercentPlan, quantity = 0,
     averagePrice = 0, value = 0, operationCount = 0}):
     assert(portfolio != null),
     _portfolio = portfolio,
-    _isin = isin,
-    _ticker = ticker,
-    _name = name,
-    _currency = currency,
-    _type = type,
-    _exchange = exchange,
+    this.isin = isin,
+    this.ticker = ticker,
+    this.name = name,
+    this.currency = currency,
+    this.type = type,
+    this.exchange = exchange,
+    this.additional = additional,
+    this.portfolioPercentPlan = portfolioPercentPlan,
+    this.quantity = quantity,
     _image = image,
-    _additional = additional,
-    _portfolioPercentPlan = portfolioPercentPlan,
-    _quantity = quantity,
     _averagePrice = averagePrice,
     _value = value,
     _operationCount = operationCount;
 
   Instrument.from(Instrument source):
-    this._id = source._id,
-    this._portfolio = source._portfolio,
-    this._isin = source._isin,
-    this._ticker = source._ticker,
-    this._name = source._name,
-    this._currency = source._currency,
-    this._type = source._type,
-    this._image = source._image,
-    this._additional = source._additional,
-    this._exchange = source._exchange,
-    this._portfolioPercentPlan = source.portfolioPercentPlan,
-    this._quantity = source._quantity,
-    this._averagePrice = source._averagePrice,
-    this._value = source._value,
-    this._operationCount = source._operationCount;
+    id = source.id,
+    _portfolio = source._portfolio,
+    isin = source.isin,
+    ticker = source.ticker,
+    name = source.name,
+    currency = source.currency,
+    type = source.type,
+    _image = source._image,
+    additional = source.additional,
+    exchange = source.exchange,
+    portfolioPercentPlan = source.portfolioPercentPlan,
+    quantity = source.quantity,
+    _averagePrice = source._averagePrice,
+    _value = source._value,
+    _operationCount = source._operationCount;
 
   Instrument.empty():
-    this._id = null,
-    this._exchange = Exchange.MCX,
-    this._quantity = 0,
-    this._averagePrice = 0,
-    this._value = 0,
-    this._operationCount = 0;
+    id = null,
+    exchange = Exchange.MCX,
+    quantity = 0,
+    _averagePrice = 0,
+    _value = 0,
+    _operationCount = 0;
 
 
   factory Instrument.fromMap(Map<String, dynamic> json) =>
@@ -117,7 +107,7 @@ class Instrument extends ChangeNotifier {
   String profitString(double currentPrice, {Currency currency}) => (profit(currentPrice) == 0) ? '' : formatCurrency(profit(currentPrice), currency: currency == null ? this.currency : currency);
 
   Map<String, dynamic> toMap() => {
-    "id": _id,
+    "id": id,
     "isin": isin,
     "ticker": ticker,
     "name": name,
@@ -134,21 +124,21 @@ class Instrument extends ChangeNotifier {
   };
 
   assign(Instrument source) {
-    this._id = source.id;
-    this._portfolio = source._portfolio;
-    this._isin = source.isin;
-    this._ticker = source.ticker;
-    this._name = source.name;
-    this._currency = source.currency;
-    this._type = source.type;
-    this._exchange = source.exchange;
-    this._image = Uint8List.fromList(source.image);
-    this._additional = source.additional;
-    this._portfolioPercentPlan = source.portfolioPercentPlan;
-    this._quantity = source.quantity;
-    this._averagePrice = source.averagePrice;
-    this._value = source.value;
-    this._operationCount = source.operationCount;
+    id = source.id;
+    _portfolio = source._portfolio;
+    isin = source.isin;
+    ticker = source.ticker;
+    name = source.name;
+    currency = source.currency;
+    type = source.type;
+    exchange = source.exchange;
+    _image = Uint8List.fromList(source.image);
+    additional = source.additional;
+    portfolioPercentPlan = source.portfolioPercentPlan;
+    quantity = source.quantity;
+    _averagePrice = source.averagePrice;
+    _value = source.value;
+    _operationCount = source.operationCount;
   }
 
   _loadImage() async {
@@ -156,14 +146,14 @@ class Instrument extends ChangeNotifier {
     // comparing lengths is the dirty way to check that image had been changed
     if ((_image == null && newImage != null) || (newImage?.length != _image?.length) ) {
       _image = newImage;
-      DBProvider.db.setInstrumentImage(_id, _image);
+      DBProvider.db.setInstrumentImage(id, _image);
       notifyListeners();
     }
   }
 
   Future<bool> update({int portfolioPercentPlan}) async {
     if (portfolioPercentPlan != null)
-      _portfolioPercentPlan = portfolioPercentPlan;
+      portfolioPercentPlan = portfolioPercentPlan;
 
     bool result = await DBProvider.db.updateInstrument(this);
 
@@ -182,7 +172,7 @@ extension InstrumentExtension on Instrument {
   String averagePriceString({Currency currency}) => averagePrice == null ? '' : formatCurrency(averagePrice, currency: currency == null ? this.currency : currency) ;
 }
 
-class InstrumentList extends ChangeNotifier {
+class InstrumentList {
   final Portfolio _portfolio;
   List<Instrument> _items = [];
 
@@ -219,7 +209,7 @@ class InstrumentList extends ChangeNotifier {
     Instrument result = Instrument(id, portfolio: _portfolio, ticker: ticker, isin: isin, name: name,
         currency: currency, type: type, exchange: exchange, additional: additional);
 
-    notifyListeners();
+    portfolio.update(); // notifing the portfolio listeners
 
     return Future.value(result);
   }

@@ -12,26 +12,26 @@ import '../quote_provider.dart';
 
 
 class PortfolioInstrumentsListView extends StatelessWidget {
-  final InstrumentList _instruments;
+  final Portfolio _portfolio;
 
-  PortfolioInstrumentsListView(this._instruments, {Key key}): super(key: key);
+  PortfolioInstrumentsListView(this._portfolio, {Key key}): super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: _instruments.instruments.length,
+      shrinkWrap: true,
+      itemCount: _portfolio.instruments.instruments.length,
       itemBuilder: (BuildContext context, int index) =>
-        ChangeNotifierProvider<Instrument>.value(value: _instruments.instruments[index],
-          child: PortfolioInstrumentListItem(_instruments.portfolio, _instruments.instruments[index]))
+        ChangeNotifierProvider<Instrument>.value(value: _portfolio.instruments.instruments[index],
+          child: PortfolioInstrumentListItem(_portfolio.instruments.instruments[index]))
     );
   }
 }
 
 class PortfolioInstrumentListItem extends StatelessWidget {
-  final Portfolio _portfolio;
   final Instrument _instrument;
 
-  PortfolioInstrumentListItem(this._portfolio, this._instrument, {Key key}) : super(key: key);
+  PortfolioInstrumentListItem(this._instrument, {Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +51,10 @@ class PortfolioInstrumentListItem extends StatelessWidget {
     }
 
     void showPortfolioOperations() {
+      Instrument instrument = context.read<Instrument>();
+
       Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => PortfolioOperationPage(_portfolio, instrument: context.read<Instrument>(),)));
+          MaterialPageRoute(builder: (_) => PortfolioOperationPage(instrument.portfolio, instrument: instrument)));
     }
 
     return ListTile(
@@ -134,9 +136,6 @@ class PortfolioInstrumentListItem extends StatelessWidget {
                   case 'edit':
                     editPortfolioInstrument();
                     break;
-                  // case 'delete':
-                  //   DBProvider.db.deleteInstrument(_instrument.id);
-                  //   break;
                   default:
                     throw Exception("Unknown instrument menu item");
                 }

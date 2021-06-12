@@ -36,6 +36,9 @@
   "portfolioEditDialog_Name": "Наименование",
   "portfolioEditDialog_startDate": "Дата создания",
 
+  "portfolioInstrumentPageAddOperation": "Добавить операцию",
+  "portfolioInstrumentPageAddMoneyOperation": "Добавить операцию с валютой",
+
   "portfolioInstrumentListView_menuEdit": "Редактировать",
 
   "portfolioInstrumentEditDialog_Title": "Настройка инструмента",
@@ -58,6 +61,13 @@
   "operationEditDialog_commission": "Комиссия",
   "operationEditDialog_withdrawmoney": "Списать деньги",
   "operationEditDialog_notickersuggestion": "Соответствие не найдено",
+
+  "moneyOperationEditDialog_Title_add": "Добавить операции с валютой",
+  "moneyOperationEditDialog_Title_edit": "Редактировать операцию с валютой",
+  "moneyOperationEditDialog_date": "Дата операции",
+  "moneyOperationEditDialog_currency": "Валюта",
+  "moneyOperationEditDialog_operationtype": "Тип операции",
+  "moneyOperationEditDialog_amount": "Сумма",
 
   "prefTitleMain": "Основные",
   "prefMainCurrencyTitle": "Основная валюта",

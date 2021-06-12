@@ -36,6 +36,9 @@
   "portfolioEditDialog_Name": "Name",
   "portfolioEditDialog_startDate": "Creation date",
 
+  "portfolioInstrumentPageAddOperation": "Add operation",
+  "portfolioInstrumentPageAddMoneyOperation": "Add money operation",
+
   "portfolioInstrumentListView_menuEdit": "Edit",
 
   "portfolioInstrumentEditDialog_Title": "Instrument settings",
@@ -58,6 +61,13 @@
   "operationEditDialog_commission": "Commission",
   "operationEditDialog_withdrawmoney": "Withdraw money",
   "operationEditDialog_notickersuggestion": "Match not found",
+
+  "moneyOperationEditDialog_Title_add": "Add money operation",
+  "moneyOperationEditDialog_Title_edit": "Edit money operation",
+  "moneyOperationEditDialog_date": "Operation date",
+  "moneyOperationEditDialog_currency": "Currency",
+  "moneyOperationEditDialog_operationtype": "Operation type",
+  "moneyOperationEditDialog_amount": "Amount",
 
   "prefTitleMain": "Main",
   "prefMainCurrencyTitle": "Main currency",

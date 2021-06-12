@@ -116,7 +116,7 @@ class QuoteProvider {
   // возвращает true если какие-то котировки добавлены в базу, иначе false
   Future<bool> _updateQuotes() async {
     bool result = false;
-    DateTime today = todayDate();
+    DateTime today = currentDate();
 
     if (lastQuoteUpdate == null || lastQuoteUpdate.isBefore(today)) {
       // Если котировки по инструменту начинаются позже, чем дата первой операции по инструменту - загрузим котировки
@@ -158,7 +158,7 @@ class QuoteProvider {
   // возвращает true если какие-то курсы добавлены в базу, иначе false
  static Future<bool> updateRates() async {
     bool result = false;
-    DateTime today = todayDate();
+    DateTime today = currentDate();
     DateTime lastRateUpdate = await DBProvider.db.lastRateUpdate();
 
     if (lastRateUpdate == null || lastRateUpdate.isBefore(today.add(Duration(days: -1)))) {
@@ -186,7 +186,7 @@ class QuoteProvider {
     if (inMainCurrency) {
       q = await _toMainCurrency(q, _instrument.currency);
     }
-    result = Quote(date: todayDate(), open: q, low: q, high: q, close: q);
+    result = Quote(date: currentDate(), open: q, low: q, high: q, close: q);
 
     return Future.value(result);
   }

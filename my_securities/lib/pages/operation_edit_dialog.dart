@@ -11,11 +11,11 @@ import 'package:my_securities/models/instrument.dart';
 import 'package:my_securities/models/operation.dart';
 import 'package:my_securities/widgets/appbar.dart';
 import '../constants.dart';
-import '../exchange.dart';
 import '../stock_exchange_interface.dart';
 
 class OperationEditDialog extends StatelessWidget {
   final Operation _operation;
+  final Instrument _operationInstrument;
   final TextEditingController _tickerEditController = TextEditingController();
   final TextEditingController _dateEditController = TextEditingController();
   final TextEditingController _priceEditController = TextEditingController();
@@ -24,8 +24,12 @@ class OperationEditDialog extends StatelessWidget {
 
   final TextEditingController _instrumentNameEditController = TextEditingController();
 
-  OperationEditDialog(this._operation, {Key key}) : super(key: key)
+  OperationEditDialog(this._operation, {Key key}) :
+    _operationInstrument = _operation.instrument ?? Instrument.empty(),
+        super(key: key)
   {
+    _tickerEditController.text = _operation.instrument.ticker;
+    _instrumentNameEditController.text = _operation.instrument.name;
     _dateEditController.text = DateFormat.yMd(ui.window.locale.languageCode).format(_operation.date);
     _priceEditController.text = (_operation.price ?? 0) == 0 ? '' : _operation.price.toString();
     _quantityEditController.text = (_operation.quantity ?? 0) == 0 ? '' : _operation.quantity.toString();
@@ -37,44 +41,30 @@ class OperationEditDialog extends StatelessWidget {
     String pageName = _operation.id == null ?
       S.of(context).operationEditDialog_Title_add :
       S.of(context).operationEditDialog_Title_edit;
-    DateTime date = _operation.date;
-    OperationType type = _operation.type;
-    int quantity = _operation.quantity;
-    double price = _operation.price;
-    double commission = _operation.commission;
     bool _createMoneyOperation = true;
-
-    String instrumentTicker;
-    String instrumentName;
-    String instrumentIsin;
-    InstrumentType instrumentType;
-    Exchange instrumentExchange;
-    Currency instrumentCurrency;
-    String instrumentAdditional;
 
     addOperation() async {
       if (_operation.instrument == null) {
         Instrument instrument = await _operation.portfolio.instruments.add(
-            instrumentTicker,
-            instrumentIsin,
-            instrumentName,
-            instrumentCurrency,
-            instrumentType,
-            instrumentExchange,
-            instrumentAdditional);
-        _operation.update(instrument: instrument);
+            _operationInstrument.ticker,
+            _operationInstrument.isin,
+            _operationInstrument.name,
+            _operationInstrument.currency,
+            _operationInstrument.type,
+            _operationInstrument.exchange,
+            _operationInstrument.additional);
+        _operation.instrument = instrument;
       }
 
-      _operation.update(date: date, type: type, quantity: quantity, price: price, commission: commission);
-      _operation.portfolio.operations.add(_operation, _createMoneyOperation);
+      _operation.add(_createMoneyOperation);
     }
     
     bool _fabEnabled() {
-      return instrumentTicker != null &&
-        date != null &&
-        type != null &&
-        quantity != null &&
-        price != null;
+      return _operationInstrument.ticker != null &&
+        _operation.date != null &&
+        _operation.type != null &&
+        _operation.quantity != null &&
+        _operation.price != null;
     }
 
     onFabPressed() async  {
@@ -86,12 +76,7 @@ class OperationEditDialog extends StatelessWidget {
       return StockExchangeProvider.stock().search(ticker: _tickerEditController.text);
     }
 
-    if (_operation.instrument != null) {
-      instrumentTicker = _operation.instrument.ticker;
-      instrumentName = _operation.instrument.name;
-      _tickerEditController.text = instrumentTicker;
-      _instrumentNameEditController.text = instrumentName;
-    }
+    // build code starts here
 
     return
       Scaffold(
@@ -104,6 +89,9 @@ class OperationEditDialog extends StatelessWidget {
                 child: TypeAheadFormField(
                   textFieldConfiguration: TextFieldConfiguration(
                       controller: _tickerEditController,
+                      // let the user to select instrument only when the operation had been added not
+                      // from the list of operations of an instrument
+                      enabled: _operation.instrument == null,
                       decoration: InputDecoration(
                           icon: Icon(FontAwesome.tag),
                           labelText: S.of(context).operationEditDialog_instrumentticker,
@@ -111,7 +99,7 @@ class OperationEditDialog extends StatelessWidget {
                       ),
                       inputFormatters: [UpperCaseTextFormatter()],
                       onChanged: (value) {
-                        instrumentTicker = value;
+                        _operationInstrument.ticker = value;
                       }
                   ),
                   suggestionsBoxDecoration: SuggestionsBoxDecoration(
@@ -135,13 +123,13 @@ class OperationEditDialog extends StatelessWidget {
                   onSuggestionSelected: (suggestion) {
                     _tickerEditController.text = suggestion.ticker ;
                     _instrumentNameEditController.text = suggestion.name;
-                    instrumentTicker = suggestion.ticker;
-                    instrumentName = suggestion.name;
-                    instrumentIsin = suggestion.isin;
-                    instrumentType = suggestion.type;
-                    instrumentExchange = suggestion.exchange;
-                    instrumentCurrency = suggestion.currency;
-                    instrumentAdditional = suggestion.additional;
+                    _operationInstrument.ticker = suggestion.ticker;
+                    _operationInstrument.name = suggestion.name;
+                    _operationInstrument.isin = suggestion.isin;
+                    _operationInstrument.type = suggestion.type;
+                    _operationInstrument.exchange = suggestion.exchange;
+                    _operationInstrument.currency = suggestion.currency;
+                    _operationInstrument.additional = suggestion.additional;
                   }
                 ),
               ), // TypeAheadFormField
@@ -175,7 +163,7 @@ class OperationEditDialog extends StatelessWidget {
                         lastDate: DateTime.now()).then((value)
                         {
                           if (value != null) {
-                            date = value;
+                            _operation.date = value;
                             _dateEditController.text =
                                 DateFormat.yMd(ui.window.locale.languageCode).format(value);
                           }
@@ -226,7 +214,7 @@ class OperationEditDialog extends StatelessWidget {
                       return result;
                     },
                     onChanged: (value) {
-                      quantity = int.tryParse(value);
+                      _operation.quantity = int.tryParse(value);
                     },
                   )
               ),
@@ -254,7 +242,7 @@ class OperationEditDialog extends StatelessWidget {
                       return result;
                     },
                     onChanged: (value) {
-                      price = double.tryParse(value);
+                      _operation.price = double.tryParse(value);
                     },
                   )
               ),
@@ -286,7 +274,7 @@ class OperationEditDialog extends StatelessWidget {
                       return result;
                     },
                     onChanged: (value) {
-                      commission = double.tryParse(value) ?? 0;
+                      _operation.commission = double.tryParse(value) ?? 0;
                     },
                   )
               ),

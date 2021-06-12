@@ -3,6 +3,9 @@ import 'package:my_securities/models/operation.dart';
 import 'instrument.dart';
 import 'package:my_securities/database.dart';
 
+import 'money.dart';
+import 'money_operation.dart';
+
 class Portfolio extends ChangeNotifier {
   PortfolioList _owner;
   int _id;
@@ -12,6 +15,7 @@ class Portfolio extends ChangeNotifier {
 
   InstrumentList _instruments;
   OperationList _operations;
+  MoneyList _monies;
 
   int get id => _id;
   String get name => _name;
@@ -25,10 +29,12 @@ class Portfolio extends ChangeNotifier {
 
   InstrumentList get instruments => _instruments;
   OperationList get operations => _operations;
+  MoneyList get monies => _monies;
 
   Portfolio(this._id, this._name, this._visible, this._startDate) {
     _instruments = InstrumentList(this);
     _operations = OperationList(this);
+    _monies = MoneyList(this);
   }
 
   Portfolio.from(Portfolio portfolio) :

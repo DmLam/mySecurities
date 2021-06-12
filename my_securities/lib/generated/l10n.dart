@@ -325,6 +325,26 @@ class S {
     );
   }
 
+  /// `Add operation`
+  String get portfolioInstrumentPageAddOperation {
+    return Intl.message(
+      'Add operation',
+      name: 'portfolioInstrumentPageAddOperation',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add money operation`
+  String get portfolioInstrumentPageAddMoneyOperation {
+    return Intl.message(
+      'Add money operation',
+      name: 'portfolioInstrumentPageAddMoneyOperation',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Edit`
   String get portfolioInstrumentListView_menuEdit {
     return Intl.message(
@@ -500,6 +520,66 @@ class S {
     return Intl.message(
       'Match not found',
       name: 'operationEditDialog_notickersuggestion',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add money operation`
+  String get moneyOperationEditDialog_Title_add {
+    return Intl.message(
+      'Add money operation',
+      name: 'moneyOperationEditDialog_Title_add',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Edit money operation`
+  String get moneyOperationEditDialog_Title_edit {
+    return Intl.message(
+      'Edit money operation',
+      name: 'moneyOperationEditDialog_Title_edit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Operation date`
+  String get moneyOperationEditDialog_date {
+    return Intl.message(
+      'Operation date',
+      name: 'moneyOperationEditDialog_date',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Currency`
+  String get moneyOperationEditDialog_currency {
+    return Intl.message(
+      'Currency',
+      name: 'moneyOperationEditDialog_currency',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Operation type`
+  String get moneyOperationEditDialog_operationtype {
+    return Intl.message(
+      'Operation type',
+      name: 'moneyOperationEditDialog_operationtype',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Amount`
+  String get moneyOperationEditDialog_amount {
+    return Intl.message(
+      'Amount',
+      name: 'moneyOperationEditDialog_amount',
       desc: '',
       args: [],
     );

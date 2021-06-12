@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:async';
 import 'dart:typed_data';
-import 'package:flutter/foundation.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:my_securities/generated/l10n.dart';
@@ -217,6 +216,7 @@ class DBProvider {
 
   Future initTables(Database db) async {
     await db.insert("portfolio", {"name": S.current.defaultPortfolioName}, );
+/*
     await db.insert("instrument",
       {
         "isin": "bla-bla-bla",
@@ -240,28 +240,27 @@ class DBProvider {
         "price": 1.632,
         "value": 163.2
       });
+*/
   }
 
   void _onConfigure(Database db) async {
     // Add support for cascade delete
     await db.execute("PRAGMA foreign_keys = ON");
-//    await db.execute('PRAGMA user_version = 1');
   }
   void _onCreate(Database db, int version) async {
     _database = db;
 
+    await db.execute('PRAGMA user_version = 1');
     await createTables(db);
     await initTables(db);
   }
 
   void _onOpen(Database db) async {
     _database = db;
-//    await db.update('instrument', {"image": null});
   }
 
   void _onUpgrade(Database db, int oldVersion, int newVersion) {
     _database = db;
-
   }
 
   void _onDowngrade(Database db, int oldVersion, int newVersion) async {
@@ -270,7 +269,7 @@ class DBProvider {
   initDB() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, "mysecurities.db");
-//    await deleteDatabase(path); // пока идет отладка
+    await deleteDatabase(path); // пока идет отладка
     await openDatabase(path,
       version: CURRENT_DB_VERSION,
       onConfigure: _onConfigure,
@@ -298,26 +297,26 @@ class DBProvider {
       Fluttertoast.showToast(msg: "Internal error: updating instrument without id");
     else {
       final Database db = await database;
-      final Batch batch = db.batch();
-      Map<String, dynamic> row = {};
+      db.transaction((txn) async {
+        Map<String, dynamic> row = {};
 
 
-      row['ticker'] = instrument.ticker;
-      row['name'] = instrument.name;
-      row['currency_id'] = Currency.values.indexOf(instrument.currency) + 1;
-      row['instrument_type_id'] = instrument.type.index + 1;
-      row['exchange_id'] = instrument.exchange.index + 1;
-      row['isin'] = instrument.isin;
-      row['additional'] = instrument.additional;
-      batch.update(
-          'instrument', row, where: 'id = ?', whereArgs: [instrument.id]);
-      batch.update('portfolio_instrument',
-          {"percent": instrument.portfolioPercentPlan},
-          where: 'portfolio_id = ? and instrument_id = ?',
-          whereArgs: [instrument.portfolio.id, instrument.id]);
-      batch.commit(noResult: true);
+        row['ticker'] = instrument.ticker;
+        row['name'] = instrument.name;
+        row['currency_id'] = Currency.values.indexOf(instrument.currency) + 1;
+        row['instrument_type_id'] = instrument.type.index + 1;
+        row['exchange_id'] = instrument.exchange.index + 1;
+        row['isin'] = instrument.isin;
+        row['additional'] = instrument.additional;
+        txn.update(
+            'instrument', row, where: 'id = ?', whereArgs: [instrument.id]);
+        txn.update('portfolio_instrument',
+            {"percent": instrument.portfolioPercentPlan},
+            where: 'portfolio_id = ? and instrument_id = ?',
+            whereArgs: [instrument.portfolio.id, instrument.id]);
 
-      result = true;
+        result = true;
+      });
     }
 
     return Future.value(result);
@@ -381,7 +380,7 @@ class DBProvider {
     final Database db = await database;
     var instruments = await db.rawQuery(_sqlPortfolioInstruments);
 
-    return instruments.isEmpty ? null:  instruments.map((i) => Instrument.fromMap(i)).toList();
+    return instruments.isNotEmpty ? instruments.map((i) => Instrument.fromMap(i)).toList() : <Instrument>[];
   }
 
    deleteInstrument(int id) async {
@@ -400,26 +399,26 @@ class DBProvider {
 
   static final String _sqlPortfolioOperations =
   '''SELECT o.id, pi.portfolio_id, pi.instrument_id, o.date, o.type, o.quantity, o.price, o.value, o.commission
-       FROM operation o, portfolio_instrument pi
-       WHERE o.portfolio_instrument_id = pi.id
-         and pi.portfolio_id = ?
+     FROM operation o, portfolio_instrument pi
+     WHERE o.portfolio_instrument_id = pi.id
+       and pi.portfolio_id = ?
     ''';
   static final String _sqlPortfolioInstrumentOperations =
   '''SELECT o.id, pi.portfolio_id, pi.instrument_id, o.date, o.type, o.quantity, o.price, o.value, o.commission
-       FROM operation o, portfolio_instrument pi
-       WHERE o.portfolio_instrument_id = pi.id
-         and pi.portfolio_id = ?
-         and pi.instrument_id = ?
+     FROM operation o, portfolio_instrument pi
+     WHERE o.portfolio_instrument_id = pi.id
+       and pi.portfolio_id = ?
+       and pi.instrument_id = ?
     ''';
 
   Future<List<Operation>> getPortfolioOperations(int portfolioId, {int instrumentId}) async {
     final Database db = await database;
-    List<Map<String, dynamic>> operations;
+    List<Map<String, dynamic>> operations =
+      instrumentId == null ?
+        await db.rawQuery(_sqlPortfolioOperations, [portfolioId]) :
+        await db.rawQuery(_sqlPortfolioInstrumentOperations, [portfolioId, instrumentId]);
 
-    operations = instrumentId == null ? await db.rawQuery(_sqlPortfolioOperations, [portfolioId]) :
-      await db.rawQuery(_sqlPortfolioInstrumentOperations, [portfolioId, instrumentId]);
-
-    return operations.isNotEmpty ? operations.map((o) => Operation.fromMap(o)).toList() : null;
+    return operations.isNotEmpty ? operations.map((o) => Operation.fromMap(o)).toList() : <Operation>[];
   }
 
   MoneyOperationType operationTypeToMoneyOperationType(OperationType op) {
@@ -428,25 +427,33 @@ class DBProvider {
   }
 
   Future<int> addOperation(Operation op, bool createMoneyOperation) async {
+    assert(op.id == null);
     final Database db = await database;
     final double operationValue = op.type == OperationType.buy ? op.quantity * op.price : -op.quantity * op.price;
+    int result;
     int portfolioInstrumentId = await _getPortfolioInstrumentId(op.portfolio.id, op.instrument.id);
     int currencyId = await getInstrumentCurrencyId(op.instrument.id);
-    final Batch batch = db.batch();
 
-    batch.execute(
-        "INSERT INTO operation (portfolio_instrument_id, date, type, quantity, price, value, commission) values (?, ?, ?, ?, ?, ?, ?)",
-        [portfolioInstrumentId, dbDateString(op.date), op.type.index, op.quantity, op.price, operationValue, op.commission]);
-    var operationId = await db.rawQuery("SELECT MAX(id) as id FROM operation");
-    int result = operationId.first["id"];
-    if (createMoneyOperation)
-      batch.insert('money',
-          {'currency_id': currencyId,
+    await db.transaction((txn) async {
+      result = await txn.insert('operation',
+          {'portfolio_instrument_id': portfolioInstrumentId,
             'date': dbDateString(op.date),
-            'type': operationTypeToMoneyOperationType(op.type).index + 1,
-            'amount': operationValue - op.commission,
-            'operation_id': result});
-    batch.commit(noResult: true);
+            'type': op.type.index,
+            'quantity': op.quantity,
+            'price': op.price,
+            'value': operationValue,
+            'commission': op.commission});
+
+      if (createMoneyOperation)
+        txn.insert('money',
+            {'currency_id': currencyId,
+              'portfolio_id': op.portfolio.id,
+              'date': dbDateString(op.date),
+              'type': operationTypeToMoneyOperationType(op.type).index + 1,
+              'amount': operationValue - op.commission,
+              'operation_id': result});
+      op.id = result;
+    });
 
     return Future.value(result);
   }
@@ -454,69 +461,68 @@ class DBProvider {
   updateOperation(Operation op) async {
     final Database db = await database;
     int currencyId = await getInstrumentCurrencyId(op.instrument.id);
-    final Batch batch = db.batch();
 
-    batch.update('operation',
-        {'date': dbDateString(op.date),
-          'type': op.type.index,
-          'quantity': op.quantity,
-          'price': op.price,
-          'value': op.value,
-          'comission': op.commission},
-        where: 'id = ?',
-        whereArgs: [op.id]);
-    batch.update('money',
-        {'currency_id': currencyId,
-          'date': dbDateString(op.date),
-          'type': operationTypeToMoneyOperationType(op.type).index + 1,
-          'amount': op.value - op.commission},
-        where: 'operation_id = ?',
-        whereArgs: [op.id]);
-    batch.commit(noResult: true);
+    await db.transaction((txn) async {
+      txn.update('operation',
+          {'date': dbDateString(op.date),
+            'type': op.type.index,
+            'quantity': op.quantity,
+            'price': op.price,
+            'value': op.value,
+            'comission': op.commission},
+          where: 'id = ?',
+          whereArgs: [op.id]);
+      txn.update('money',
+          {'currency_id': currencyId,
+            'date': dbDateString(op.date),
+            'type': operationTypeToMoneyOperationType(op.type).index + 1,
+            'amount': op.value - op.commission},
+          where: 'operation_id = ?',
+          whereArgs: [op.id]);
+    });
   }
 
   deleteOperation(int id) async {
     final Database db = await database;
-    final Batch batch = db.batch();
 
-    batch.delete('operation', where: 'id = ?', whereArgs: [id]);
-    batch.delete('money', where: 'operation_id = ?', whereArgs: [id]);
-    batch.commit(noResult: true);
+    await db.transaction((txn) async {
+      txn.delete('money', where: 'operation_id = ?', whereArgs: [id]);
+      txn.delete('operation', where: 'id = ?', whereArgs: [id]);
+    });
   }
 
   addQuotes(int instrumentId, List<Quote> quotes) async {
     if (quotes.isNotEmpty) {
       final Database db = await database;
-      final Batch batch = db.batch();
 
-      for (var quote in quotes) {
-        batch.insert('quote', {
-          'instrument_id': instrumentId,
-          'date': dbDateString(quote.date),
-          'open': quote.open,
-          'low': quote.low,
-          'high': quote.high,
-          'close': quote.close,
-        });
-      }
-      batch.update('instrument', {'last_quote_update': dbDateString(DateTime.now())}, where: 'id = ?', whereArgs: [instrumentId]);
-      batch.commit(noResult: true);
+      await db.transaction((txn) async {
+        for (var quote in quotes) {
+          txn.insert('quote', {
+            'instrument_id': instrumentId,
+            'date': dbDateString(quote.date),
+            'open': quote.open,
+            'low': quote.low,
+            'high': quote.high,
+            'close': quote.close,
+          });
+        }
+        txn.update('instrument', {'last_quote_update': dbDateString(DateTime.now())}, where: 'id = ?', whereArgs: [instrumentId]);
+      });
     }
   }
 
   addRates(List<Rate> rates) async {
     if (rates.isNotEmpty) {
       final Database db = await database;
-      final Batch batch = db.batch();
-
-      for (var rate in rates) {
-        batch.insert('rate', {
-          'currency_id': rate.currency.index + 1,
-          'date': dbDateString(rate.date),
-          'rate': rate.close,
-        });
-      }
-      batch.commit(noResult: true);
+      db.transaction((txn) async {
+        for (var rate in rates) {
+          txn.insert('rate', {
+            'currency_id': rate.currency.index + 1,
+            'date': dbDateString(rate.date),
+            'rate': rate.close,
+          });
+        }
+      });
     }
   }
 
@@ -614,26 +620,30 @@ class DBProvider {
     return Future.value(result);
   }
 
-  Future<List<Money>> getMoneys() async {
-    final Database db = await database;
-    List<Money> result;
+  static final _sqlPortfolioMonies =
+  '''SELECT  m.portfolio_id, m.currency_id, sum(case WHEN m.type = 1 THEN m.amount ELSE -m.amount END) amount 
+     FROM money m
+     WHERE portfolio_id = ?
+     GROUP BY currency_id
+     HAVING sum(case WHEN m.type = 1 THEN m.amount ELSE -m.amount END) <> 0
+  ''';
 
-    List<Map<String, dynamic>> moneys = await db.rawQuery(
-      'SELECT currency_id, sum(case WHEN type = 1 THEN amount ELSE -amount END) amount FROM money'
-    );
-    // если нет операций с деньгами, то будет возвращен набор данных из одной строки со всеми null в качестве значений
-    if (moneys.isNotEmpty && moneys[0]['currency_id'] != null) {
-      result = moneys.map((m) => Money.fromMap(m)).toList();
-    }
-    
-    return Future.value(result);
+  Future<List<Money>> getPortfolioMonies(int portfolioId) async {
+    final Database db = await database;
+    List<Map<String, dynamic>> money =
+    await db.rawQuery(_sqlPortfolioMonies, [portfolioId]);
+
+    return money.isNotEmpty ? money.map((m) => Money.fromMap(m)).toList() : <Money>[];
   }
 
-  Future<List<MoneyOperation>> getMoneyOperations() async {
+  static final _sqlPortfolioMoneyOperations =
+    'SELECT id, currency, date, type, amount FROM money WHERE id = ?';
+
+  Future<List<MoneyOperation>> getPortfolioMoneyOperations(int portfolioId) async {
     final Database db = await database;
     List<MoneyOperation> result;
 
-    List<Map<String, dynamic>> operations = await db.rawQuery('SELECT * FROM money');
+    List<Map<String, dynamic>> operations = await db.rawQuery(_sqlPortfolioMoneyOperations, [portfolioId]);
     if (operations.isNotEmpty) {
       result = operations.map((o) => MoneyOperation.fromMap(o)).toList();
     }
@@ -644,7 +654,7 @@ class DBProvider {
   addMoneyOperation(MoneyOperation op) async {
     final Database db = await database;
 
-    await db.insert('money', {'currency_id': op.currency.index + 1, 'date': dbDateString(op.date), 'type': op.type.index + 1, 'amount': op.amount});
+    await db.insert('money', {'portfolio_id': op.portfolio.id, 'currency_id': op.currency.index + 1, 'date': dbDateString(op.date), 'type': op.type.index + 1, 'amount': op.amount});
   }
 
   updateMoneyOperation(MoneyOperation op) async {
