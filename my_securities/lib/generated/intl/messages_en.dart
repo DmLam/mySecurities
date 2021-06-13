@@ -25,9 +25,11 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m2(portfolio_name) => "Percent in \'${portfolio_name}\' portfolio";
 
-  static m3(portfolio) => "${portfolio} operations";
+  static m3(portfolio) => "${portfolio} money operations";
 
-  static m4(name) => "Are you sure you want to delete portfolio \'${name}\'?";
+  static m4(portfolio) => "${portfolio} operations";
+
+  static m5(name) => "Are you sure you want to delete portfolio \'${name}\'?";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -59,6 +61,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "operationEditDialog_commission" : MessageLookupByLibrary.simpleMessage("Commission"),
     "operationEditDialog_date" : MessageLookupByLibrary.simpleMessage("Operation date"),
     "operationEditDialog_instrumentticker" : MessageLookupByLibrary.simpleMessage("Ticker"),
+    "operationEditDialog_noenoughmoney" : MessageLookupByLibrary.simpleMessage("Not enough money for this operation"),
     "operationEditDialog_notickersuggestion" : MessageLookupByLibrary.simpleMessage("Match not found"),
     "operationEditDialog_operationtype" : MessageLookupByLibrary.simpleMessage("Operation type"),
     "operationEditDialog_price" : MessageLookupByLibrary.simpleMessage("Price"),
@@ -79,8 +82,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "portfolioInstrumentListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Edit"),
     "portfolioInstrumentPageAddMoneyOperation" : MessageLookupByLibrary.simpleMessage("Add money operation"),
     "portfolioInstrumentPageAddOperation" : MessageLookupByLibrary.simpleMessage("Add operation"),
-    "portfolioOperations_Title" : m3,
-    "portfoliosListView_confirmDeleteDialogContent" : m4,
+    "portfolioMoneyOperations_Title" : m3,
+    "portfolioOperations_Title" : m4,
+    "portfoliosListView_confirmDeleteDialogContent" : m5,
     "portfoliosListView_confirmDeleteDialogTitle" : MessageLookupByLibrary.simpleMessage("Portfolio deletion"),
     "portfoliosListView_menuDelete" : MessageLookupByLibrary.simpleMessage("Delete"),
     "portfoliosListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Edit"),

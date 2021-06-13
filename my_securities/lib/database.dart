@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:io';import 'dart:io';
 import 'dart:async';
 import 'dart:typed_data';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -269,7 +269,7 @@ class DBProvider {
   initDB() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, "mysecurities.db");
-    await deleteDatabase(path); // пока идет отладка
+//    await deleteDatabase(path); // пока идет отладка
     await openDatabase(path,
       version: CURRENT_DB_VERSION,
       onConfigure: _onConfigure,
@@ -621,10 +621,10 @@ class DBProvider {
   }
 
   static final _sqlPortfolioMonies =
-  '''SELECT  m.portfolio_id, m.currency_id, sum(case WHEN m.type = 1 THEN m.amount ELSE -m.amount END) amount 
+  '''SELECT m.portfolio_id, m.currency_id, sum(case WHEN m.type = 1 THEN m.amount ELSE -m.amount END) amount 
      FROM money m
-     WHERE portfolio_id = ?
-     GROUP BY currency_id
+     WHERE m.portfolio_id = ?
+     GROUP BY m.currency_id
      HAVING sum(case WHEN m.type = 1 THEN m.amount ELSE -m.amount END) <> 0
   ''';
 
@@ -637,7 +637,7 @@ class DBProvider {
   }
 
   static final _sqlPortfolioMoneyOperations =
-    'SELECT id, currency, date, type, amount FROM money WHERE id = ?';
+    'SELECT id, currency_id, date, type, amount FROM money WHERE id = ? ORDER BY date, id';
 
   Future<List<MoneyOperation>> getPortfolioMoneyOperations(int portfolioId) async {
     final Database db = await database;

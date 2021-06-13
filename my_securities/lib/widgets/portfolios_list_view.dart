@@ -49,21 +49,6 @@ class PortfolioListViewItem extends StatelessWidget {
     );
   }
 
-  _addPortfolio(BuildContext context) async {
-    Portfolio portfolio = Portfolio.empty();
-
-    bool result = await Navigator.of(context).push(
-        MaterialPageRoute(
-            builder:(_) => PortfolioEditDialog(portfolio),
-            fullscreenDialog: true
-        )
-    );
-
-    if (result) {
-      context.read<PortfolioList>().add(_portfolio);
-    }
-  }
-
   _editPortfolio(BuildContext context) async {
     bool result = await Navigator.of(context).push(
         MaterialPageRoute(

@@ -10,36 +10,48 @@ import 'package:my_securities/widgets/appbar.dart';
 import '../constants.dart';
 import '../exchange.dart';
 
-class MoneyOperationEditDialog extends StatelessWidget {
+class MoneyOperationEditDialog extends StatefulWidget {
   final MoneyOperation _moneyOperation;
+
+  MoneyOperationEditDialog(this._moneyOperation, {Key key}) : super(key: key);
+
+  @override
+  _MoneyOperationEditDialogState createState() => _MoneyOperationEditDialogState();
+}
+
+class _MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
   final TextEditingController _dateEditController = TextEditingController();
   final TextEditingController _amountEditController = TextEditingController();
 
-  MoneyOperationEditDialog(this._moneyOperation, {Key key}) : super(key: key) {
-    _dateEditController.text = DateFormat.yMd(ui.window.locale.languageCode).format(_moneyOperation.date);
-    _amountEditController.text = (_moneyOperation.amount ?? 0) == 0 ? '' : _moneyOperation.amount.toString();
+  @override
+  void initState() {
+    _dateEditController.text = DateFormat.yMd(ui.window.locale.languageCode)
+        .format(widget._moneyOperation.date);
+    _amountEditController.text = widget._moneyOperation.amount?.toString();
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    String pageName = _moneyOperation.id == null ?
+    String pageName = widget._moneyOperation.id == null ?
       S.of(context).moneyOperationEditDialog_Title_add :
       S.of(context).moneyOperationEditDialog_Title_edit;
 
-    addMoneyOperation() async {
-      _moneyOperation.add();
-    }
 
     bool _fabEnabled() {
-      return _moneyOperation.date != null &&
-          _moneyOperation.currency != null &&
-          _moneyOperation.type != null &&
-          _moneyOperation.amount != null;
+      return widget._moneyOperation.date != null &&
+          widget._moneyOperation.currency != null &&
+          widget._moneyOperation.type != null &&
+          widget._moneyOperation.amount != null;
     }
 
     onFabPressed() async  {
       Navigator.of(context).pop(true);
-      addMoneyOperation();
+
+      if (widget._moneyOperation.id == null)
+        widget._moneyOperation.add();
+      else
+        widget._moneyOperation.update();
     }
 
 
@@ -60,14 +72,16 @@ class MoneyOperationEditDialog extends StatelessWidget {
                 onTap: () {
                   showDatePicker(
                       context: context,
-                      initialDate: _moneyOperation.date,
+                      initialDate: widget._moneyOperation.date,
                       firstDate: DateTime(2000),
                       lastDate: DateTime.now()).then((value)
                   {
                     if (value != null) {
-                      _moneyOperation.date = value;
-                      _dateEditController.text =
-                          DateFormat.yMd(ui.window.locale.languageCode).format(value);
+                      setState(() {
+                        widget._moneyOperation.date = value;
+                        _dateEditController.text =
+                            DateFormat.yMd(ui.window.locale.languageCode).format(value);
+                      });
                     }
                   });
                 }
@@ -76,7 +90,7 @@ class MoneyOperationEditDialog extends StatelessWidget {
             Expanded(flex: 10, child: Text('')),
             Expanded(flex: 45,
               child: DropdownButtonFormField (
-                value: _moneyOperation.currency,
+                value: widget._moneyOperation.currency,
                 decoration: InputDecoration(
                     icon: Icon(Icons.attach_money),
                     labelText: S.of(context).moneyOperationEditDialog_currency,
@@ -88,14 +102,18 @@ class MoneyOperationEditDialog extends StatelessWidget {
                     child: Text(c.name()),
                   )
                 ).toList(),
-                onChanged: (value) {_moneyOperation.currency = value;},
+                onChanged: (value) {
+                  setState(() {
+                    widget._moneyOperation.currency = value;
+                  });
+                },
               )
             ),
           ]),
           dialogPanel(children: [
             Expanded(flex: 45,
               child: DropdownButtonFormField (
-                value: _moneyOperation.type,
+                value: widget._moneyOperation.type,
                 decoration: InputDecoration(
                     icon: Icon(Icons.attach_money),
                     labelText: S.of(context).moneyOperationEditDialog_operationtype,
@@ -104,14 +122,18 @@ class MoneyOperationEditDialog extends StatelessWidget {
                 items: [
                   DropdownMenuItem(
                     value: MoneyOperationType.deposit,
-                    child: Text(MONEY_OPERATION_TYPE_NAMES[MoneyOperationType.deposit.index]),
+                    child: Text(MoneyOperationType.deposit.name()),
                   ),
                   DropdownMenuItem(
                     value: MoneyOperationType.withdraw,
-                    child: Text(MONEY_OPERATION_TYPE_NAMES[MoneyOperationType.withdraw.index]),
+                    child: Text(MoneyOperationType.withdraw.name()),
                   )
                 ],
-                onChanged: (value) {_moneyOperation.type = value;},
+                onChanged: (value) {
+                  setState(() {
+                    widget._moneyOperation.type = value;
+                  });
+                },
               )
             ),
             Expanded(flex: 10, child: Text('')),
@@ -133,21 +155,23 @@ class MoneyOperationEditDialog extends StatelessWidget {
                 validator: (value) {
                   String result;
                   if (value != null && value != '') {
-                    if (_moneyOperation.amount == null) {
+                    if (widget._moneyOperation.amount == null) {
                       result = S.of(context).errorInvalidValue;
                     }
                   }
                   return result;
                 },
                 onChanged: (value) {
-                  _moneyOperation.amount = double.tryParse(value);
+                  setState(() {
+                    widget._moneyOperation.amount = double.tryParse(value);
+                  });
                 },
               )
             ),
           ])
         ])
       ),
-        floatingActionButton:       // don't show FAB if keyboard is opened, because the FAB overflows most bottom editor
+      floatingActionButton:       // don't show FAB if keyboard is opened, because the FAB overflows most bottom editor
         Visibility(
             visible: isKeyboardOpen(context), // check keyboard is open
             child: FloatingActionButton(

@@ -525,6 +525,26 @@ class S {
     );
   }
 
+  /// `Not enough money for this operation`
+  String get operationEditDialog_noenoughmoney {
+    return Intl.message(
+      'Not enough money for this operation',
+      name: 'operationEditDialog_noenoughmoney',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{portfolio} money operations`
+  String portfolioMoneyOperations_Title(Object portfolio) {
+    return Intl.message(
+      '$portfolio money operations',
+      name: 'portfolioMoneyOperations_Title',
+      desc: '',
+      args: [portfolio],
+    );
+  }
+
   /// `Add money operation`
   String get moneyOperationEditDialog_Title_add {
     return Intl.message(

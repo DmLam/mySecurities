@@ -16,6 +16,7 @@ class Portfolio extends ChangeNotifier {
   InstrumentList _instruments;
   OperationList _operations;
   MoneyList _monies;
+  MoneyOperationList _moneyOperations;
 
   int get id => _id;
   String get name => _name;
@@ -30,11 +31,13 @@ class Portfolio extends ChangeNotifier {
   InstrumentList get instruments => _instruments;
   OperationList get operations => _operations;
   MoneyList get monies => _monies;
+  MoneyOperationList get moneyOperations => _moneyOperations;
 
   Portfolio(this._id, this._name, this._visible, this._startDate) {
     _instruments = InstrumentList(this);
     _operations = OperationList(this);
     _monies = MoneyList(this);
+    _moneyOperations = MoneyOperationList(this);
   }
 
   Portfolio.from(Portfolio portfolio) :
@@ -72,13 +75,23 @@ class Portfolio extends ChangeNotifier {
   Instrument instrumentById(int id) => instruments.instrumentById(id);
 
   Future<bool> update({String name, bool visible, DateTime startDate}) async {
-    if (name != null)
+    bool doUpdate = false;
+    bool result;
+
+    if (name != null) {
       _name = name;
-    if (visible != null)
+      doUpdate = true;
+    }
+    if (visible != null) {
       _visible = visible;
-    if (startDate != null)
+      doUpdate = true;
+    }
+    if (startDate != null) {
       _startDate = startDate;
-    bool result = await DBProvider.db.updatePortfolio(this);
+      doUpdate = true;
+    }
+    if (doUpdate)
+      result = await DBProvider.db.updatePortfolio(this);
 
     notifyListeners();
 

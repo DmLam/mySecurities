@@ -25,9 +25,11 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m2(portfolio_name) => "Процент в портфеле \'${portfolio_name}\'";
 
-  static m3(portfolio) => "Операции в ${portfolio}";
+  static m3(portfolio) => "Операции с валютой в ${portfolio}";
 
-  static m4(name) => "Вы уверены, что хотите удалить портфель \'${name}\'?";
+  static m4(portfolio) => "Операции в ${portfolio}";
+
+  static m5(name) => "Вы уверены, что хотите удалить портфель \'${name}\'?";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -59,6 +61,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "operationEditDialog_commission" : MessageLookupByLibrary.simpleMessage("Комиссия"),
     "operationEditDialog_date" : MessageLookupByLibrary.simpleMessage("Дата операции"),
     "operationEditDialog_instrumentticker" : MessageLookupByLibrary.simpleMessage("Тикер"),
+    "operationEditDialog_noenoughmoney" : MessageLookupByLibrary.simpleMessage("Недостаточно средств для проведения операции"),
     "operationEditDialog_notickersuggestion" : MessageLookupByLibrary.simpleMessage("Соответствие не найдено"),
     "operationEditDialog_operationtype" : MessageLookupByLibrary.simpleMessage("Тип операции"),
     "operationEditDialog_price" : MessageLookupByLibrary.simpleMessage("Цена"),
@@ -79,8 +82,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "portfolioInstrumentListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Редактировать"),
     "portfolioInstrumentPageAddMoneyOperation" : MessageLookupByLibrary.simpleMessage("Добавить операцию с валютой"),
     "portfolioInstrumentPageAddOperation" : MessageLookupByLibrary.simpleMessage("Добавить операцию"),
-    "portfolioOperations_Title" : m3,
-    "portfoliosListView_confirmDeleteDialogContent" : m4,
+    "portfolioMoneyOperations_Title" : m3,
+    "portfolioOperations_Title" : m4,
+    "portfoliosListView_confirmDeleteDialogContent" : m5,
     "portfoliosListView_confirmDeleteDialogTitle" : MessageLookupByLibrary.simpleMessage("Удаление портфеля"),
     "portfoliosListView_menuDelete" : MessageLookupByLibrary.simpleMessage("Удалить"),
     "portfoliosListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Редактировать"),

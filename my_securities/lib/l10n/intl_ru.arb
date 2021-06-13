@@ -61,6 +61,9 @@
   "operationEditDialog_commission": "Комиссия",
   "operationEditDialog_withdrawmoney": "Списать деньги",
   "operationEditDialog_notickersuggestion": "Соответствие не найдено",
+  "operationEditDialog_noenoughmoney": "Недостаточно средств для проведения операции",
+
+  "portfolioMoneyOperations_Title": "Операции с валютой в {portfolio}",
 
   "moneyOperationEditDialog_Title_add": "Добавить операции с валютой",
   "moneyOperationEditDialog_Title_edit": "Редактировать операцию с валютой",

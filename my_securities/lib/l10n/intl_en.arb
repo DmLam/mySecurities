@@ -61,6 +61,9 @@
   "operationEditDialog_commission": "Commission",
   "operationEditDialog_withdrawmoney": "Withdraw money",
   "operationEditDialog_notickersuggestion": "Match not found",
+  "operationEditDialog_noenoughmoney": "Not enough money for this operation",
+
+  "portfolioMoneyOperations_Title": "{portfolio} money operations",
 
   "moneyOperationEditDialog_Title_add": "Add money operation",
   "moneyOperationEditDialog_Title_edit": "Edit money operation",

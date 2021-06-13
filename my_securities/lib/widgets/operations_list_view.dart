@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:my_securities/common/message_dialog.dart';
+import 'package:my_securities/common/utils.dart';
 import 'package:provider/provider.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/exchange.dart';
@@ -32,7 +33,6 @@ class OperationsListView extends StatelessWidget {
 }
 
 Widget operationsListItem(BuildContext context, Operation operation) {
-  final String languageCode = Localizations.localeOf(context).languageCode;
   Instrument instrument = context.watch<Instrument>();
 
   editOperation() {
@@ -53,21 +53,21 @@ Widget operationsListItem(BuildContext context, Operation operation) {
 
   return ListTile(
       leading: instrument.image == null ? Icon(Icons.attach_money) : Image.memory(instrument.image),
-      title: Text("${OPERATION_TYPE_NAMES[operation.type.index]} ${operation.quantity} ${S.of(context).pcs} * ${operation.price} ${instrument.currency.sign()}"),
+      title: Text('${OPERATION_TYPE_NAMES[operation.type.index]} ${operation.quantity} ${S.of(context).pcs} * ${operation.price} ${instrument.currency.sign()}'),
       subtitle: Row(mainAxisSize: MainAxisSize.max,
           children: [
-            Expanded(flex: 70, child: Text("${operation.value.toString()} ${operation.instrument.currency.sign()}")),
-            Expanded(flex: 30, child: Text(DateFormat.yMd(languageCode).format(operation.date), style: TextStyle(fontStyle: FontStyle.italic, fontSize: 11), textAlign: TextAlign.right, ))
+            Expanded(flex: 70, child: Text('${operation.value.toString()} ${operation.instrument.currency.sign()}')),
+            Expanded(flex: 30, child: Text(DateFormat.yMd(languageCode(context)).format(operation.date), style: TextStyle(fontStyle: FontStyle.italic, fontSize: 11), textAlign: TextAlign.right, ))
           ]),
       trailing: PopupMenuButton(
           itemBuilder: (_) => <PopupMenuItem<String>>[
             PopupMenuItem<String>(
-              value: "edit",
+              value: 'edit',
               child: Text(S.of(context).operationsListViewItem_menuEdit),
             ),
 
             PopupMenuItem<String>(
-              value: "delete",
+              value: 'delete',
               child: Text(S.of(context).operationsListViewItem_menuDelete),
             )
           ],

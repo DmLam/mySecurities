@@ -1,14 +1,19 @@
 import 'package:flutter/foundation.dart';
+import '../constants.dart';
 import '../database.dart';
 import 'model.dart';
 import 'package:my_securities/models/portfolio.dart';
 import '../exchange.dart';
-import 'money.dart';
 
 
 enum MoneyOperationType {deposit, withdraw, buy, sell}  // buy and sell is only for non-money operations (i.e. buying and selling securities)
 
-class MoneyOperation {
+extension MoneyOperationTypeExtension on MoneyOperationType {
+  String name() {
+    return MONEY_OPERATION_TYPE_NAMES[this.index];
+  }
+}
+class MoneyOperation extends ChangeNotifier {
   int id;
   Portfolio portfolio;
   Currency currency;
@@ -34,7 +39,6 @@ class MoneyOperation {
     this.portfolio = portfolio;
     type = MoneyOperationType.deposit;
     date = DateTime(now.year, now.month, now.day);
-    amount = 0;
   }
 
   MoneyOperation.from(MoneyOperation op) :
@@ -53,26 +57,53 @@ class MoneyOperation {
   }
 
   Future<int> add() async {
-    int result = await portfolio.monies._add(this);
+    int result = await portfolio.moneyOperations._add(this);
 
-    portfolio.notifyListeners();
+    notifyListeners();
+    portfolio.update(); // changes nothing, just notify listeners
+
+    return Future.value(result);
+  }
+
+  Future<bool> update() async {
+    bool result;
+
+    if (id != null) {
+      await DBProvider.db.updateMoneyOperation(this);
+      notifyListeners();
+      portfolio.update(); // changes nothing, just notify listeners
+      result = true;
+    }
+
+
+    return Future.value(result);
+  }
+
+  Future<bool> delete() async {
+    bool result = await portfolio.moneyOperations._delete(this);
+
+    notifyListeners();
+    portfolio.update(); // changes nothing, just notify listeners
 
     return Future.value(result);
   }
 }
 
-class MoneyList {
+class MoneyOperationList {
   Portfolio _portfolio;
-  List<Money> _items;
+  List<MoneyOperation> _items;
 
-  MoneyList(this._portfolio) {
+  MoneyOperationList(this._portfolio) {
     _loadFromDb();
   }
 
-  List<Money> get monies => [..._items];
+  List<MoneyOperation> get operations => [..._items];
+
+  List<MoneyOperation> byCurrency(Currency currency) =>
+    _items.where((item) => item.currency == currency).toList();
 
   _loadFromDb() async {
-    _items = await DBProvider.db.getPortfolioMonies(_portfolio.id);
+    _items = await DBProvider.db.getPortfolioMoneyOperations(_portfolio.id);
   }
 
   Future<int> _add(MoneyOperation moneyOperation) async {
@@ -85,6 +116,4 @@ class MoneyList {
     await DBProvider.db.deleteMoneyOperation(moneyOperation.id);
     await _loadFromDb();
   }
-
-
 }

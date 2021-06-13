@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 bool isKeyboardOpen(BuildContext context) => MediaQuery.of(context).viewInsets.bottom == 0.0;
 
+String languageCode(BuildContext context) => Localizations.localeOf(context).languageCode;
+
 // returns date part of the date
 DateTime dateOf(DateTime date) {
   return DateTime(date.year, date.month, date.day);

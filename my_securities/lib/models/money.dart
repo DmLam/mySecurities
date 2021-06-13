@@ -1,10 +1,9 @@
 import 'package:flutter/cupertino.dart';
-import 'package:my_securities/database.dart';
 import 'package:my_securities/models/portfolio.dart';
 
+import '../database.dart';
 import '../exchange.dart';
 import 'model.dart';
-import 'money_operation.dart';
 
 class Money extends ChangeNotifier {
   Portfolio portfolio;
@@ -21,3 +20,21 @@ class Money extends ChangeNotifier {
       );
 }
 
+class MoneyList {
+  Portfolio _portfolio;
+  List<Money> _items;
+
+  MoneyList(this._portfolio) {
+    _loadFromDb();
+  }
+
+  Money byCurrency(Currency currency) {
+    return _items.where((element) => (element.currency == currency)).first;
+  }
+
+  List<Money> get monies => [..._items];
+
+  _loadFromDb() async {
+    _items = await DBProvider.db.getPortfolioMonies(_portfolio.id);
+  }
+}

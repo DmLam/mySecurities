@@ -5,7 +5,7 @@ import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/models/instrument.dart';
 import 'package:my_securities/models/portfolio.dart';
 import 'package:my_securities/pages/portfolio_instrument_edit_dialog.dart';
-import 'package:my_securities/pages/portfolio_operation_page.dart';
+import 'package:my_securities/pages/portfolio_operations_page.dart';
 import 'package:provider/provider.dart';
 import '../exchange.dart';
 import '../quote_provider.dart';
@@ -54,7 +54,7 @@ class PortfolioInstrumentListItem extends StatelessWidget {
       Instrument instrument = context.read<Instrument>();
 
       Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => PortfolioOperationPage(instrument.portfolio, instrument: instrument)));
+          MaterialPageRoute(builder: (_) => PortfolioOperationsPage(instrument.portfolio, instrument: instrument)));
     }
 
     return ListTile(

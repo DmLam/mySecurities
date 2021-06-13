@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:fluttericon/font_awesome_icons.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:my_securities/common/dialog_panel.dart';
 import 'dart:ui' as ui;
 import 'package:my_securities/common/utils.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/models/instrument.dart';
+import 'package:my_securities/models/money.dart';
 import 'package:my_securities/models/operation.dart';
 import 'package:my_securities/widgets/appbar.dart';
 import '../constants.dart';
@@ -28,12 +30,12 @@ class OperationEditDialog extends StatelessWidget {
     _operationInstrument = _operation.instrument ?? Instrument.empty(),
         super(key: key)
   {
-    _tickerEditController.text = _operation.instrument.ticker;
-    _instrumentNameEditController.text = _operation.instrument.name;
+    _tickerEditController.text = _operation.instrument?.ticker;
+    _instrumentNameEditController.text = _operation.instrument?.name;
     _dateEditController.text = DateFormat.yMd(ui.window.locale.languageCode).format(_operation.date);
-    _priceEditController.text = (_operation.price ?? 0) == 0 ? '' : _operation.price.toString();
-    _quantityEditController.text = (_operation.quantity ?? 0) == 0 ? '' : _operation.quantity.toString();
-    _commissionEditController.text = (_operation.commission ?? 0) == 0 ? '' : _operation.commission.toString();
+    _priceEditController.text = _operation.price?.toString();
+    _quantityEditController.text = _operation.quantity?.toString();
+    _commissionEditController.text = _operation.commission?.toString();
   }
 
   @override
@@ -44,6 +46,15 @@ class OperationEditDialog extends StatelessWidget {
     bool _createMoneyOperation = true;
 
     addOperation() async {
+      if (_createMoneyOperation) {
+        Money money = _operation.portfolio.monies.byCurrency(_operationInstrument.currency);
+
+        if (money == null || money.amount < _operation.value) {
+          Fluttertoast.showToast(msg: S.of(context).operationEditDialog_noenoughmoney);
+          return;
+        }
+      }
+
       if (_operation.instrument == null) {
         Instrument instrument = await _operation.portfolio.instruments.add(
             _operationInstrument.ticker,
