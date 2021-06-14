@@ -637,7 +637,7 @@ class DBProvider {
   }
 
   static final _sqlPortfolioMoneyOperations =
-    'SELECT id, currency_id, date, type, amount FROM money WHERE id = ? ORDER BY date, id';
+    'SELECT id, portfolio_id, currency_id, date, type, amount FROM money WHERE portfolio_id = ? ORDER BY date, id';
 
   Future<List<MoneyOperation>> getPortfolioMoneyOperations(int portfolioId) async {
     final Database db = await database;
@@ -687,23 +687,20 @@ class DBProvider {
     return result;
   }
 
-  Future<bool> addPortfolio(Portfolio portfolio) async {
-    bool result = false;
+  Future<int> addPortfolio(Portfolio portfolio) async {
+    assert(portfolio.id == null, 'Internal error: adding portfolio with id');
+
+    int result;
     final Database db = await database;
 
-    if (portfolio.id != null)
-      Fluttertoast.showToast(msg: "Internal error: adding portfolio with id");
-    else {
-      try {
-        await db.insert('portfolio', {'name': portfolio.name});
-        result = true;
-      }
-      catch (e) {
-        int code = extractErrorCodeFromErrorMessage(e.message);
-        if (code == error_SQLITE_CONSTRAINT_UNIQUE) {
-          Fluttertoast.showToast(
-              msg: S.current.db_portfolioAlreadyExists(portfolio.name));
-        }
+    try {
+      result = await db.insert('portfolio', {'name': portfolio.name});
+    }
+    catch (e) {
+      int code = extractErrorCodeFromErrorMessage(e.message);
+      if (code == error_SQLITE_CONSTRAINT_UNIQUE) {
+        Fluttertoast.showToast(
+            msg: S.current.db_portfolioAlreadyExists(portfolio.name));
       }
     }
 

@@ -85,7 +85,7 @@ class Instrument extends ChangeNotifier {
 
   factory Instrument.fromMap(Map<String, dynamic> json) =>
       Instrument(json["id"],
-          portfolio: Model.portfolios().portfolioById(json["portfolio_id"]),
+          portfolio: Model.portfolios.portfolioById(json["portfolio_id"]),
           isin: json["isin"],
           ticker: json["ticker"],
           name: json["name"],

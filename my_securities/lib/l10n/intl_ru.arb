@@ -65,6 +65,11 @@
 
   "portfolioMoneyOperations_Title": "Операции с валютой в {portfolio}",
 
+  "moneyOperationsListView_menuEdit": "Редактировать",
+  "moneyOperationsListView_menuDelete": "Удалить",
+  "moneyOperationsListView_confirmDeleteDialogTitle": "Удаление операции",
+  "moneyOperationsListView_confirmDeleteDialogContent": "Вы уверены, что хотите удалить операцию '{description}'?",
+
   "moneyOperationEditDialog_Title_add": "Добавить операции с валютой",
   "moneyOperationEditDialog_Title_edit": "Редактировать операцию с валютой",
   "moneyOperationEditDialog_date": "Дата операции",

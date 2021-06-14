@@ -32,7 +32,7 @@ class OperationEditDialog extends StatelessWidget {
   {
     _tickerEditController.text = _operation.instrument?.ticker;
     _instrumentNameEditController.text = _operation.instrument?.name;
-    _dateEditController.text = DateFormat.yMd(ui.window.locale.languageCode).format(_operation.date);
+    _dateEditController.text = dateString(_operation.date);
     _priceEditController.text = _operation.price?.toString();
     _quantityEditController.text = _operation.quantity?.toString();
     _commissionEditController.text = _operation.commission?.toString();
@@ -175,8 +175,7 @@ class OperationEditDialog extends StatelessWidget {
                         {
                           if (value != null) {
                             _operation.date = value;
-                            _dateEditController.text =
-                                DateFormat.yMd(ui.window.locale.languageCode).format(value);
+                            _dateEditController.text = dateString(value);
                           }
                         });
                   }

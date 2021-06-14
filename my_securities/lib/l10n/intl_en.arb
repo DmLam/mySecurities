@@ -65,6 +65,11 @@
 
   "portfolioMoneyOperations_Title": "{portfolio} money operations",
 
+  "moneyOperationsListView_menuEdit": "Edit",
+  "moneyOperationsListView_menuDelete": "Delete",
+  "moneyOperationsListView_confirmDeleteDialogTitle": "Operation deletion",
+  "moneyOperationsListView_confirmDeleteDialogContent": "Are you sure you want to delete operation '{description}'?",
+
   "moneyOperationEditDialog_Title_add": "Add money operation",
   "moneyOperationEditDialog_Title_edit": "Edit money operation",
   "moneyOperationEditDialog_date": "Operation date",

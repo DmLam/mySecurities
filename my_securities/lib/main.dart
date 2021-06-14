@@ -47,7 +47,7 @@ class MySecuritiesApp extends StatelessWidget {
         builder: (context, widget) {
           return
             ChangeNotifierProvider<PortfolioList>(
-                    create: (_) => Model.portfolios(),
+                    create: (_) => Model.portfolios,
               child: MaterialApp(
                   localizationsDelegates: [
                     S.delegate,

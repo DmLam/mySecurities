@@ -40,7 +40,7 @@ Widget operationsListItem(BuildContext context, Operation operation) {
   }
 
   deleteOperation() async {
-    String date = DateFormat.yMd(Intl.getCurrentLocale()).format(operation.date);
+    String date = dateString(operation.date);
     String description =  "${operation.instrument.ticker} * ${operation.quantity} (${date})";
     String confirmation = await messageDialog(context,
         S.of(context).operationsListView_confirmDeleteDialogTitle,
@@ -56,8 +56,13 @@ Widget operationsListItem(BuildContext context, Operation operation) {
       title: Text('${OPERATION_TYPE_NAMES[operation.type.index]} ${operation.quantity} ${S.of(context).pcs} * ${operation.price} ${instrument.currency.sign()}'),
       subtitle: Row(mainAxisSize: MainAxisSize.max,
           children: [
-            Expanded(flex: 70, child: Text('${operation.value.toString()} ${operation.instrument.currency.sign()}')),
-            Expanded(flex: 30, child: Text(DateFormat.yMd(languageCode(context)).format(operation.date), style: TextStyle(fontStyle: FontStyle.italic, fontSize: 11), textAlign: TextAlign.right, ))
+            Expanded(flex: 70,
+              child: Text('${operation.value.toString()} ${operation.instrument.currency.sign()}')),
+            Expanded(flex: 30,
+              child: Text(dateString(operation.date),
+                style: TextStyle(fontStyle: FontStyle.italic, fontSize: 11),
+                textAlign: TextAlign.right)
+            )
           ]),
       trailing: PopupMenuButton(
           itemBuilder: (_) => <PopupMenuItem<String>>[

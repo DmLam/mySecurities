@@ -14,7 +14,7 @@ class Money extends ChangeNotifier {
 
   factory Money.fromMap(Map<String, dynamic> json) =>
       Money(
-        portfolio: Model.portfolios().portfolioById(json["portfolio_id"]),
+        portfolio: Model.portfolios.portfolioById(json["portfolio_id"]),
         currency: Currency.values[json["currency_id"] - 1],
         amount: json["amount"]
       );
@@ -28,8 +28,14 @@ class MoneyList {
     _loadFromDb();
   }
 
+  Portfolio get portfolio => _portfolio;
+
   Money byCurrency(Currency currency) {
     return _items.where((element) => (element.currency == currency)).first;
+  }
+
+  refresh() async {
+    await _loadFromDb();
   }
 
   List<Money> get monies => [..._items];

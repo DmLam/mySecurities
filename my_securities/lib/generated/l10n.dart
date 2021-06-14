@@ -545,6 +545,46 @@ class S {
     );
   }
 
+  /// `Edit`
+  String get moneyOperationsListView_menuEdit {
+    return Intl.message(
+      'Edit',
+      name: 'moneyOperationsListView_menuEdit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Delete`
+  String get moneyOperationsListView_menuDelete {
+    return Intl.message(
+      'Delete',
+      name: 'moneyOperationsListView_menuDelete',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Operation deletion`
+  String get moneyOperationsListView_confirmDeleteDialogTitle {
+    return Intl.message(
+      'Operation deletion',
+      name: 'moneyOperationsListView_confirmDeleteDialogTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Are you sure you want to delete operation '{description}'?`
+  String moneyOperationsListView_confirmDeleteDialogContent(Object description) {
+    return Intl.message(
+      'Are you sure you want to delete operation \'$description\'?',
+      name: 'moneyOperationsListView_confirmDeleteDialogContent',
+      desc: '',
+      args: [description],
+    );
+  }
+
   /// `Add money operation`
   String get moneyOperationEditDialog_Title_add {
     return Intl.message(

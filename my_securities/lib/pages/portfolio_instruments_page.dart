@@ -32,54 +32,55 @@ class PortfolioInstrumentsPage extends StatelessWidget {
     }
 
     return
-      ChangeNotifierProvider<Portfolio>.value(
-        value: _portfolio,
-        builder: (context, widget ) {
-          return Scaffold(
-            appBar: MySecuritiesAppBar(pageName: "${_portfolio.name}"),
-            body: Column(
-              children: [
-                PortfolioInstrumentsListView(context.watch<Portfolio>()),
-                PortfolioMoniesListView(context.read<Portfolio>())
-              ]
-            ),
-            floatingActionButton: SpeedDial(
-              icon: Icons.add,
-              activeIcon: Icons.close,
+      Scaffold(
+        appBar: MySecuritiesAppBar(pageName: "${_portfolio.name}"),
+        body:
+          ChangeNotifierProvider<Portfolio>.value(
+            value: _portfolio,
+            builder: (context, _) {
+              Portfolio portfolio = context.watch<Portfolio>();
+
+              return Column(children: [
+                PortfolioInstrumentsListView(portfolio),
+                PortfolioMoniesListView(portfolio)
+              ]);
+            }
+          ),
+        floatingActionButton: SpeedDial(
+          icon: Icons.add,
+          activeIcon: Icons.close,
+          backgroundColor: Colors.blue,
+          visible: true,
+          curve: Curves.bounceIn,
+          children: [
+            SpeedDialChild(
+              child: Icon(Icons.attach_money),
               backgroundColor: Colors.blue,
-              visible: true,
-              curve: Curves.bounceIn,
-              children: [
-                SpeedDialChild(
-                  child: Icon(Icons.attach_money),
-                  backgroundColor: Colors.blue,
-                  label: S.of(context).portfolioInstrumentPageAddMoneyOperation,
-                  labelStyle: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white,
-                      fontSize: 16.0),
-                  labelBackgroundColor: Colors.blue,
-                  onTap: () {
-                    addMoneyOperation();
-                  },
-                ),
-                SpeedDialChild(
-                  child: Icon(Icons.add_chart),
-                  backgroundColor: Colors.blue,
-                  label: S.of(context).portfolioInstrumentPageAddOperation,
-                  labelStyle: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white,
-                      fontSize: 16.0),
-                  labelBackgroundColor: Colors.blue,
-                  onTap: () {
-                    addOperation();
-                  },
-                ),
-              ]
-            )
-          );
-        }
-    );
+              label: S.of(context).portfolioInstrumentPageAddMoneyOperation,
+              labelStyle: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                  fontSize: 16.0),
+              labelBackgroundColor: Colors.blue,
+              onTap: () {
+                addMoneyOperation();
+              },
+            ),
+            SpeedDialChild(
+              child: Icon(Icons.add_chart),
+              backgroundColor: Colors.blue,
+              label: S.of(context).portfolioInstrumentPageAddOperation,
+              labelStyle: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                  fontSize: 16.0),
+              labelBackgroundColor: Colors.blue,
+              onTap: () {
+                addOperation();
+              },
+            ),
+          ]
+        )
+      );
   }
 }

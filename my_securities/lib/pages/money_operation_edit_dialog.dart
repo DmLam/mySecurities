@@ -25,8 +25,7 @@ class _MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
 
   @override
   void initState() {
-    _dateEditController.text = DateFormat.yMd(ui.window.locale.languageCode)
-        .format(widget._moneyOperation.date);
+    _dateEditController.text = dateString(widget._moneyOperation.date);
     _amountEditController.text = widget._moneyOperation.amount?.toString();
     super.initState();
   }
@@ -79,8 +78,7 @@ class _MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
                     if (value != null) {
                       setState(() {
                         widget._moneyOperation.date = value;
-                        _dateEditController.text =
-                            DateFormat.yMd(ui.window.locale.languageCode).format(value);
+                        _dateEditController.text = dateString(value);
                       });
                     }
                   });

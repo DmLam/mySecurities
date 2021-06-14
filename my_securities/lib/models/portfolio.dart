@@ -3,6 +3,7 @@ import 'package:my_securities/models/operation.dart';
 import 'instrument.dart';
 import 'package:my_securities/database.dart';
 
+import 'model.dart';
 import 'money.dart';
 import 'money_operation.dart';
 
@@ -37,7 +38,7 @@ class Portfolio extends ChangeNotifier {
     _instruments = InstrumentList(this);
     _operations = OperationList(this);
     _monies = MoneyList(this);
-    _moneyOperations = MoneyOperationList(this);
+    _moneyOperations = MoneyOperationList(_monies);
   }
 
   Portfolio.from(Portfolio portfolio) :
@@ -74,6 +75,10 @@ class Portfolio extends ChangeNotifier {
 
   Instrument instrumentById(int id) => instruments.instrumentById(id);
 
+  Future<int> add(Portfolio portfolio) async {
+    return Future.value(await Model.portfolios._add(portfolio));
+  }
+
   Future<bool> update({String name, bool visible, DateTime startDate}) async {
     bool doUpdate = false;
     bool result;
@@ -96,6 +101,10 @@ class Portfolio extends ChangeNotifier {
     notifyListeners();
 
     return Future.value(result);
+  }
+
+  Future<bool> delete() async {
+    return Future.value(await Model.portfolios._delete(this));
   }
 }
 
@@ -124,31 +133,29 @@ class PortfolioList extends ChangeNotifier {
     return result;
   }
 
-  _getPortfoliosFromDB() async {
+  _loadFromDb() async {
     _items = await DBProvider.db.getPortfolios();
     _items.forEach((element) {element._owner = this;});
   }
 
   Future _init() async{
-    await _getPortfoliosFromDB();
+    await _loadFromDb();
   }
 
-  Future<bool> add(Portfolio portfolio) async {
-    bool result = await DBProvider.db.addPortfolio(portfolio);
+  Future<int> _add(Portfolio portfolio) async {
+    int result = await DBProvider.db.addPortfolio(portfolio);
 
-    if (result){
-      await _getPortfoliosFromDB();
-      notifyListeners();
-    }
+    await _loadFromDb();
+    notifyListeners();
 
     return Future.value(result);
   }
 
-  Future<bool> delete(Portfolio portfolio) async {
+  Future<bool> _delete(Portfolio portfolio) async {
     bool result = await DBProvider.db.deletePortfolio(portfolio);
 
     if (result){
-      await _getPortfoliosFromDB();
+      await _loadFromDb();
       notifyListeners();
     }
 

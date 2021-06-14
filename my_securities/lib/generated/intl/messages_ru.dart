@@ -23,13 +23,15 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m1(description) => "Вы уверены, что хотите удалить операцию \'${description}\'?";
 
-  static m2(portfolio_name) => "Процент в портфеле \'${portfolio_name}\'";
+  static m2(description) => "Вы уверены, что хотите удалить операцию \'${description}\'?";
 
-  static m3(portfolio) => "Операции с валютой в ${portfolio}";
+  static m3(portfolio_name) => "Процент в портфеле \'${portfolio_name}\'";
 
-  static m4(portfolio) => "Операции в ${portfolio}";
+  static m4(portfolio) => "Операции с валютой в ${portfolio}";
 
-  static m5(name) => "Вы уверены, что хотите удалить портфель \'${name}\'?";
+  static m5(portfolio) => "Операции в ${portfolio}";
+
+  static m6(name) => "Вы уверены, что хотите удалить портфель \'${name}\'?";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -56,6 +58,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "moneyOperationEditDialog_operationtype" : MessageLookupByLibrary.simpleMessage("Тип операции"),
     "moneyOperationTypeDeposit" : MessageLookupByLibrary.simpleMessage("Поступление"),
     "moneyOperationTypeWithdraw" : MessageLookupByLibrary.simpleMessage("Вывод"),
+    "moneyOperationsListView_confirmDeleteDialogContent" : m1,
+    "moneyOperationsListView_confirmDeleteDialogTitle" : MessageLookupByLibrary.simpleMessage("Удаление операции"),
+    "moneyOperationsListView_menuDelete" : MessageLookupByLibrary.simpleMessage("Удалить"),
+    "moneyOperationsListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Редактировать"),
     "operationEditDialog_Title_add" : MessageLookupByLibrary.simpleMessage("Добавить операцию"),
     "operationEditDialog_Title_edit" : MessageLookupByLibrary.simpleMessage("Редактировать операцию"),
     "operationEditDialog_commission" : MessageLookupByLibrary.simpleMessage("Комиссия"),
@@ -71,20 +77,20 @@ class MessageLookup extends MessageLookupByLibrary {
     "operationTypeSell" : MessageLookupByLibrary.simpleMessage("Продажа"),
     "operationsListViewItem_menuDelete" : MessageLookupByLibrary.simpleMessage("Удалить"),
     "operationsListViewItem_menuEdit" : MessageLookupByLibrary.simpleMessage("Редактировать"),
-    "operationsListView_confirmDeleteDialogContent" : m1,
+    "operationsListView_confirmDeleteDialogContent" : m2,
     "operationsListView_confirmDeleteDialogTitle" : MessageLookupByLibrary.simpleMessage("Удаление операции"),
     "pcs" : MessageLookupByLibrary.simpleMessage("шт"),
     "portfolioEditDialog_Name" : MessageLookupByLibrary.simpleMessage("Наименование"),
     "portfolioEditDialog_Title" : MessageLookupByLibrary.simpleMessage("Редактировать портфель"),
     "portfolioEditDialog_startDate" : MessageLookupByLibrary.simpleMessage("Дата создания"),
     "portfolioInstrumentEditDialog_Title" : MessageLookupByLibrary.simpleMessage("Настройка инструмента"),
-    "portfolioInstrumentEditDialog_percent" : m2,
+    "portfolioInstrumentEditDialog_percent" : m3,
     "portfolioInstrumentListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Редактировать"),
     "portfolioInstrumentPageAddMoneyOperation" : MessageLookupByLibrary.simpleMessage("Добавить операцию с валютой"),
     "portfolioInstrumentPageAddOperation" : MessageLookupByLibrary.simpleMessage("Добавить операцию"),
-    "portfolioMoneyOperations_Title" : m3,
-    "portfolioOperations_Title" : m4,
-    "portfoliosListView_confirmDeleteDialogContent" : m5,
+    "portfolioMoneyOperations_Title" : m4,
+    "portfolioOperations_Title" : m5,
+    "portfoliosListView_confirmDeleteDialogContent" : m6,
     "portfoliosListView_confirmDeleteDialogTitle" : MessageLookupByLibrary.simpleMessage("Удаление портфеля"),
     "portfoliosListView_menuDelete" : MessageLookupByLibrary.simpleMessage("Удалить"),
     "portfoliosListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Редактировать"),

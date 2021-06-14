@@ -63,8 +63,8 @@ class Operation extends ChangeNotifier{
 
   factory Operation.fromMap(Map<String, dynamic> json) =>
       Operation(id: json["id"],
-          portfolio: Model.portfolios().portfolioById(json["portfolio_id"]),
-          instrument: Model.portfolios().portfolioById(json["portfolio_id"]).instrumentById(json["instrument_id"]),
+          portfolio: Model.portfolios.portfolioById(json["portfolio_id"]),
+          instrument: Model.portfolios.portfolioById(json["portfolio_id"]).instrumentById(json["instrument_id"]),
           date: DateTime.parse(json["date"]),
           type: OperationType.values[json["type"]],
           quantity: json["quantity"],

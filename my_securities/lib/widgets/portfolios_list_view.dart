@@ -50,7 +50,7 @@ class PortfolioListViewItem extends StatelessWidget {
   }
 
   _editPortfolio(BuildContext context) async {
-    bool result = await Navigator.of(context).push(
+    await Navigator.of(context).push(
         MaterialPageRoute(
           builder:(_) => PortfolioEditDialog(_portfolio),
           fullscreenDialog: true
@@ -66,7 +66,7 @@ class PortfolioListViewItem extends StatelessWidget {
         [S.of(context).dialogAction_Continue, S.of(context).dialogAction_Cancel]);
 
     if (confirmation == S.of(context).dialogAction_Continue)
-      context.read<PortfolioList>().delete(_portfolio);
+      _portfolio.delete();
   }
 
   _updatePortfolioVisibility(BuildContext context) {
@@ -98,21 +98,21 @@ class PortfolioListViewItem extends StatelessWidget {
               subtitle: Text(started ?? ''),
               trailing: PopupMenuButton(
                   itemBuilder: (_) =>
-                  <PopupMenuItem<String>>[
-                    PopupMenuItem<String>(
-                      value: 'edit',
-                      child: Text(S.of(context).portfoliosListView_menuEdit),
-                    ),
-                    PopupMenuItem<String>(
-                      value: 'delete',
-                      child: Text(S.of(context).portfoliosListView_menuDelete),
-                    ),
-                    CheckedPopupMenuItem<String>(
-                      value: 'visible',
-                      child: Text(S.of(context).portfoliosListView_menuVisible),
-                      checked: _portfolio.visible,
-                    ),
-                  ],
+                    <PopupMenuItem<String>>[
+                      PopupMenuItem<String>(
+                        value: 'edit',
+                        child: Text(S.of(context).portfoliosListView_menuEdit),
+                      ),
+                      PopupMenuItem<String>(
+                        value: 'delete',
+                        child: Text(S.of(context).portfoliosListView_menuDelete),
+                      ),
+                      CheckedPopupMenuItem<String>(
+                        value: 'visible',
+                        child: Text(S.of(context).portfoliosListView_menuVisible),
+                        checked: _portfolio.visible,
+                      ),
+                    ],
                   onSelected: (value) {
                     switch (value) {
                       case 'edit':

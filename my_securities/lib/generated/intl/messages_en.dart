@@ -23,13 +23,15 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m1(description) => "Are you sure you want to delete operation \'${description}\'?";
 
-  static m2(portfolio_name) => "Percent in \'${portfolio_name}\' portfolio";
+  static m2(description) => "Are you sure you want to delete operation \'${description}\'?";
 
-  static m3(portfolio) => "${portfolio} money operations";
+  static m3(portfolio_name) => "Percent in \'${portfolio_name}\' portfolio";
 
-  static m4(portfolio) => "${portfolio} operations";
+  static m4(portfolio) => "${portfolio} money operations";
 
-  static m5(name) => "Are you sure you want to delete portfolio \'${name}\'?";
+  static m5(portfolio) => "${portfolio} operations";
+
+  static m6(name) => "Are you sure you want to delete portfolio \'${name}\'?";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -56,6 +58,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "moneyOperationEditDialog_operationtype" : MessageLookupByLibrary.simpleMessage("Operation type"),
     "moneyOperationTypeDeposit" : MessageLookupByLibrary.simpleMessage("Deposit"),
     "moneyOperationTypeWithdraw" : MessageLookupByLibrary.simpleMessage("Withdraw"),
+    "moneyOperationsListView_confirmDeleteDialogContent" : m1,
+    "moneyOperationsListView_confirmDeleteDialogTitle" : MessageLookupByLibrary.simpleMessage("Operation deletion"),
+    "moneyOperationsListView_menuDelete" : MessageLookupByLibrary.simpleMessage("Delete"),
+    "moneyOperationsListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Edit"),
     "operationEditDialog_Title_add" : MessageLookupByLibrary.simpleMessage("Add operation"),
     "operationEditDialog_Title_edit" : MessageLookupByLibrary.simpleMessage("Edit operation"),
     "operationEditDialog_commission" : MessageLookupByLibrary.simpleMessage("Commission"),
@@ -71,20 +77,20 @@ class MessageLookup extends MessageLookupByLibrary {
     "operationTypeSell" : MessageLookupByLibrary.simpleMessage("Sell"),
     "operationsListViewItem_menuDelete" : MessageLookupByLibrary.simpleMessage("Delete"),
     "operationsListViewItem_menuEdit" : MessageLookupByLibrary.simpleMessage("Edit"),
-    "operationsListView_confirmDeleteDialogContent" : m1,
+    "operationsListView_confirmDeleteDialogContent" : m2,
     "operationsListView_confirmDeleteDialogTitle" : MessageLookupByLibrary.simpleMessage("Operation deletion"),
     "pcs" : MessageLookupByLibrary.simpleMessage("pcs"),
     "portfolioEditDialog_Name" : MessageLookupByLibrary.simpleMessage("Name"),
     "portfolioEditDialog_Title" : MessageLookupByLibrary.simpleMessage("Edit portfolio"),
     "portfolioEditDialog_startDate" : MessageLookupByLibrary.simpleMessage("Creation date"),
     "portfolioInstrumentEditDialog_Title" : MessageLookupByLibrary.simpleMessage("Instrument settings"),
-    "portfolioInstrumentEditDialog_percent" : m2,
+    "portfolioInstrumentEditDialog_percent" : m3,
     "portfolioInstrumentListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Edit"),
     "portfolioInstrumentPageAddMoneyOperation" : MessageLookupByLibrary.simpleMessage("Add money operation"),
     "portfolioInstrumentPageAddOperation" : MessageLookupByLibrary.simpleMessage("Add operation"),
-    "portfolioMoneyOperations_Title" : m3,
-    "portfolioOperations_Title" : m4,
-    "portfoliosListView_confirmDeleteDialogContent" : m5,
+    "portfolioMoneyOperations_Title" : m4,
+    "portfolioOperations_Title" : m5,
+    "portfoliosListView_confirmDeleteDialogContent" : m6,
     "portfoliosListView_confirmDeleteDialogTitle" : MessageLookupByLibrary.simpleMessage("Portfolio deletion"),
     "portfoliosListView_menuDelete" : MessageLookupByLibrary.simpleMessage("Delete"),
     "portfoliosListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Edit"),

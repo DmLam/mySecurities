@@ -30,7 +30,8 @@ class PortfolioMoneyOperationsPage extends StatelessWidget {
       appBar: MySecuritiesAppBar(pageName: S.of(context).portfolioMoneyOperations_Title(_portfolio.name)),
       body: ChangeNotifierProvider<Portfolio>.value(
         value: _portfolio,
-        child: MoneyOperationsListView(_portfolio, currency: _currency),
+        builder: (context, _) =>
+          MoneyOperationsListView(context.watch<Portfolio>(), currency: _currency),
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),

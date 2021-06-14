@@ -4,6 +4,7 @@ import '../database.dart';
 import 'model.dart';
 import 'package:my_securities/models/portfolio.dart';
 import '../exchange.dart';
+import 'money.dart';
 
 
 enum MoneyOperationType {deposit, withdraw, buy, sell}  // buy and sell is only for non-money operations (i.e. buying and selling securities)
@@ -26,7 +27,7 @@ class MoneyOperation extends ChangeNotifier {
   factory MoneyOperation.fromMap(Map<String, dynamic> json) =>
       MoneyOperation(
           id: json["id"],
-          portfolio: Model.portfolios().portfolioById(json["portfolio_id"]),
+          portfolio: Model.portfolios.portfolioById(json["portfolio_id"]),
           currency: Currency.values[json["currency_id"] - 1],
           date: DateTime.parse(json["date"]),
           type: MoneyOperationType.values[json["type"] - 1],
@@ -75,45 +76,46 @@ class MoneyOperation extends ChangeNotifier {
       result = true;
     }
 
-
     return Future.value(result);
   }
 
-  Future<bool> delete() async {
-    bool result = await portfolio.moneyOperations._delete(this);
+  delete() async {
+    await portfolio.moneyOperations._delete(this);
 
     notifyListeners();
     portfolio.update(); // changes nothing, just notify listeners
-
-    return Future.value(result);
   }
 }
 
 class MoneyOperationList {
-  Portfolio _portfolio;
+  MoneyList _monies;
   List<MoneyOperation> _items;
 
-  MoneyOperationList(this._portfolio) {
+  MoneyOperationList(this._monies) {
     _loadFromDb();
   }
 
   List<MoneyOperation> get operations => [..._items];
 
   List<MoneyOperation> byCurrency(Currency currency) =>
-    _items.where((item) => item.currency == currency).toList();
+    _items.where((item) => currency == null || item.currency == currency).toList();
 
   _loadFromDb() async {
-    _items = await DBProvider.db.getPortfolioMoneyOperations(_portfolio.id);
+    _items = await DBProvider.db.getPortfolioMoneyOperations(_monies.portfolio.id);
   }
 
   Future<int> _add(MoneyOperation moneyOperation) async {
     int result = await DBProvider.db.addMoneyOperation(moneyOperation);
     await _loadFromDb();
+    await _monies.refresh();  // refresh list of monies in the portfolio
+    _monies.portfolio.update(); // just notify portfolio that the list of money operations has been changed
     return Future.value(result);
   }
 
   _delete(MoneyOperation moneyOperation) async {
     await DBProvider.db.deleteMoneyOperation(moneyOperation.id);
     await _loadFromDb();
+    await _monies.refresh();  // refresh list of monies in the portfolio
+    _monies.portfolio.update(); // just notify portfolio that the list of money operations has been changed
   }
 }
