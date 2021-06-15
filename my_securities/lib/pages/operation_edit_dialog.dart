@@ -3,9 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:fluttericon/font_awesome_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:intl/intl.dart';
 import 'package:my_securities/common/dialog_panel.dart';
-import 'dart:ui' as ui;
 import 'package:my_securities/common/utils.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/models/instrument.dart';
@@ -67,7 +65,16 @@ class OperationEditDialog extends StatelessWidget {
         _operation.instrument = instrument;
       }
 
-      _operation.add(_createMoneyOperation);
+      try {
+        _operation.add(_createMoneyOperation);
+      }
+      catch (e) {
+        if (e is NoCurrencyException)
+          Fluttertoast.showToast(msg: S.of(context).errorNoCurrency);
+        else
+          if (e is NotEnoughMoneyException)
+            Fluttertoast.showToast(msg: S.of(context).errorNotEnoughMoney);
+      }
     }
     
     bool _fabEnabled() {
@@ -200,59 +207,79 @@ class OperationEditDialog extends StatelessWidget {
             // quantity, price
             dialogPanel(children: [
               Expanded(flex: 45,
-                  child: TextFormField(
-                    textAlign: TextAlign.end,
-                    controller:  _quantityEditController,
-                    keyboardType: TextInputType.numberWithOptions(signed: false, decimal: false),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
-                    ],
-                    style: TextStyle(fontSize: 18),
-                    decoration: InputDecoration(
-                        icon: Icon(Icons.filter_1),
-                        labelText: S.of(context).operationEditDialog_quantity,
-                        contentPadding: EDIT_UNDERLINE_PADDING
-                    ),
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    validator: (value) {
-                      String result;
-                      if (value != null && value != '') {
-                        if (_operation.quantity == null) {
-                          result = S.of(context).errorInvalidValue;
+                  child: FocusScope(
+                    child: TextFormField(
+                      textAlign: TextAlign.end,
+                      controller:  _quantityEditController,
+                      keyboardType: TextInputType.numberWithOptions(signed: false, decimal: false),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
+                      ],
+                      style: TextStyle(fontSize: 18),
+                      decoration: InputDecoration(
+                          icon: Icon(Icons.filter_1),
+                          labelText: S.of(context).operationEditDialog_quantity,
+                          contentPadding: EDIT_UNDERLINE_PADDING
+                      ),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) {
+                        String result;
+                        if (value != null && value != '') {
+                          if (_operation.quantity == null) {
+                            result = S.of(context).errorInvalidValue;
+                          }
                         }
-                      }
-                      return result;
+                        return result;
+                      },
+                      onChanged: (value) {
+                        _operation.quantity = int.tryParse(value);
+                      },
+                    ),
+                    onFocusChange: (focused) {
+                      if (focused)
+                        _quantityEditController.selection =
+                            TextSelection(
+                                baseOffset: 0,
+                                extentOffset: _quantityEditController.value.text.length
+                            );
                     },
-                    onChanged: (value) {
-                      _operation.quantity = int.tryParse(value);
-                    },
-                  )
+                  ),
               ),
               Expanded(flex: 10, child: Text('')),
               Expanded(flex: 45,
-                  child: TextFormField(
-                    textAlign: TextAlign.end,
-                    controller:  _priceEditController,
-                    keyboardType: TextInputType.numberWithOptions(signed: false, decimal: true),
-                    inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9\.,]'))],
-                    style: TextStyle(fontSize: 18),
-                    decoration: InputDecoration(
-                        icon: Icon(Icons.attach_money),
-                        labelText: S.of(context).operationEditDialog_price,
-                        contentPadding: EDIT_UNDERLINE_PADDING
-                    ),
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    validator: (value) {
-                      String result;
-                      if (value != null && value != '') {
-                        if (_operation.price == null) {
-                          result = S.of(context).errorInvalidValue;
+                  child: FocusScope(
+                    child: TextFormField(
+                      textAlign: TextAlign.end,
+                      controller:  _priceEditController,
+                      keyboardType: TextInputType.numberWithOptions(signed: false, decimal: true),
+                      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9\.,]'))],
+                      style: TextStyle(fontSize: 18),
+                      decoration: InputDecoration(
+                          icon: Icon(Icons.attach_money),
+                          labelText: S.of(context).operationEditDialog_price,
+                          contentPadding: EDIT_UNDERLINE_PADDING
+                      ),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) {
+                        String result;
+                        if (value != null && value != '') {
+                          if (_operation.price == null) {
+                            result = S.of(context).errorInvalidValue;
+                          }
                         }
-                      }
-                      return result;
-                    },
-                    onChanged: (value) {
-                      _operation.price = double.tryParse(value);
+                        return result;
+                      },
+                      onChanged: (value) {
+                        _operation.price = double.tryParse(value);
+                      },
+                    ),
+                    onFocusChange: (focused) {
+                      if (focused)
+                        _priceEditController.selection =
+                            TextSelection(
+                                baseOffset: 0,
+                                extentOffset: _priceEditController.value.text.length
+                            );
                     },
                   )
               ),
@@ -260,31 +287,41 @@ class OperationEditDialog extends StatelessWidget {
             // commission
             dialogPanel(children: [
               Expanded(flex: 50,
-                  child: TextFormField(
-                    textAlign: TextAlign.end,
-                    controller:  _commissionEditController,
-                    keyboardType: TextInputType.numberWithOptions(signed: false, decimal: true),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'[0-9\.,]'))
-                    ],
-                    style: TextStyle(fontSize: 18),
-                    decoration: InputDecoration(
-                        icon: Icon(Icons.monetization_on),
-                        labelText: S.of(context).operationEditDialog_commission,
-                        contentPadding: EDIT_UNDERLINE_PADDING
-                    ),
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    validator: (value) {
-                      String result;
-                      if (value != null && value != '') {
-                        if (_operation.commission == null) {
-                          result = S.of(context).errorInvalidValue;
+                  child: FocusScope(
+                    child: TextFormField(
+                      textAlign: TextAlign.end,
+                      controller:  _commissionEditController,
+                      keyboardType: TextInputType.numberWithOptions(signed: false, decimal: true),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[0-9\.,]'))
+                      ],
+                      style: TextStyle(fontSize: 18),
+                      decoration: InputDecoration(
+                          icon: Icon(Icons.monetization_on),
+                          labelText: S.of(context).operationEditDialog_commission,
+                          contentPadding: EDIT_UNDERLINE_PADDING
+                      ),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) {
+                        String result;
+                        if (value != null && value != '') {
+                          if (_operation.commission == null) {
+                            result = S.of(context).errorInvalidValue;
+                          }
                         }
-                      }
-                      return result;
-                    },
-                    onChanged: (value) {
-                      _operation.commission = double.tryParse(value) ?? 0;
+                        return result;
+                      },
+                      onChanged: (value) {
+                        _operation.commission = double.tryParse(value) ?? 0;
+                      },
+                    ),
+                    onFocusChange: (focused) {
+                      if (focused)
+                        _commissionEditController.selection =
+                            TextSelection(
+                                baseOffset: 0,
+                                extentOffset: _commissionEditController.value.text.length
+                            );
                     },
                   )
               ),

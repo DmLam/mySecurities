@@ -8,6 +8,8 @@
   "dialogAction_Continue": "Continue",
 
   "errorInvalidValue": "Invalid value",
+  "errorNoCurrency": "There is no money in the instrument's currency",
+  "errorNotEnoughMoney": "There is not enough money to purchase",
 
   "applicationTitle": "My securities",
   "defaultPortfolioName": "My portfolio",

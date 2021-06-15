@@ -105,6 +105,26 @@ class S {
     );
   }
 
+  /// `There is no money in the instrument's currency`
+  String get errorNoCurrency {
+    return Intl.message(
+      'There is no money in the instrument\'s currency',
+      name: 'errorNoCurrency',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `There is not enough money to purchase`
+  String get errorNotEnoughMoney {
+    return Intl.message(
+      'There is not enough money to purchase',
+      name: 'errorNotEnoughMoney',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `My securities`
   String get applicationTitle {
     return Intl.message(

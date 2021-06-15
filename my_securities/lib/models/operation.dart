@@ -1,11 +1,17 @@
 import 'package:flutter/foundation.dart';
 import 'package:my_securities/exchange.dart';
+import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/models/portfolio.dart';
 import '../database.dart';
 import 'instrument.dart';
 import 'model.dart';
+import 'money.dart';
 
 enum OperationType {buy, sell}
+
+
+class NoCurrencyException implements Exception {}
+class NotEnoughMoneyException implements Exception {}
 
 class Operation extends ChangeNotifier{
   int id;
@@ -85,16 +91,28 @@ class Operation extends ChangeNotifier{
   }
 
   Future<int> add(bool createMoneyOperation) async {
-    int result = await portfolio.operations._add(this, createMoneyOperation);
+    int result;
 
-    portfolio.notifyListeners();
+    if (createMoneyOperation) {
+      // check there is enough money for the operation
+      Money m = portfolio.monies.byCurrency(instrument.currency);
+      if (m == null)
+        throw NoCurrencyException();
+      else
+      if (m.amount < value)
+        throw NotEnoughMoneyException();
+    }
+
+    result = await portfolio.operations._add(this, createMoneyOperation);
+
+    portfolio.update();
     instrument.notifyListeners();
 
     return Future.value(result);
   }
 
   delete() async {
-    bool result = await portfolio.operations._delete(this);
+    await portfolio.operations._delete(this);
 
     portfolio.notifyListeners();
     instrument.notifyListeners();

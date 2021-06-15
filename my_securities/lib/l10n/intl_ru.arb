@@ -11,6 +11,8 @@
   "defaultPortfolioName": "Мой портфель",
 
   "errorInvalidValue": "Недопустимое значение",
+  "errorNoCurrency": "Отсутствуют средства в валюте инструмента",
+  "errorNotEnoughMoney": "Недостаточно средств для покупки",
 
   "operationTypeBuy": "Покупка",
   "operationTypeSell": "Продажа",

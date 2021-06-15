@@ -136,33 +136,43 @@ class _MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
             ),
             Expanded(flex: 10, child: Text('')),
             Expanded(flex: 45,
-              child: TextFormField(
-                textAlign: TextAlign.end,
-                controller:  _amountEditController,
-                keyboardType: TextInputType.numberWithOptions(signed: false, decimal: true),
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
-                ],
-                style: TextStyle(fontSize: 18),
-                decoration: InputDecoration(
-                    icon: Icon(Icons.filter_1),
-                    labelText: S.of(context).moneyOperationEditDialog_amount,
-                    contentPadding: EDIT_UNDERLINE_PADDING
-                ),
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (value) {
-                  String result;
-                  if (value != null && value != '') {
-                    if (widget._moneyOperation.amount == null) {
-                      result = S.of(context).errorInvalidValue;
+              child: FocusScope(
+                child: TextFormField(
+                  textAlign: TextAlign.end,
+                  controller: _amountEditController,
+                  keyboardType: TextInputType.numberWithOptions(signed: false, decimal: true),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
+                  ],
+                  style: TextStyle(fontSize: 18),
+                  decoration: InputDecoration(
+                      icon: Icon(Icons.filter_1),
+                      labelText: S.of(context).moneyOperationEditDialog_amount,
+                      contentPadding: EDIT_UNDERLINE_PADDING
+                  ),
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (value) {
+                    String result;
+                    if (value != null && value != '') {
+                      if (widget._moneyOperation.amount == null) {
+                        result = S.of(context).errorInvalidValue;
+                      }
                     }
-                  }
-                  return result;
-                },
-                onChanged: (value) {
-                  setState(() {
-                    widget._moneyOperation.amount = double.tryParse(value);
-                  });
+                    return result;
+                  },
+                  onChanged: (value) {
+                    setState(() {
+                      widget._moneyOperation.amount = double.tryParse(value);
+                    });
+                  },
+                ),
+                onFocusChange: (focused) {
+                  if (focused)
+                    _amountEditController.selection =
+                        TextSelection(
+                            baseOffset: 0,
+                            extentOffset: _amountEditController.value.text.length
+                        );
                 },
               )
             ),

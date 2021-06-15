@@ -46,6 +46,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "dialogAction_no" : MessageLookupByLibrary.simpleMessage("Нет"),
     "dialogAction_yes" : MessageLookupByLibrary.simpleMessage("Да"),
     "errorInvalidValue" : MessageLookupByLibrary.simpleMessage("Недопустимое значение"),
+    "errorNoCurrency" : MessageLookupByLibrary.simpleMessage("Отсутствуют средства в валюте инструмента"),
+    "errorNotEnoughMoney" : MessageLookupByLibrary.simpleMessage("Недостаточно средств для покупки"),
     "instrumentTypeBond" : MessageLookupByLibrary.simpleMessage("Облигация"),
     "instrumentTypeCurrency" : MessageLookupByLibrary.simpleMessage("Валюта"),
     "instrumentTypeEtf" : MessageLookupByLibrary.simpleMessage("Фонд"),

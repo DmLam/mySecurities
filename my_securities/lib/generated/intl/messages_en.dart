@@ -46,6 +46,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "dialogAction_no" : MessageLookupByLibrary.simpleMessage("No"),
     "dialogAction_yes" : MessageLookupByLibrary.simpleMessage("Yes"),
     "errorInvalidValue" : MessageLookupByLibrary.simpleMessage("Invalid value"),
+    "errorNoCurrency" : MessageLookupByLibrary.simpleMessage("There is no money in the instrument\'s currency"),
+    "errorNotEnoughMoney" : MessageLookupByLibrary.simpleMessage("There is not enough money to purchase"),
     "instrumentTypeBond" : MessageLookupByLibrary.simpleMessage("Bond"),
     "instrumentTypeCurrency" : MessageLookupByLibrary.simpleMessage("Currency"),
     "instrumentTypeEtf" : MessageLookupByLibrary.simpleMessage("Etf"),

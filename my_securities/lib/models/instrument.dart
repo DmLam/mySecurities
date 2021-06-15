@@ -40,7 +40,7 @@ class Instrument extends ChangeNotifier {
 
   Instrument(this.id, {@required Portfolio portfolio, isin = '', @required ticker, name = '', currency, type,
     exchange = Exchange.MCX, image, additional, portfolioPercentPlan, quantity = 0,
-    averagePrice = 0, value = 0, operationCount = 0}):
+    averagePrice = 0.0, value = 0.0, operationCount = 0}):
     assert(portfolio != null),
     _portfolio = portfolio,
     this.isin = isin,

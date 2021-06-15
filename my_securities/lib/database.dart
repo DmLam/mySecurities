@@ -428,6 +428,8 @@ class DBProvider {
 
   Future<int> addOperation(Operation op, bool createMoneyOperation) async {
     assert(op.id == null);
+    assert(op.instrument != null);
+
     final Database db = await database;
     final double operationValue = op.type == OperationType.buy ? op.quantity * op.price : -op.quantity * op.price;
     int result;
@@ -435,6 +437,12 @@ class DBProvider {
     int currencyId = await getInstrumentCurrencyId(op.instrument.id);
 
     await db.transaction((txn) async {
+      // if there is no this instrument in this portfolio, then create relation
+      if (portfolioInstrumentId == null)
+        portfolioInstrumentId = await txn.insert('portfolio_instrument',
+            {'portfolio_id': op.portfolio.id,
+              'instrument_id': op.instrument.id});
+
       result = await txn.insert('operation',
           {'portfolio_instrument_id': portfolioInstrumentId,
             'date': dbDateString(op.date),
