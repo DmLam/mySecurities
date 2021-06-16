@@ -184,6 +184,10 @@ class InstrumentList {
 
   List<Instrument> get instruments => [..._items];
 
+  refresh() async {
+    await _loadFromDb();
+  }
+
   Instrument instrumentById(int id) {
     Instrument result;
     for(Instrument instrument in _items) {

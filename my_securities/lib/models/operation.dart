@@ -129,19 +129,32 @@ class OperationList {
 
   List<Operation> get operations => [..._items];
 
+  List<Operation> byInstrument(Instrument instrument) =>
+    _items.where((op) => instrument == null || op.instrument == instrument).toList();
+
   _loadFromDb() async {
     _items = await DBProvider.db.getPortfolioOperations(_portfolio.id);
   }
 
+  refresh() async {
+    await _portfolio.instruments.refresh(); // reload instruments from db
+    await _loadFromDb();
+  }
+
   Future<int> _add (Operation operation, bool createMoneyOperation) async {
     int result = await DBProvider.db.addOperation(operation, createMoneyOperation);
-    await _loadFromDb();
+    await _portfolio.monies.refresh(); // reload money from db
+    await refresh();
+    _portfolio.update();
+
     return Future.value(result);
   }
 
   _delete(Operation operation) async {
-    await DBProvider.db.deleteOperation(operation.id);
-    await _loadFromDb();
+    await DBProvider.db.deleteOperation(operation);
+    await _portfolio.monies.refresh(); // reload money from db
+    await refresh();
+    _portfolio.update();
   }
 
 }

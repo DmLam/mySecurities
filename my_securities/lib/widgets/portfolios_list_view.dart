@@ -85,7 +85,6 @@ class PortfolioListViewItem extends StatelessWidget {
             started = S.of(context).portfoliosListView_portfolioStarted + ': '+
                 DateFormat('dd.MM.yyyy').format(context.read<Portfolio>().startDate);
 
-
           return GestureDetector(
             child: ListTile(
               title: Text(context.watch<Portfolio>().name,
@@ -129,7 +128,6 @@ class PortfolioListViewItem extends StatelessWidget {
                     }
                   }
               ),
-              //          onLongPress: editOperation,
             ),
             onTap: () {_showPortfolioInstruments(context);},
           );

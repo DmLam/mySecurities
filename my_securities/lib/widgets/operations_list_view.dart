@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:my_securities/common/message_dialog.dart';
 import 'package:my_securities/common/utils.dart';
+import 'package:my_securities/pages/operation_edit_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/exchange.dart';
@@ -11,21 +12,24 @@ import 'package:my_securities/models/portfolio.dart';
 import '../constants.dart';
 
 class OperationsListView extends StatelessWidget {
-  final Instrument instrument;
+  final Instrument _instrument;
 
-  const OperationsListView({this.instrument, Key key}) : super(key: key);
+  const OperationsListView({Instrument instrument, Key key}) :
+        _instrument = instrument,
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
     Portfolio portfolio = context.watch<Portfolio>();
+    List<Operation> operations = portfolio.operations.byInstrument(_instrument);
 
     return ListView.builder(
-      itemCount: portfolio.operations.operations.length,
+      itemCount: operations.length,
       itemBuilder: (context, index) {
         return ChangeNotifierProvider<Instrument>.value(
-          value: portfolio.operations.operations[index].instrument,
+          value: operations[index].instrument,
           builder: (context, widget) {
-            return operationsListItem(context, portfolio.operations.operations[index]);
+            return operationsListItem(context, operations[index]);
           }
         );
       });
@@ -35,8 +39,15 @@ class OperationsListView extends StatelessWidget {
 Widget operationsListItem(BuildContext context, Operation operation) {
   Instrument instrument = context.watch<Instrument>();
 
-  editOperation() {
-
+  editOperation() async {
+   bool result = await Navigator.of(context).push(
+     MaterialPageRoute(
+       builder: (_) => OperationEditDialog(operation),
+       fullscreenDialog: true
+     ),
+   );
+   if (result)
+     operation.update();
   }
 
   deleteOperation() async {
@@ -47,11 +58,16 @@ Widget operationsListItem(BuildContext context, Operation operation) {
         S.of(context).operationsListView_confirmDeleteDialogContent(description),
         [S.of(context).dialogAction_Continue, S.of(context).dialogAction_Cancel]);
 
-    if (confirmation == S.of(context).dialogAction_Continue)
+    if (confirmation == S.of(context).dialogAction_Continue) {
       operation.delete();
+      // if the operation was the last one on this instrument - close the page
+      if (instrument != null && operation.portfolio.operations.byInstrument(instrument).length == 1)
+        Navigator.pop(context);
+    }
   }
 
-  return ListTile(
+  return GestureDetector(
+    child: ListTile(
       leading: instrument.image == null ? Icon(Icons.attach_money) : Image.memory(instrument.image),
       title: Text('${OPERATION_TYPE_NAMES[operation.type.index]} ${operation.quantity} ${S.of(context).pcs} * ${operation.price} ${instrument.currency.sign()}'),
       subtitle: Row(mainAxisSize: MainAxisSize.max,
@@ -89,7 +105,8 @@ Widget operationsListItem(BuildContext context, Operation operation) {
             }
           }
       ),
-      onLongPress: editOperation
+    ),
+    onTap: editOperation
   );
 
 }

@@ -386,8 +386,10 @@ class DBProvider {
    deleteInstrument(int id) async {
      final Database db = await database;
 
-     db.delete('instrument', where: 'id = ?', whereArgs: [id]);
-     db.delete('quote', where: 'instrument_id = ?', whereArgs: [id]);
+     await db.transaction((txn) async {
+       txn.delete('instrument', where: 'id = ?', whereArgs: [id]);
+       txn.delete('quote', where: 'instrument_id = ?', whereArgs: [id]);
+     });
    }
 
   Future<int> _getPortfolioInstrumentId(int portfolioId, int instrumentId) async {
@@ -490,12 +492,20 @@ class DBProvider {
     });
   }
 
-  deleteOperation(int id) async {
+  deleteOperation(Operation op) async {
     final Database db = await database;
+    int portfolioInstrumentId = await _getPortfolioInstrumentId(op.portfolio.id, op.instrument.id);
 
     await db.transaction((txn) async {
-      txn.delete('money', where: 'operation_id = ?', whereArgs: [id]);
-      txn.delete('operation', where: 'id = ?', whereArgs: [id]);
+      await txn.delete('money', where: 'operation_id = ?', whereArgs: [op.id]);
+      await txn.delete('operation', where: 'id = ?', whereArgs: [op.id]);
+
+      var restOpCount = await txn.rawQuery('SELECT count(*) cnt FROM operation where portfolio_instrument_id = ?', [portfolioInstrumentId]);
+      if (restOpCount[0]['cnt'] == 0)
+        await txn.delete('portfolio_instrument',
+            where: 'portfolio_id = ? and instrument_id = ?',
+            whereArgs: [op.portfolio.id, op.instrument.id]
+        );
     });
   }
 
@@ -671,10 +681,10 @@ class DBProvider {
     await db.update('money', {'id': op.id, 'currency_id': op.currency.index + 1, 'date': dbDateString(op.date), 'type': op.type.index + 1, 'amount': op.amount});
   }
 
-  deleteMoneyOperation(int id) async {
+  deleteMoneyOperation(MoneyOperation op) async {
     final Database db = await database;
 
-    await db.delete('money',  where: 'id = ?', whereArgs: [id]);
+    await db.delete('money',  where: 'id = ?', whereArgs: [op.id]);
   }
 
   Future<List<Portfolio>> getPortfolios() async {

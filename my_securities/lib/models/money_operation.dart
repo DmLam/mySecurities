@@ -104,16 +104,16 @@ class MoneyOperationList {
     _items = await DBProvider.db.getPortfolioMoneyOperations(_monies.portfolio.id);
   }
 
-  Future<int> _add(MoneyOperation moneyOperation) async {
-    int result = await DBProvider.db.addMoneyOperation(moneyOperation);
+  Future<int> _add(MoneyOperation op) async {
+    int result = await DBProvider.db.addMoneyOperation(op);
     await _loadFromDb();
     await _monies.refresh();  // refresh list of monies in the portfolio
     _monies.portfolio.update(); // just notify portfolio that the list of money operations has been changed
     return Future.value(result);
   }
 
-  _delete(MoneyOperation moneyOperation) async {
-    await DBProvider.db.deleteMoneyOperation(moneyOperation.id);
+  _delete(MoneyOperation op) async {
+    await DBProvider.db.deleteMoneyOperation(op);
     await _loadFromDb();
     await _monies.refresh();  // refresh list of monies in the portfolio
     _monies.portfolio.update(); // just notify portfolio that the list of money operations has been changed
