@@ -118,7 +118,7 @@ class Operation extends ChangeNotifier{
     if (id != null) {
       await DBProvider.db.updateOperation(this);
 
-      MoneyOperation mop = portfolio.moneyOperations.byOperationId(id);
+      MoneyOperation mop = portfolio.moneyOperations.byId(id);
       if (mop != null) {
         mop.currency = instrument.currency;
         mop.type = operationTypeToMoneyOperationType(this.type);
@@ -136,7 +136,7 @@ class Operation extends ChangeNotifier{
 
   delete() async {
     await DBProvider.db.deleteOperation(this);
-    MoneyOperation mop = portfolio.moneyOperations.byOperationId(id);
+    MoneyOperation mop = portfolio.moneyOperations.byId(id);
     if (mop != null)
       mop.delete();
 

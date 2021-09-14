@@ -129,7 +129,7 @@ class MoneyOperationList {
     _loadFromDb();
   }
 
-  MoneyOperation byOperationId(int id) => _items.where((item) => item.operation.id == id).toList().first;
+  MoneyOperation byId(int id) => _items.where((item) => item.operation.id == id).toList().first;
 
   Future<int> _add(MoneyOperation op) async {
     int result = await DBProvider.db.addMoneyOperation(op);
