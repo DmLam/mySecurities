@@ -96,13 +96,12 @@ Map<String, Map<String, String>> EXCHANGES = { // ignore: non_constant_identifie
   'HSX': {'country': 'Vietnam', 'name': 'HoChiMinh Stock Exchange'},
 };
 
-final List CurrencyNames = Currency.values.map((currency) => currency.name()).toList(); // ignore: non_constant_identifier_names
+final List CurrencyNames = Currency.values.map((currency) => currency.name).toList(); // ignore: non_constant_identifier_names
 
 extension ExchangeExtenstion on Exchange {
   String name() {
     return this.toString().split('.').last;
   }
-
 }
 
 Exchange exchangeFromName(String name) {
@@ -113,15 +112,20 @@ enum Currency {RUB, USD, EUR, GBP, HKD, CHF, JPY, CNY, TRY}
 List CurrencySigns = ['₽', '\$', '€', '£', 'HK\$', '₣', '¥', '¥', '₺']; // ignore: non_constant_identifier_names
 
 extension CurrencyExtension on Currency {
-  String name() {
-    return this.toString().split('.').last;
-  }
+  int get id => index + 1;
 
-  String sign() {
-    return CurrencySigns[Currency.values.indexOf(this)];
-  }
+  String get name => this.toString().split('.').last;
 
+  String get sign => CurrencySigns[Currency.values.indexOf(this)];
+
+  static Currency byId(int id) => Currency.values[id - 1];
 }
+
+// Unfortunately, static extension's method doesn't work like Currency.byId(1), only using extension name instead on type name
+// like CurrencyExtension.byId(1),
+// see https://stackoverflow.com/questions/59725226/is-there-a-way-to-add-a-static-extension-method-on-a-class-directly-in-dart
+// so, I simply wrote function currencyById(int id)
+Currency currencyById(int id) => Currency.values[id - 1];
 
 const CURRENCY_ROUND_ACCURACY = 4;
 

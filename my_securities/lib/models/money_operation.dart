@@ -1,38 +1,57 @@
 import 'package:flutter/foundation.dart';
 import '../constants.dart';
 import '../database.dart';
-import 'model.dart';
-import 'package:my_securities/models/portfolio.dart';
 import '../exchange.dart';
+import 'model.dart';
 import 'money.dart';
+import 'operation.dart';
+import 'portfolio.dart';
 
 
 enum MoneyOperationType {deposit, withdraw, buy, sell}  // buy and sell is only for non-money operations (i.e. buying and selling securities)
 
 extension MoneyOperationTypeExtension on MoneyOperationType {
-  String name() {
-    return MONEY_OPERATION_TYPE_NAMES[this.index];
-  }
+  int get id => index + 1;
+
+  String get name => MONEY_OPERATION_TYPE_NAMES[this.index];
 }
+
+// see comment to currencyById
+MoneyOperationType moneyOperationTypeById(int id) => MoneyOperationType.values[id - 1];
+
 class MoneyOperation extends ChangeNotifier {
   int id;
   Portfolio portfolio;
+  Operation operation;
   Currency currency;
   DateTime date;
   MoneyOperationType type;
-  double amount;
+  double _amount;
 
-  MoneyOperation({this.id, this.portfolio, this.currency, this.date, this.type, this.amount});
+  double get amount => _amount;
+  set amount(double value) {
+    if (_amount != value) {
+      portfolio.monies.byCurrency(currency).amount += value - _amount;
+      _amount = value;
+    }
+  }
 
-  factory MoneyOperation.fromMap(Map<String, dynamic> json) =>
-      MoneyOperation(
-          id: json["id"],
-          portfolio: Model.portfolios.portfolioById(json["portfolio_id"]),
-          currency: Currency.values[json["currency_id"] - 1],
-          date: DateTime.parse(json["date"]),
-          type: MoneyOperationType.values[json["type"] - 1],
-          amount: json["amount"]
-      );
+  MoneyOperation({this.id, this.portfolio, this.operation, this.currency, this.date, this.type, amount}):
+    _amount = amount;
+
+  factory MoneyOperation.fromMap(Map<String, dynamic> json) {
+    Portfolio portfolio = Model.portfolios.portfolioById(json["portfolio_id"]);
+
+    return MoneyOperation(
+        id: json["id"],
+        portfolio: portfolio,
+        operation: portfolio.operations.byId(json["operation_id"]),
+        currency: currencyById(json["currency_id"]),
+        date: DateTime.parse(json["date"]),
+        type: moneyOperationTypeById(json["type"]),
+        amount: json["amount"]
+    );
+  }
 
   MoneyOperation.empty({@required Portfolio portfolio}) {
     DateTime now = DateTime.now();
@@ -45,13 +64,15 @@ class MoneyOperation extends ChangeNotifier {
   MoneyOperation.from(MoneyOperation op) :
     currency = op.currency,
     portfolio = op.portfolio,
+    operation = op.operation,
     date = op.date,
     type = op.type,
-    amount = op.amount;
+    _amount = op.amount;
 
   assign(MoneyOperation op) {
     currency = op.currency;
     portfolio = op.portfolio;
+    operation = op.operation;
     date = op.date;
     type = op.type;
     amount = op.amount;
@@ -104,6 +125,12 @@ class MoneyOperationList {
     _items = await DBProvider.db.getPortfolioMoneyOperations(_monies.portfolio.id);
   }
 
+  refresh() {
+    _loadFromDb();
+  }
+
+  MoneyOperation byOperationId(int id) => _items.where((item) => item.operation.id == id).toList().first;
+
   Future<int> _add(MoneyOperation op) async {
     int result = await DBProvider.db.addMoneyOperation(op);
     await _loadFromDb();
@@ -118,4 +145,9 @@ class MoneyOperationList {
     await _monies.refresh();  // refresh list of monies in the portfolio
     _monies.portfolio.update(); // just notify portfolio that the list of money operations has been changed
   }
+}
+
+MoneyOperationType operationTypeToMoneyOperationType(OperationType op) {
+  return op == OperationType.buy ? MoneyOperationType.buy :
+  op == OperationType.sell ? MoneyOperationType.sell : null;
 }

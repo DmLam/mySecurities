@@ -18,6 +18,8 @@
   "operationTypeSell": "Продажа",
   "moneyOperationTypeDeposit": "Поступление",
   "moneyOperationTypeWithdraw": "Вывод",
+  "moneyOperationTypeBuy": "Покупка",
+  "moneyOperationTypeSell": "Продажа",
   "instrumentTypeCurrency": "Валюта",
   "instrumentTypeShare": "Акция",
   "instrumentTypeEtf": "Фонд",

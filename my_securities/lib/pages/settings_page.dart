@@ -17,7 +17,7 @@ class SettingsPage extends StatelessWidget {
           title: Text(S.of(context).prefMainCurrencyTitle),
           fullWidth: false,
           pref: Preferences.prefMAIN_CURRENCY_ID,
-          items: Currency.values.map((currency) => DropdownMenuItem(value: currency.index, child: Text(currency.name()))).toList()),
+          items: Currency.values.map((currency) => DropdownMenuItem(value: currency.index, child: Text(currency.name))).toList()),
       PrefTitle(title: Text(S.of(context).prefTitleAppearance)),
       PrefCheckbox(
         pref: Preferences.prefDARK_THEME,

@@ -47,7 +47,7 @@ class MoneyOperationsListItem extends StatelessWidget {
 
   _deleteMoneyOperation(BuildContext context) async {
     String operationDate = dateString(_operation.date);
-    String operationDescription = '"${_operation.type.name()} ${_operation.currency.sign()}${_operation.amount} from $operationDate"';
+    String operationDescription = '"${_operation.type.name} ${_operation.currency.sign}${_operation.amount} from $operationDate"';
     String confirmation = await messageDialog(context,
         S.of(context).moneyOperationsListView_confirmDeleteDialogTitle,
         S.of(context).moneyOperationsListView_confirmDeleteDialogContent(operationDescription),
@@ -65,7 +65,7 @@ class MoneyOperationsListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       title: Row(children: [
-        Text('${_operation.type.name()} ${_operation.currency.sign()}${_operation.amount}',
+        Text('${_operation.type.name} ${_operation.currency.sign}${_operation.amount}',
           style: TextStyle(fontSize: 19)
         ),
         Expanded(

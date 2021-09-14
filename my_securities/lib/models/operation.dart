@@ -1,14 +1,20 @@
 import 'package:flutter/foundation.dart';
 import 'package:my_securities/exchange.dart';
-import 'package:my_securities/generated/l10n.dart';
-import 'package:my_securities/models/portfolio.dart';
+import '../constants.dart';
 import '../database.dart';
+import 'money_operation.dart';
+import 'portfolio.dart';
 import 'instrument.dart';
 import 'model.dart';
 import 'money.dart';
 
 enum OperationType {buy, sell}
 
+extension OperationTypeExtension on OperationType {
+  int get id => index + 1;
+
+  String get name => OPERATION_TYPE_NAMES[this.index];
+}
 
 class NoCurrencyException implements Exception {}
 class NotEnoughMoneyException implements Exception {}
@@ -31,7 +37,7 @@ class Operation extends ChangeNotifier{
 
   Operation({@required int id, @required Portfolio portfolio, Instrument instrument,
       @required DateTime date, @required OperationType type, @required int quantity, @required double price,
-      double commission}):
+      double commission = 0, MoneyOperation moneyOperation}):
     this.id = id,
     this.portfolio = portfolio,
     this.instrument = instrument,
@@ -76,22 +82,11 @@ class Operation extends ChangeNotifier{
           quantity: json["quantity"],
           price: json["price"],
           commission: json["commission"]
+          // todo - load reference money operation if present
       );
 
-  Future<bool> update() async {
-    bool result = false;
-
-    if (id != null) {
-      await DBProvider.db.updateOperation(this);
-      portfolio.notifyListeners();
-      instrument.notifyListeners();
-      result = true;
-    }
-    return Future.value(result);
-  }
-
   Future<int> add(bool createMoneyOperation) async {
-    int result;
+    MoneyOperation moneyOp;
 
     if (createMoneyOperation) {
       // check there is enough money for the operation
@@ -101,21 +96,52 @@ class Operation extends ChangeNotifier{
       else
       if (m.amount < value)
         throw NotEnoughMoneyException();
+
+      moneyOp = MoneyOperation(portfolio: portfolio,
+          date: date,
+          currency: instrument.currency,
+          type: operationTypeToMoneyOperationType(type),
+          amount: value + commission,
+          operation: this);
     }
 
-    result = await portfolio.operations._add(this, createMoneyOperation);
+    await DBProvider.db.addOperation(this, moneyOperation: moneyOp);
+    await portfolio.refresh(); // reload instruments, money and operations from db
+//    instrument.notifyListeners();
 
-    portfolio.update();
-    instrument.notifyListeners();
+    return Future.value(id);
+  }
 
+  Future<bool> update() async {
+    bool result = false;
+
+    if (id != null) {
+      await DBProvider.db.updateOperation(this);
+
+      MoneyOperation mop = portfolio.moneyOperations.byOperationId(id);
+      if (mop != null) {
+        mop.currency = instrument.currency;
+        mop.type = operationTypeToMoneyOperationType(this.type);
+        mop.date = date;
+        mop.amount = value + commission;
+        mop.update();
+      }
+      portfolio.refresh(); // reload instruments, money and operations from db
+//      instrument.notifyListeners();
+
+      result = true;
+    }
     return Future.value(result);
   }
 
   delete() async {
-    await portfolio.operations._delete(this);
+    await DBProvider.db.deleteOperation(this);
+    MoneyOperation mop = portfolio.moneyOperations.byOperationId(id);
+    if (mop != null)
+      mop.delete();
 
-    portfolio.notifyListeners();
-    instrument.notifyListeners();
+    await portfolio.refresh(); // reload instruments, money and operations from db
+//    instrument.notifyListeners();
   }
 }
 
@@ -132,29 +158,9 @@ class OperationList {
   List<Operation> byInstrument(Instrument instrument) =>
     _items.where((op) => instrument == null || op.instrument == instrument).toList();
 
+  Operation byId(int id) => id == null ? null : _items.where((item) => item.id == id).toList().first;
+
   _loadFromDb() async {
     _items = await DBProvider.db.getPortfolioOperations(_portfolio.id);
   }
-
-  refresh() async {
-    await _portfolio.instruments.refresh(); // reload instruments from db
-    await _loadFromDb();
-  }
-
-  Future<int> _add (Operation operation, bool createMoneyOperation) async {
-    int result = await DBProvider.db.addOperation(operation, createMoneyOperation);
-    await _portfolio.monies.refresh(); // reload money from db
-    await refresh();
-    _portfolio.update();
-
-    return Future.value(result);
-  }
-
-  _delete(Operation operation) async {
-    await DBProvider.db.deleteOperation(operation);
-    await _portfolio.monies.refresh(); // reload money from db
-    await refresh();
-    _portfolio.update();
-  }
-
 }

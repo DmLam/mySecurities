@@ -26,8 +26,8 @@ class OperationsListView extends StatelessWidget {
     return ListView.builder(
       itemCount: operations.length,
       itemBuilder: (context, index) {
-        return ChangeNotifierProvider<Instrument>.value(
-          value: operations[index].instrument,
+        return ChangeNotifierProvider<Operation>.value(
+          value: operations[index],
           builder: (context, widget) {
             return operationsListItem(context, operations[index]);
           }
@@ -37,7 +37,6 @@ class OperationsListView extends StatelessWidget {
 }
 
 Widget operationsListItem(BuildContext context, Operation operation) {
-  Instrument instrument = context.watch<Instrument>();
 
   editOperation() async {
    bool result = await Navigator.of(context).push(
@@ -61,19 +60,20 @@ Widget operationsListItem(BuildContext context, Operation operation) {
     if (confirmation == S.of(context).dialogAction_Continue) {
       operation.delete();
       // if the operation was the last one on this instrument - close the page
-      if (instrument != null && operation.portfolio.operations.byInstrument(instrument).length == 1)
+      if (operation.instrument != null && operation.portfolio.operations.byInstrument(operation.instrument).length == 1)
         Navigator.pop(context);
     }
   }
 
   return GestureDetector(
     child: ListTile(
-      leading: instrument.image == null ? Icon(Icons.attach_money) : Image.memory(instrument.image),
-      title: Text('${OPERATION_TYPE_NAMES[operation.type.index]} ${operation.quantity} ${S.of(context).pcs} * ${operation.price} ${instrument.currency.sign()}'),
+      leading: operation.instrument.image == null ? Icon(Icons.attach_money) :
+        Image.memory(operation.instrument.image),
+      title: Text('${OPERATION_TYPE_NAMES[operation.type.index]} ${operation.quantity} ${S.of(context).pcs} * ${operation.price} ${operation.instrument.currency.sign}'),
       subtitle: Row(mainAxisSize: MainAxisSize.max,
           children: [
             Expanded(flex: 70,
-              child: Text('${operation.value.toString()} ${operation.instrument.currency.sign()}')),
+              child: Text('${operation.value.toString()} ${operation.instrument.currency.sign}')),
             Expanded(flex: 30,
               child: Text(dateString(operation.date),
                 style: TextStyle(fontStyle: FontStyle.italic, fontSize: 11),

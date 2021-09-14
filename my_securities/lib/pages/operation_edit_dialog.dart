@@ -13,21 +13,31 @@ import 'package:my_securities/widgets/appbar.dart';
 import '../constants.dart';
 import '../stock_exchange_interface.dart';
 
-class OperationEditDialog extends StatelessWidget {
+class OperationEditDialog extends StatefulWidget {
   final Operation _operation;
   final Instrument _operationInstrument;
+
+  OperationEditDialog(this._operation, {Key key}) :
+    _operationInstrument = _operation.instrument ?? Instrument.empty(),
+    super(key: key);
+
+  @override
+  _OperationEditDialogState createState() {
+    return _OperationEditDialogState(_operation);
+  }
+}
+
+class _OperationEditDialogState extends State<OperationEditDialog> {
+  Operation _operation;
   final TextEditingController _tickerEditController = TextEditingController();
   final TextEditingController _dateEditController = TextEditingController();
   final TextEditingController _priceEditController = TextEditingController();
   final TextEditingController _quantityEditController = TextEditingController();
   final TextEditingController _commissionEditController = TextEditingController();
-
   final TextEditingController _instrumentNameEditController = TextEditingController();
+  bool _createMoneyOperation = true;
 
-  OperationEditDialog(this._operation, {Key key}) :
-    _operationInstrument = _operation.instrument ?? Instrument.empty(),
-        super(key: key)
-  {
+  _OperationEditDialogState(this._operation) {
     _tickerEditController.text = _operation.instrument?.ticker;
     _instrumentNameEditController.text = _operation.instrument?.name;
     _dateEditController.text = dateString(_operation.date);
@@ -41,28 +51,15 @@ class OperationEditDialog extends StatelessWidget {
     String pageName = _operation.id == null ?
       S.of(context).operationEditDialog_Title_add :
       S.of(context).operationEditDialog_Title_edit;
-    bool _createMoneyOperation = true;
 
     addOperation() async {
       if (_createMoneyOperation) {
-        Money money = _operation.portfolio.monies.byCurrency(_operationInstrument.currency);
+        Money money = _operation.portfolio.monies.byCurrency(_operation.instrument.currency);
 
         if (money == null || money.amount < _operation.value) {
           Fluttertoast.showToast(msg: S.of(context).operationEditDialog_noenoughmoney);
           return;
         }
-      }
-
-      if (_operation.instrument == null) {
-        Instrument instrument = await _operation.portfolio.instruments.add(
-            _operationInstrument.ticker,
-            _operationInstrument.isin,
-            _operationInstrument.name,
-            _operationInstrument.currency,
-            _operationInstrument.type,
-            _operationInstrument.exchange,
-            _operationInstrument.additional);
-        _operation.instrument = instrument;
       }
 
       try {
@@ -72,30 +69,64 @@ class OperationEditDialog extends StatelessWidget {
         if (e is NoCurrencyException)
           Fluttertoast.showToast(msg: S.of(context).errorNoCurrency);
         else
-          if (e is NotEnoughMoneyException)
-            Fluttertoast.showToast(msg: S.of(context).errorNotEnoughMoney);
+        if (e is NotEnoughMoneyException)
+          Fluttertoast.showToast(msg: S.of(context).errorNotEnoughMoney);
       }
     }
-    
+
+    editOperation() async {
+    }
+
     bool _fabEnabled() {
-      return _operationInstrument.ticker != null &&
-        _operation.date != null &&
+      return widget._operationInstrument.ticker != null &&
+        widget._operation.date != null &&
         _operation.type != null &&
         _operation.quantity != null &&
         _operation.price != null;
     }
 
     onFabPressed() async  {
+      if (_operation.instrument == null) {
+        _operation.instrument = Instrument(
+            portfolio: _operation.portfolio,
+            ticker: widget._operationInstrument.ticker,
+            isin: widget._operationInstrument.isin,
+            name: widget._operationInstrument.name,
+            currency: widget._operationInstrument.currency,
+            type: widget._operationInstrument.type,
+            exchange: widget._operationInstrument.exchange,
+            additional: widget._operationInstrument.additional);
+        _operation.instrument.add();
+      }
+
+      if (_operation.id == null)
+        addOperation();
+      else
+        editOperation();
+
       Navigator.of(context).pop(true);
-      addOperation();
     }
 
     Future<List> tickerSuggestions(String pattern) async {
       return StockExchangeProvider.stock().search(ticker: _tickerEditController.text);
     }
 
-    // build code starts here
+    onTickerSuggestionSelected(dynamic suggestion) {
+      if (widget._operationInstrument.ticker != suggestion.ticker) {
+        _tickerEditController.text = suggestion.ticker;
+        _instrumentNameEditController.text = suggestion.name;
+        widget._operationInstrument.ticker = suggestion.ticker;
+        widget._operationInstrument.name = suggestion.name;
+        widget._operationInstrument.isin = suggestion.isin;
+        widget._operationInstrument.type = suggestion.type;
+        widget._operationInstrument.exchange = suggestion.exchange;
+        widget._operationInstrument.currency = suggestion.currency;
+        widget._operationInstrument.additional = suggestion.additional;
+        _operation.instrument = null;
+      }
+    }
 
+    // build code starts here
     return
       Scaffold(
         appBar: MySecuritiesAppBar(pageName: pageName),
@@ -104,7 +135,7 @@ class OperationEditDialog extends StatelessWidget {
             // instrument
             dialogPanel(children: [
               Expanded(flex: 30,
-                child: TypeAheadFormField(
+                child: TypeAheadFormField( // ticker
                   textFieldConfiguration: TextFieldConfiguration(
                       controller: _tickerEditController,
                       // let the user to select instrument only when the operation had been added not
@@ -116,9 +147,9 @@ class OperationEditDialog extends StatelessWidget {
                           contentPadding: EDIT_UNDERLINE_PADDING
                       ),
                       inputFormatters: [UpperCaseTextFormatter()],
-                      onChanged: (value) {
-                        _operationInstrument.ticker = value;
-                      }
+                      // onChanged: (value) {
+                      //   widget._operationInstrument.ticker = value;
+                      // }
                   ),
                   suggestionsBoxDecoration: SuggestionsBoxDecoration(
                       constraints: BoxConstraints(
@@ -126,6 +157,7 @@ class OperationEditDialog extends StatelessWidget {
                       )
                   ),
                   suggestionsCallback: tickerSuggestions,
+                  onSuggestionSelected: onTickerSuggestionSelected,
                   itemBuilder: (context, suggestion) {
                     return ListTile(
                       title: Text(suggestion.ticker),
@@ -138,22 +170,12 @@ class OperationEditDialog extends StatelessWidget {
                         child: Text(S.of(context).operationEditDialog_notickersuggestion)
                     );
                   },
-                  onSuggestionSelected: (suggestion) {
-                    _tickerEditController.text = suggestion.ticker ;
-                    _instrumentNameEditController.text = suggestion.name;
-                    _operationInstrument.ticker = suggestion.ticker;
-                    _operationInstrument.name = suggestion.name;
-                    _operationInstrument.isin = suggestion.isin;
-                    _operationInstrument.type = suggestion.type;
-                    _operationInstrument.exchange = suggestion.exchange;
-                    _operationInstrument.currency = suggestion.currency;
-                    _operationInstrument.additional = suggestion.additional;
-                  }
                 ),
               ), // TypeAheadFormField
               Expanded(flex: 10, child: Text('')),
               Expanded(flex: 60,
-                child: TextField(controller: _instrumentNameEditController,
+                child: TextField( // instrument name
+                  controller: _instrumentNameEditController,
                   readOnly: true,
                   style: TextStyle(fontSize: 14),
                   decoration: InputDecoration(
@@ -328,7 +350,7 @@ class OperationEditDialog extends StatelessWidget {
               Expanded(flex: 50,
                   child: CheckboxListTile(
                       title: Text(S.of(context).operationEditDialog_withdrawmoney),
-                      value: _createMoneyOperation,
+                      value: true,
                       controlAffinity: ListTileControlAffinity.leading,
                       onChanged: (value) => {_createMoneyOperation = value}
                   )

@@ -50,7 +50,7 @@ class PortfolioMoniesListItem extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.teal, fontSize: 36),
                   ),
-                  Text(_money.currency.name(),
+                  Text(_money.currency.name,
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.teal, fontSize: 12),
                   )

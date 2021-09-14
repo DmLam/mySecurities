@@ -35,10 +35,19 @@ class Portfolio extends ChangeNotifier {
   MoneyOperationList get moneyOperations => _moneyOperations;
 
   Portfolio(this._id, this._name, this._visible, this._startDate) {
+    _loadFromDb();
+  }
+
+  _loadFromDb() {
     _instruments = InstrumentList(this);
     _operations = OperationList(this);
     _monies = MoneyList(this);
     _moneyOperations = MoneyOperationList(_monies);
+  }
+
+  refresh() async {
+    _loadFromDb();
+    notifyListeners();
   }
 
   Portfolio.from(Portfolio portfolio) :
@@ -135,7 +144,7 @@ class PortfolioList extends ChangeNotifier {
 
   _loadFromDb() async {
     _items = await DBProvider.db.getPortfolios();
-    _items.forEach((element) {element._owner = this;});
+    _items.forEach((element) => element._owner = this);
   }
 
   Future _init() async{

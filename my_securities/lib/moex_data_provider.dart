@@ -97,7 +97,7 @@ class MOEXDataProvider implements StockExchangeProvider {
       case Currency.USD:
         return "USD000000TOD";
       default:
-        throw Exception("There is no ticker for currency " + currency.name());
+        throw Exception("There is no ticker for currency " + currency.name);
     }
   }
 

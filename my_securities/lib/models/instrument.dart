@@ -1,14 +1,20 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:my_securities/generated/l10n.dart';
-import 'package:my_securities/exchange.dart';
-import 'package:my_securities/models/portfolio.dart';
-
+import '../exchange.dart';
+import '../constants.dart';
 import '../database.dart';
 import '../stock_exchange_interface.dart';
 import 'model.dart';
+import 'portfolio.dart';
 
 enum InstrumentType {currency, share, etf, federalBond, subfederalBond, corporateBond, futures, stockIndex}
+
+extension InstrumentTypeExtension on InstrumentType {
+  int get id => index + 1;
+
+  String get name => INSTRUMENT_TYPE_NAMES[this.index];
+}
 
 class Instrument extends ChangeNotifier {
   int id;
@@ -38,11 +44,19 @@ class Instrument extends ChangeNotifier {
   double get value => _value;
   int get operationCount => _operationCount;
 
-  Instrument(this.id, {@required Portfolio portfolio, isin = '', @required ticker, name = '', currency, type,
-    exchange = Exchange.MCX, image, additional, portfolioPercentPlan, quantity = 0,
-    averagePrice = 0.0, value = 0.0, operationCount = 0}):
+  _initId() async {
+    if (id == null)
+      id = await DBProvider.db.getInstrumentId(isin);
+  }
+
+  Instrument({int id, @required Portfolio portfolio, String isin = '', @required String ticker,
+    String name = '', Currency currency, InstrumentType type,
+    Exchange exchange = Exchange.MCX, Uint8List image, String additional,
+    int portfolioPercentPlan, int quantity = 0,
+    double averagePrice = 0.0, double value = 0.0, int operationCount = 0}):
     assert(portfolio != null),
     _portfolio = portfolio,
+    this.id = id,
     this.isin = isin,
     this.ticker = ticker,
     this.name = name,
@@ -55,7 +69,10 @@ class Instrument extends ChangeNotifier {
     _image = image,
     _averagePrice = averagePrice,
     _value = value,
-    _operationCount = operationCount;
+    _operationCount = operationCount
+  {
+    _initId();
+  }
 
   Instrument.from(Instrument source):
     id = source.id,
@@ -84,7 +101,8 @@ class Instrument extends ChangeNotifier {
 
 
   factory Instrument.fromMap(Map<String, dynamic> json) =>
-      Instrument(json["id"],
+      Instrument(
+          id: json["id"],
           portfolio: Model.portfolios.portfolioById(json["portfolio_id"]),
           isin: json["isin"],
           ticker: json["ticker"],
@@ -151,6 +169,18 @@ class Instrument extends ChangeNotifier {
     }
   }
 
+  Future<int> add() async {
+    assert(id == null, 'instrument already added to db (id = $id)');
+    id = await DBProvider.db.getInstrumentId(isin);
+
+    if (id == null)
+      id = await DBProvider.db.addInstrument(
+          ticker, isin, name, currency, type, exchange, additional);
+
+    portfolio.refresh();
+
+    return Future.value(id);
+  }
   Future<bool> update({int portfolioPercentPlan}) async {
     if (portfolioPercentPlan != null)
       portfolioPercentPlan = portfolioPercentPlan;
@@ -202,19 +232,5 @@ class InstrumentList {
 
   _loadFromDb() async {
     _items = await DBProvider.db.getPortfolioInstruments(_portfolio.id);
-  }
-
-  Future<Instrument> add(String ticker, String isin, String name, Currency currency, InstrumentType type, Exchange exchange, String additional) async {
-    int id = await DBProvider.db.getInstrumentId(isin);
-
-    if (id == null)
-      id = await DBProvider.db.addInstrument(ticker, isin, name, currency, type, exchange, additional);
-
-    Instrument result = Instrument(id, portfolio: _portfolio, ticker: ticker, isin: isin, name: name,
-        currency: currency, type: type, exchange: exchange, additional: additional);
-
-    portfolio.update(); // notifing the portfolio listeners
-
-    return Future.value(result);
   }
 }

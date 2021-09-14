@@ -18,6 +18,8 @@
   "operationTypeSell": "Sell",
   "moneyOperationTypeDeposit": "Deposit",
   "moneyOperationTypeWithdraw": "Withdraw",
+  "moneyOperationTypeBuy": "Buy",
+  "moneyOperationTypeSell": "Sell",
   "instrumentTypeCurrency": "Currency",
   "instrumentTypeShare": "Share",
   "instrumentTypeEtf": "Etf",

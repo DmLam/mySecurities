@@ -185,6 +185,26 @@ class S {
     );
   }
 
+  /// `Buy`
+  String get moneyOperationTypeBuy {
+    return Intl.message(
+      'Buy',
+      name: 'moneyOperationTypeBuy',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Sell`
+  String get moneyOperationTypeSell {
+    return Intl.message(
+      'Sell',
+      name: 'moneyOperationTypeSell',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Currency`
   String get instrumentTypeCurrency {
     return Intl.message(

@@ -1,4 +1,4 @@
-import 'dart:io';import 'dart:io';
+import 'dart:io';
 import 'dart:async';
 import 'dart:typed_data';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -59,15 +59,15 @@ class DBProvider {
                         name TEXT NOT NULL,
                         shortname TEXT NOT NULL,
                         sign TEXT);''');
-    await db.execute("INSERT INTO currency (id, name, shortname, sign) values (1, 'Рубль', 'RUB', '₽')");
-    await db.execute("INSERT INTO currency (id, name, shortname, sign) values (2, 'Доллар', 'USD', '\$')");
-    await db.execute("INSERT INTO currency (id, name, shortname, sign) values (3, 'Евро', 'EUR', '€')");
-    await db.execute("INSERT INTO currency (id, name, shortname, sign) values (4, 'Фунт', 'GBP', '£')");
-    await db.execute("INSERT INTO currency (id, name, shortname, sign) values (5, 'Гонконгский доллар', 'HKD', 'HK\$')");
-    await db.execute("INSERT INTO currency (id, name, shortname, sign) values (6, 'Швейцарский франк', 'CHF', '₣')");
-    await db.execute("INSERT INTO currency (id, name, shortname, sign) values (7, 'Йена', 'JPY', '¥')");
-    await db.execute("INSERT INTO currency (id, name, shortname, sign) values (8, 'Юань', 'CNY', '¥')");
-    await db.execute("INSERT INTO currency (id, name, shortname, sign) values (9, 'Турецкая лира', 'TRY', '₺')");
+    await db.execute("INSERT INTO currency (id, name, shortname, sign) values (${Currency.RUB.id}, 'Рубль', 'RUB', '₽')");
+    await db.execute("INSERT INTO currency (id, name, shortname, sign) values (${Currency.USD.id}, 'Доллар', 'USD', '\$')");
+    await db.execute("INSERT INTO currency (id, name, shortname, sign) values (${Currency.EUR.id}, 'Евро', 'EUR', '€')");
+    await db.execute("INSERT INTO currency (id, name, shortname, sign) values (${Currency.GBP.id}, 'Фунт', 'GBP', '£')");
+    await db.execute("INSERT INTO currency (id, name, shortname, sign) values (${Currency.HKD.id}, 'Гонконгский доллар', 'HKD', 'HK\$')");
+    await db.execute("INSERT INTO currency (id, name, shortname, sign) values (${Currency.CHF.id}, 'Швейцарский франк', 'CHF', '₣')");
+    await db.execute("INSERT INTO currency (id, name, shortname, sign) values (${Currency.JPY.id}, 'Йена', 'JPY', '¥')");
+    await db.execute("INSERT INTO currency (id, name, shortname, sign) values (${Currency.CNY.id}, 'Юань', 'CNY', '¥')");
+    await db.execute("INSERT INTO currency (id, name, shortname, sign) values (${Currency.TRY.id}, 'Турецкая лира', 'TRY', '₺')");
   }
   Future<void> _createTableExchange(Database db) async {
     await db.execute('CREATE TABLE exchange (id INTEGER PRIMARY KEY, name TEXT NOT NULL, shortname TEXT NOT NULL, country TEXT NOT NULL)');
@@ -338,17 +338,6 @@ class DBProvider {
     return Future.value(result);
   }
 
-  Future<int> getInstrumentCurrencyId(int instrumentId) async {
-    int result;
-    final Database db = await database;
-    var currency = await db.rawQuery("SELECT currency_id FROM instrument WHERE id = ?", [instrumentId]);
-    var r = currency.isNotEmpty ? currency.first['currency_id'] : null;
-    if (r != null)
-      result = r;
-
-    return Future.value(result);
-  }
-
   static final String _sqlInstruments =
   '''SELECT i.id, i.isin, i.ticker, i.name, i.currency_id, i.instrument_type_id, i.exchange_id, i.additional, i.portfolio_percent_plan, 
                   i.additional, i.image, sum(o.quantity) quantity, sum(o.price * o.quantity) / sum(o.quantity) avgprice, sum(o.value) value, count(o.id) operation_count 
@@ -400,14 +389,16 @@ class DBProvider {
   }
 
   static final String _sqlPortfolioOperations =
-  '''SELECT o.id, pi.portfolio_id, pi.instrument_id, o.date, o.type, o.quantity, o.price, o.value, o.commission
-     FROM operation o, portfolio_instrument pi
+  '''SELECT o.id, pi.portfolio_id, pi.instrument_id, o.date, o.type, o.quantity, o.price, o.value, o.commission, 
+            m.id money_operation_id
+     FROM operation o LEFT JOIN money m ON m.operation_id = o.id, portfolio_instrument pi
      WHERE o.portfolio_instrument_id = pi.id
        and pi.portfolio_id = ?
     ''';
   static final String _sqlPortfolioInstrumentOperations =
-  '''SELECT o.id, pi.portfolio_id, pi.instrument_id, o.date, o.type, o.quantity, o.price, o.value, o.commission
-     FROM operation o, portfolio_instrument pi
+  '''SELECT o.id, pi.portfolio_id, pi.instrument_id, o.date, o.type, o.quantity, o.price, o.value, o.commission,
+            m.id money_operation_id
+     FROM operation o LEFT JOIN money m ON m.operation_id = o.id, portfolio_instrument pi
      WHERE o.portfolio_instrument_id = pi.id
        and pi.portfolio_id = ?
        and pi.instrument_id = ?
@@ -423,20 +414,12 @@ class DBProvider {
     return operations.isNotEmpty ? operations.map((o) => Operation.fromMap(o)).toList() : <Operation>[];
   }
 
-  MoneyOperationType operationTypeToMoneyOperationType(OperationType op) {
-    return op == OperationType.buy ? MoneyOperationType.buy :
-    op == OperationType.sell ? MoneyOperationType.sell : null;
-  }
-
-  Future<int> addOperation(Operation op, bool createMoneyOperation) async {
+  Future<int> addOperation(Operation op, {MoneyOperation moneyOperation}) async {
     assert(op.id == null);
     assert(op.instrument != null);
 
     final Database db = await database;
-    final double operationValue = op.type == OperationType.buy ? op.quantity * op.price : -op.quantity * op.price;
-    int result;
     int portfolioInstrumentId = await _getPortfolioInstrumentId(op.portfolio.id, op.instrument.id);
-    int currencyId = await getInstrumentCurrencyId(op.instrument.id);
 
     await db.transaction((txn) async {
       // if there is no this instrument in this portfolio, then create relation
@@ -445,32 +428,24 @@ class DBProvider {
             {'portfolio_id': op.portfolio.id,
               'instrument_id': op.instrument.id});
 
-      result = await txn.insert('operation',
+      op.id = await txn.insert('operation',
           {'portfolio_instrument_id': portfolioInstrumentId,
             'date': dbDateString(op.date),
             'type': op.type.index,
             'quantity': op.quantity,
             'price': op.price,
-            'value': operationValue,
+            'value': op.value,
             'commission': op.commission});
 
-      if (createMoneyOperation)
-        txn.insert('money',
-            {'currency_id': currencyId,
-              'portfolio_id': op.portfolio.id,
-              'date': dbDateString(op.date),
-              'type': operationTypeToMoneyOperationType(op.type).index + 1,
-              'amount': operationValue - op.commission,
-              'operation_id': result});
-      op.id = result;
+      if (moneyOperation != null)
+        addMoneyOperation(moneyOperation, dbe: txn);
     });
 
-    return Future.value(result);
+    return Future.value(op.id);
   }
 
   updateOperation(Operation op) async {
     final Database db = await database;
-    int currencyId = await getInstrumentCurrencyId(op.instrument.id);
 
     await db.transaction((txn) async {
       txn.update('operation',
@@ -482,10 +457,11 @@ class DBProvider {
             'comission': op.commission},
           where: 'id = ?',
           whereArgs: [op.id]);
+
       txn.update('money',
-          {'currency_id': currencyId,
+          {'currency_id': op.instrument.currency.id,
             'date': dbDateString(op.date),
-            'type': operationTypeToMoneyOperationType(op.type).index + 1,
+            'type': operationTypeToMoneyOperationType(op.type).id,
             'amount': op.value - op.commission},
           where: 'operation_id = ?',
           whereArgs: [op.id]);
@@ -655,7 +631,7 @@ class DBProvider {
   }
 
   static final _sqlPortfolioMoneyOperations =
-    'SELECT id, portfolio_id, currency_id, date, type, amount FROM money WHERE portfolio_id = ? ORDER BY date, id';
+    'SELECT id, portfolio_id, operation_id, currency_id, date, type, amount FROM money WHERE portfolio_id = ? ORDER BY date, id';
 
   Future<List<MoneyOperation>> getPortfolioMoneyOperations(int portfolioId) async {
     final Database db = await database;
@@ -669,22 +645,37 @@ class DBProvider {
     return Future.value(result);
   }
 
-  addMoneyOperation(MoneyOperation op) async {
-    final Database db = await database;
+  addMoneyOperation(MoneyOperation mop, {DatabaseExecutor dbe}) async {
+    final Database db = dbe ?? await database;
 
-    await db.insert('money', {'portfolio_id': op.portfolio.id, 'currency_id': op.currency.index + 1, 'date': dbDateString(op.date), 'type': op.type.index + 1, 'amount': op.amount});
+    await db.insert( 'money',
+        {
+          'portfolio_id': mop.portfolio.id,
+          'currency_id': mop.currency.id,
+          'date': dbDateString(mop.date),
+          'type': mop.type.id,
+          'amount': mop.amount,
+          'operation_id': mop.operation?.id
+        });
   }
 
-  updateMoneyOperation(MoneyOperation op) async {
+  updateMoneyOperation(MoneyOperation mop) async {
     final Database db = await database;
 
-    await db.update('money', {'id': op.id, 'currency_id': op.currency.index + 1, 'date': dbDateString(op.date), 'type': op.type.index + 1, 'amount': op.amount});
+    await db.update('money',
+        {
+          'id': mop.id,
+          'currency_id': mop.currency.id,
+          'date': dbDateString(mop.date),
+          'type': mop.type.id,
+          'amount': mop.amount
+        });
   }
 
-  deleteMoneyOperation(MoneyOperation op) async {
+  deleteMoneyOperation(MoneyOperation mop) async {
     final Database db = await database;
 
-    await db.delete('money',  where: 'id = ?', whereArgs: [op.id]);
+    await db.delete('money',  where: 'id = ?', whereArgs: [mop.id]);
   }
 
   Future<List<Portfolio>> getPortfolios() async {

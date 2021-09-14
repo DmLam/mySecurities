@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/models/instrument.dart';
+import 'package:my_securities/models/money.dart';
 import 'package:my_securities/models/operation.dart';
 import 'package:my_securities/models/portfolio.dart';
 import 'package:my_securities/pages/operation_edit_dialog.dart';
@@ -20,11 +22,9 @@ class PortfolioOperationsPage extends StatelessWidget {
   Widget build(BuildContext context) {
 
     addOperation() async {
-      Operation operation = Operation.empty(portfolio: _portfolio, instrument: _instrument);
-
       await Navigator.of(context).push(
         MaterialPageRoute(
-            builder: (_) => OperationEditDialog(operation),
+            builder: (_) => OperationEditDialog(Operation.empty(portfolio: _portfolio, instrument: _instrument)),
             fullscreenDialog: true
         )
       );

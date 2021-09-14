@@ -51,7 +51,7 @@ class QuoteProvider {
 
   Future<double> currencyRate(Currency from, Currency to, DateTime datetime) async {
     double result;
-    String cacheKey = from.name() + to.name();
+    String cacheKey = from.name + to.name;
 
     if (_rateCache.containsKey(cacheKey)) {
       _CachedPrice r = _rateCache[cacheKey];

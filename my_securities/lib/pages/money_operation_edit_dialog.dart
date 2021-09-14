@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
-import 'dart:ui' as ui;
 import 'package:my_securities/common/dialog_panel.dart';
 import 'package:my_securities/common/utils.dart';
 import 'package:my_securities/generated/l10n.dart';
@@ -12,6 +10,9 @@ import '../exchange.dart';
 
 class MoneyOperationEditDialog extends StatefulWidget {
   final MoneyOperation _moneyOperation;
+  double _operationAmount;
+  DateTime _operationDate;
+  MoneyOperationType _operationType;
 
   MoneyOperationEditDialog(this._moneyOperation, {Key key}) : super(key: key);
 
@@ -25,6 +26,10 @@ class _MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
 
   @override
   void initState() {
+    widget._operationAmount = widget._moneyOperation.amount;
+    widget._operationDate = widget._moneyOperation.date;
+    widget._operationType = widget._moneyOperation.type;
+
     _dateEditController.text = dateString(widget._moneyOperation.date);
     _amountEditController.text = widget._moneyOperation.amount?.toString();
     super.initState();
@@ -36,7 +41,6 @@ class _MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
       S.of(context).moneyOperationEditDialog_Title_add :
       S.of(context).moneyOperationEditDialog_Title_edit;
 
-
     bool _fabEnabled() {
       return widget._moneyOperation.date != null &&
           widget._moneyOperation.currency != null &&
@@ -46,6 +50,9 @@ class _MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
 
     onFabPressed() async  {
       Navigator.of(context).pop(true);
+      widget._moneyOperation.type = widget._operationType;
+      widget._moneyOperation.date = widget._operationDate;
+      widget._moneyOperation.amount = widget._operationAmount;
 
       if (widget._moneyOperation.id == null)
         widget._moneyOperation.add();
@@ -77,7 +84,7 @@ class _MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
                   {
                     if (value != null) {
                       setState(() {
-                        widget._moneyOperation.date = value;
+                        widget._operationDate = value;
                         _dateEditController.text = dateString(value);
                       });
                     }
@@ -97,14 +104,9 @@ class _MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
                 items: Currency.values.map((c) =>
                   DropdownMenuItem<Currency>(
                     value: c,
-                    child: Text(c.name()),
+                    child: Text(c.name),
                   )
                 ).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    widget._moneyOperation.currency = value;
-                  });
-                },
               )
             ),
           ]),
@@ -120,16 +122,16 @@ class _MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
                 items: [
                   DropdownMenuItem(
                     value: MoneyOperationType.deposit,
-                    child: Text(MoneyOperationType.deposit.name()),
+                    child: Text(MoneyOperationType.deposit.name),
                   ),
                   DropdownMenuItem(
                     value: MoneyOperationType.withdraw,
-                    child: Text(MoneyOperationType.withdraw.name()),
+                    child: Text(MoneyOperationType.withdraw.name),
                   )
                 ],
                 onChanged: (value) {
                   setState(() {
-                    widget._moneyOperation.type = value;
+                    widget._operationType = value;
                   });
                 },
               )
@@ -162,7 +164,7 @@ class _MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
                   },
                   onChanged: (value) {
                     setState(() {
-                      widget._moneyOperation.amount = double.tryParse(value);
+                      widget._operationAmount = double.tryParse(value);
                     });
                   },
                 ),

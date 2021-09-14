@@ -8,7 +8,7 @@ import 'package:my_securities/pages/operation_edit_dialog.dart';
 import 'package:my_securities/widgets/portfolio_monies_list_view.dart';
 import 'package:provider/provider.dart';
 import 'package:my_securities/widgets/appbar.dart';
-import 'package:my_securities/widgets/portfolio_instrument_list_view.dart';
+import 'package:my_securities/widgets/portfolio_instruments_list_view.dart';
 import 'package:my_securities/models/portfolio.dart';
 
 class PortfolioInstrumentsPage extends StatelessWidget {
