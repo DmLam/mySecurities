@@ -40,6 +40,9 @@ class PortfolioInstrumentsPage extends StatelessWidget {
             builder: (context, _) {
               Portfolio portfolio = context.watch<Portfolio>();
 
+//              print("Instruments count = ${portfolio.instruments.length}");
+//              print("Monies count = ${portfolio.monies.length}");
+
               return Column(children: [
                 PortfolioInstrumentsListView(portfolio),
                 PortfolioMoniesListView(portfolio)

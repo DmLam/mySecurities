@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:my_securities/database_list.dart';
 import '../constants.dart';
 import '../database.dart';
 import '../exchange.dart';
@@ -31,7 +32,10 @@ class MoneyOperation extends ChangeNotifier {
   double get amount => _amount;
   set amount(double value) {
     if (_amount != value) {
-      portfolio.monies.byCurrency(currency).amount += value - _amount;
+      Money money = portfolio.monies.byCurrency(currency);
+
+      if (money != null)
+        money.amount += value - _amount;
       _amount = value;
     }
   }
@@ -79,10 +83,9 @@ class MoneyOperation extends ChangeNotifier {
   }
 
   Future<int> add() async {
-    int result = await portfolio.moneyOperations._add(this);
+    int result = await DBProvider.db.addMoneyOperation(this);
 
-    notifyListeners();
-    portfolio.update(); // changes nothing, just notify listeners
+    portfolio.refresh(); // changes nothing, just notify listeners
 
     return Future.value(result);
   }
@@ -101,50 +104,35 @@ class MoneyOperation extends ChangeNotifier {
   }
 
   delete() async {
-    await portfolio.moneyOperations._delete(this);
+    await DBProvider.db.deleteMoneyOperation(this);
 
-    notifyListeners();
-    portfolio.update(); // changes nothing, just notify listeners
+    portfolio.refresh();
   }
 }
 
-class MoneyOperationList {
-  MoneyList _monies;
-  List<MoneyOperation> _items;
+class MoneyOperationList extends DatabaseList<MoneyOperation>{
 
-  MoneyOperationList(this._monies) {
-    _loadFromDb();
-  }
-
-  List<MoneyOperation> get operations => [..._items];
+  MoneyOperationList(Portfolio portfolio): super(portfolio);
 
   List<MoneyOperation> byCurrency(Currency currency) =>
-    _items.where((item) => currency == null || item.currency == currency).toList();
+      length == 0 ? null :
+      items.where((item) => currency == null || item.currency == currency).toList();
 
-  _loadFromDb() async {
-    _items = await DBProvider.db.getPortfolioMoneyOperations(_monies.portfolio.id);
+  loadFromDb() async {
+    items = await DBProvider.db.getPortfolioMoneyOperations(portfolio.id);
   }
 
-  refresh() {
-    _loadFromDb();
+  MoneyOperation byOperationId(int id) {
+    if (length == null || id == null)
+      return null;
+
+    return
+      items
+        .where((item) => item?.operation?.id == id)
+        .toList()
+        ?.first;
   }
 
-  MoneyOperation byId(int id) => _items.where((item) => item.operation.id == id).toList().first;
-
-  Future<int> _add(MoneyOperation op) async {
-    int result = await DBProvider.db.addMoneyOperation(op);
-    await _loadFromDb();
-    await _monies.refresh();  // refresh list of monies in the portfolio
-    _monies.portfolio.update(); // just notify portfolio that the list of money operations has been changed
-    return Future.value(result);
-  }
-
-  _delete(MoneyOperation op) async {
-    await DBProvider.db.deleteMoneyOperation(op);
-    await _loadFromDb();
-    await _monies.refresh();  // refresh list of monies in the portfolio
-    _monies.portfolio.update(); // just notify portfolio that the list of money operations has been changed
-  }
 }
 
 MoneyOperationType operationTypeToMoneyOperationType(OperationType op) {

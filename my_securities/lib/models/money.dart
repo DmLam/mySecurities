@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:my_securities/database_list.dart';
 import 'package:my_securities/models/portfolio.dart';
 
 import '../database.dart';
@@ -20,27 +21,23 @@ class Money extends ChangeNotifier {
       );
 }
 
-class MoneyList {
-  Portfolio _portfolio;
-  List<Money> _items;
+class MoneyList extends DatabaseList<Money> {
 
-  MoneyList(this._portfolio) {
-    _loadFromDb();
-  }
-
-  Portfolio get portfolio => _portfolio;
+  MoneyList(Portfolio portfolio) : super(portfolio);
 
   Money byCurrency(Currency currency) {
-    return _items.where((element) => (element.currency == currency)).first;
+    Money result;
+
+    if (items.length > 0)
+      result = items.where((element) => (element.currency == currency)).first;
+    return result;
   }
 
   refresh() async {
-    await _loadFromDb();
+    await loadFromDb();
   }
 
-  List<Money> get monies => [..._items];
-
-  _loadFromDb() async {
-    _items = await DBProvider.db.getPortfolioMonies(_portfolio.id);
+  loadFromDb() async {
+    items = await DBProvider.db.getPortfolioMonies(portfolio.id);
   }
 }

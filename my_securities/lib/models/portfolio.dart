@@ -38,15 +38,20 @@ class Portfolio extends ChangeNotifier {
     _loadFromDb();
   }
 
-  _loadFromDb() {
+  _loadFromDb() async {
     _instruments = InstrumentList(this);
     _operations = OperationList(this);
     _monies = MoneyList(this);
-    _moneyOperations = MoneyOperationList(_monies);
+    _moneyOperations = MoneyOperationList(this);
+
+    await _instruments.ready;
+    await _operations.ready;
+    await _monies.ready;
+    await _moneyOperations.ready;
   }
 
   refresh() async {
-    _loadFromDb();
+    await _loadFromDb();
     notifyListeners();
   }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:my_securities/database_list.dart';
 import 'package:my_securities/exchange.dart';
 import '../constants.dart';
 import '../database.dart';
@@ -107,7 +108,6 @@ class Operation extends ChangeNotifier{
 
     await DBProvider.db.addOperation(this, moneyOperation: moneyOp);
     await portfolio.refresh(); // reload instruments, money and operations from db
-//    instrument.notifyListeners();
 
     return Future.value(id);
   }
@@ -118,7 +118,7 @@ class Operation extends ChangeNotifier{
     if (id != null) {
       await DBProvider.db.updateOperation(this);
 
-      MoneyOperation mop = portfolio.moneyOperations.byId(id);
+      MoneyOperation mop = portfolio.moneyOperations.byOperationId(id);
       if (mop != null) {
         mop.currency = instrument.currency;
         mop.type = operationTypeToMoneyOperationType(this.type);
@@ -127,7 +127,6 @@ class Operation extends ChangeNotifier{
         mop.update();
       }
       portfolio.refresh(); // reload instruments, money and operations from db
-//      instrument.notifyListeners();
 
       result = true;
     }
@@ -136,31 +135,24 @@ class Operation extends ChangeNotifier{
 
   delete() async {
     await DBProvider.db.deleteOperation(this);
-    MoneyOperation mop = portfolio.moneyOperations.byId(id);
+    MoneyOperation mop = portfolio.moneyOperations.byOperationId(id);
     if (mop != null)
       mop.delete();
 
-    await portfolio.refresh(); // reload instruments, money and operations from db
-//    instrument.notifyListeners();
+    portfolio.refresh(); // reload instruments, money and operations from db
   }
 }
 
-class OperationList {
-  List<Operation> _items = [];
-  Portfolio _portfolio;
+class OperationList extends DatabaseList<Operation> {
 
-  OperationList(this._portfolio) {
-    _loadFromDb();
-  }
-
-  List<Operation> get operations => [..._items];
+  OperationList(Portfolio portfolio) : super(portfolio);
 
   List<Operation> byInstrument(Instrument instrument) =>
-    _items.where((op) => instrument == null || op.instrument == instrument).toList();
+    items.where((op) => instrument == null || op.instrument == instrument).toList();
 
-  Operation byId(int id) => id == null ? null : _items.where((item) => item.id == id).toList().first;
+  Operation byId(int id) => id == null ? null : items.where((item) => item.id == id).toList().first;
 
-  _loadFromDb() async {
-    _items = await DBProvider.db.getPortfolioOperations(_portfolio.id);
+  loadFromDb() async {
+    items = await DBProvider.db.getPortfolioOperations(portfolio.id);
   }
 }

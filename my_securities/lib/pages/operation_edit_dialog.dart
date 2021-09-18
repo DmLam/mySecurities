@@ -56,7 +56,8 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
       if (_createMoneyOperation) {
         Money money = _operation.portfolio.monies.byCurrency(_operation.instrument.currency);
 
-        if (money == null || money.amount < _operation.value) {
+        if ((_operation.type == OperationType.buy) &&
+            (money == null || money.amount < _operation.value)) {
           Fluttertoast.showToast(msg: S.of(context).operationEditDialog_noenoughmoney);
           return;
         }
@@ -147,9 +148,6 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
                           contentPadding: EDIT_UNDERLINE_PADDING
                       ),
                       inputFormatters: [UpperCaseTextFormatter()],
-                      // onChanged: (value) {
-                      //   widget._operationInstrument.ticker = value;
-                      // }
                   ),
                   suggestionsBoxDecoration: SuggestionsBoxDecoration(
                       constraints: BoxConstraints(
@@ -222,7 +220,7 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
                           contentPadding: EdgeInsets.all(3.0)
                       ),
                       isExpanded: true,
-                      onChanged: (type) {type = OperationType.values[OPERATION_TYPE_NAMES.indexOf(type)];}
+                      onChanged: (type) {_operation.type = OperationType.values[OPERATION_TYPE_NAMES.indexOf(type)];}
                   )
               )
             ]),

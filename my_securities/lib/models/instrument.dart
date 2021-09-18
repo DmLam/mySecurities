@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:my_securities/database_list.dart';
 import 'package:my_securities/generated/l10n.dart';
 import '../exchange.dart';
 import '../constants.dart';
@@ -177,8 +178,6 @@ class Instrument extends ChangeNotifier {
       id = await DBProvider.db.addInstrument(
           ticker, isin, name, currency, type, exchange, additional);
 
-    portfolio.refresh();
-
     return Future.value(id);
   }
   Future<bool> update({int portfolioPercentPlan}) async {
@@ -202,25 +201,20 @@ extension InstrumentExtension on Instrument {
   String averagePriceString({Currency currency}) => averagePrice == null ? '' : formatCurrency(averagePrice, currency: currency == null ? this.currency : currency) ;
 }
 
-class InstrumentList {
-  final Portfolio _portfolio;
-  List<Instrument> _items = [];
+class InstrumentList extends DatabaseList<Instrument> {
 
-  InstrumentList(this._portfolio) {
-    _loadFromDb();
-  }
+  InstrumentList(Portfolio portfolio) : super(portfolio);
 
-  Portfolio get portfolio => _portfolio;
-
-  List<Instrument> get instruments => [..._items];
+  List<Instrument> get instruments => [...items];
 
   refresh() async {
-    await _loadFromDb();
+    await loadFromDb();
   }
 
   Instrument instrumentById(int id) {
     Instrument result;
-    for(Instrument instrument in _items) {
+
+    for(Instrument instrument in items) {
       if (instrument.id == id) {
         result = instrument;
         break;
@@ -230,7 +224,7 @@ class InstrumentList {
     return result;
   }
 
-  _loadFromDb() async {
-    _items = await DBProvider.db.getPortfolioInstruments(_portfolio.id);
+  loadFromDb() async {
+    items = await DBProvider.db.getPortfolioInstruments(portfolio.id);
   }
 }

@@ -42,10 +42,10 @@ class _MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
       S.of(context).moneyOperationEditDialog_Title_edit;
 
     bool _fabEnabled() {
-      return widget._moneyOperation.date != null &&
+      return widget._operationDate != null &&
           widget._moneyOperation.currency != null &&
-          widget._moneyOperation.type != null &&
-          widget._moneyOperation.amount != null;
+          widget._operationType != null &&
+          widget._operationAmount != null;
     }
 
     onFabPressed() async  {
@@ -107,6 +107,10 @@ class _MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
                     child: Text(c.name),
                   )
                 ).toList(),
+                onChanged: widget._moneyOperation.currency == null ?
+                    (value) {
+                      widget._moneyOperation.currency = value;
+                    } : null,
               )
             ),
           ]),
@@ -156,7 +160,7 @@ class _MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
                   validator: (value) {
                     String result;
                     if (value != null && value != '') {
-                      if (widget._moneyOperation.amount == null) {
+                      if (widget._operationAmount == null) {
                         result = S.of(context).errorInvalidValue;
                       }
                     }

@@ -383,9 +383,17 @@ class DBProvider {
 
   Future<int> _getPortfolioInstrumentId(int portfolioId, int instrumentId) async {
     final Database db = await database;
-    var pi = await db.query('portfolio_instrument', columns: ['id'], where: 'portfolio_id=? and instrument_id=?', whereArgs: [portfolioId, instrumentId] );
+    int result;
 
-    return Future.value(pi.isEmpty ? null : pi[0]['id']);
+    if (instrumentId != null) {
+      var pi = await db.query('portfolio_instrument', columns: ['id'],
+          where: 'portfolio_id=? and instrument_id=?',
+          whereArgs: [portfolioId, instrumentId]);
+
+      result = pi.isEmpty ? null : pi[0]['id'];
+    }
+
+    return  Future.value(result);
   }
 
   static final String _sqlPortfolioOperations =
@@ -471,6 +479,8 @@ class DBProvider {
   deleteOperation(Operation op) async {
     final Database db = await database;
     int portfolioInstrumentId = await _getPortfolioInstrumentId(op.portfolio.id, op.instrument.id);
+
+    assert(portfolioInstrumentId != null, 'portfolioInstrumentId shouldn'' be null');
 
     await db.transaction((txn) async {
       await txn.delete('money', where: 'operation_id = ?', whereArgs: [op.id]);
@@ -624,8 +634,7 @@ class DBProvider {
 
   Future<List<Money>> getPortfolioMonies(int portfolioId) async {
     final Database db = await database;
-    List<Map<String, dynamic>> money =
-    await db.rawQuery(_sqlPortfolioMonies, [portfolioId]);
+    List<Map<String, dynamic>> money = await db.rawQuery(_sqlPortfolioMonies, [portfolioId]);
 
     return money.isNotEmpty ? money.map((m) => Money.fromMap(m)).toList() : <Money>[];
   }
@@ -646,9 +655,9 @@ class DBProvider {
   }
 
   addMoneyOperation(MoneyOperation mop, {DatabaseExecutor dbe}) async {
-    final Database db = dbe ?? await database;
+    final DatabaseExecutor dbx = dbe ?? await database;
 
-    await db.insert( 'money',
+    await dbx.insert( 'money',
         {
           'portfolio_id': mop.portfolio.id,
           'currency_id': mop.currency.id,
