@@ -211,11 +211,24 @@ class InstrumentList extends DatabaseList<Instrument> {
     await loadFromDb();
   }
 
-  Instrument instrumentById(int id) {
+  Instrument byId(int id) {
     Instrument result;
 
     for(Instrument instrument in items) {
       if (instrument.id == id) {
+        result = instrument;
+        break;
+      }
+    }
+
+    return result;
+  }
+
+  Instrument byTicker(String ticker) {
+    Instrument result;
+
+    for(Instrument instrument in items) {
+      if (instrument.ticker == ticker) {
         result = instrument;
         break;
       }

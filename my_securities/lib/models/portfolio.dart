@@ -87,7 +87,7 @@ class Portfolio extends ChangeNotifier {
     notifyListeners();
   }
 
-  Instrument instrumentById(int id) => instruments.instrumentById(id);
+  Instrument instrumentById(int id) => instruments.byId(id);
 
   Future<int> add(Portfolio portfolio) async {
     return Future.value(await Model.portfolios._add(portfolio));

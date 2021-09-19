@@ -12,23 +12,24 @@ import 'package:my_securities/models/portfolio.dart';
 import '../constants.dart';
 
 class OperationsListView extends StatelessWidget {
-  final Instrument _instrument;
+  final String _ticker;
 
-  const OperationsListView({Instrument instrument, Key key}) :
-        _instrument = instrument,
+  const OperationsListView({String ticker, Key key}) :
+        _ticker = ticker,
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
     Portfolio portfolio = context.watch<Portfolio>();
+    List<Operation> operations = portfolio.operations.byInstrument(portfolio.instruments.byTicker(_ticker));
 
     return ListView.builder(
-      itemCount: portfolio.operations.length,
+      itemCount: operations.length,
       itemBuilder: (context, index) {
         return ChangeNotifierProvider<Operation>.value(
-          value: portfolio.operations[index],
+          value: operations[index],
           builder: (context, widget) {
-            return operationsListItem(context, portfolio.operations[index]);
+            return operationsListItem(context, operations[index]);
           }
         );
       });

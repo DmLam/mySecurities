@@ -5,7 +5,6 @@ import 'package:my_securities/models/portfolio.dart';
 import 'package:my_securities/widgets/appbar.dart';
 import 'package:my_securities/widgets/money_operations_list_view.dart';
 import 'package:provider/provider.dart';
-
 import '../exchange.dart';
 import 'money_operation_edit_dialog.dart';
 

@@ -33,7 +33,7 @@ class PortfolioOperationsPage extends StatelessWidget {
         appBar: MySecuritiesAppBar(pageName: S.of(context).portfolioOperations_Title(_portfolio.name)),
         body: ChangeNotifierProvider<Portfolio>.value(
             value: _portfolio,
-            child: OperationsListView(instrument: _instrument)),
+            child: OperationsListView(ticker: _instrument.ticker)),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),
           onPressed: addOperation,
