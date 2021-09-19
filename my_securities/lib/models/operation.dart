@@ -126,7 +126,7 @@ class Operation extends ChangeNotifier{
         mop.amount = value + commission;
         mop.update();
       }
-      portfolio.refresh(); // reload instruments, money and operations from db
+      await portfolio.refresh(); // reload instruments, money and operations from db
 
       result = true;
     }
@@ -134,12 +134,13 @@ class Operation extends ChangeNotifier{
   }
 
   delete() async {
-    await DBProvider.db.deleteOperation(this);
     MoneyOperation mop = portfolio.moneyOperations.byOperationId(id);
-    if (mop != null)
-      mop.delete();
 
-    portfolio.refresh(); // reload instruments, money and operations from db
+    await DBProvider.db.deleteOperation(this);
+    if (mop != null)
+      await mop.delete();
+    else
+      await portfolio.refresh(); // reload instruments, money and operations from db
   }
 }
 
@@ -150,7 +151,7 @@ class OperationList extends DatabaseList<Operation> {
   List<Operation> byInstrument(Instrument instrument) =>
     items.where((op) => instrument == null || op.instrument == instrument).toList();
 
-  Operation byId(int id) => id == null ? null : items.where((item) => item.id == id).toList().first;
+  Operation byId(int id) => id == null ? null : items.where((item) => item.id == id).toList()?.first;
 
   loadFromDb() async {
     items = await DBProvider.db.getPortfolioOperations(portfolio.id);

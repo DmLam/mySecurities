@@ -76,6 +76,7 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
     }
 
     editOperation() async {
+      // todo: realise editOperation
     }
 
     bool _fabEnabled() {
@@ -86,7 +87,7 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
         _operation.price != null;
     }
 
-    onFabPressed() async  {
+    onFabPressed() async {
       if (_operation.instrument == null) {
         _operation.instrument = Instrument(
             portfolio: _operation.portfolio,
@@ -101,9 +102,9 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
       }
 
       if (_operation.id == null)
-        addOperation();
+        await addOperation();
       else
-        editOperation();
+        await editOperation();
 
       Navigator.of(context).pop(true);
     }

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/models/instrument.dart';
-import 'package:my_securities/models/money.dart';
 import 'package:my_securities/models/operation.dart';
 import 'package:my_securities/models/portfolio.dart';
 import 'package:my_securities/pages/operation_edit_dialog.dart';

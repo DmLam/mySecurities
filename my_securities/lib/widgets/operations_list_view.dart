@@ -21,15 +21,14 @@ class OperationsListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Portfolio portfolio = context.watch<Portfolio>();
-    List<Operation> operations = portfolio.operations.byInstrument(_instrument);
 
     return ListView.builder(
-      itemCount: operations.length,
+      itemCount: portfolio.operations.length,
       itemBuilder: (context, index) {
         return ChangeNotifierProvider<Operation>.value(
-          value: operations[index],
+          value: portfolio.operations[index],
           builder: (context, widget) {
-            return operationsListItem(context, operations[index]);
+            return operationsListItem(context, portfolio.operations[index]);
           }
         );
       });
@@ -58,7 +57,7 @@ Widget operationsListItem(BuildContext context, Operation operation) {
         [S.of(context).dialogAction_Continue, S.of(context).dialogAction_Cancel]);
 
     if (confirmation == S.of(context).dialogAction_Continue) {
-      operation.delete();
+      await operation.delete();
       // if the operation was the last one on this instrument - close the page
       if (operation.instrument != null && operation.portfolio.operations.byInstrument(operation.instrument).length == 1)
         Navigator.pop(context);

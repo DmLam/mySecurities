@@ -106,7 +106,7 @@ class MoneyOperation extends ChangeNotifier {
   delete() async {
     await DBProvider.db.deleteMoneyOperation(this);
 
-    portfolio.refresh();
+    await portfolio.refresh();
   }
 }
 

@@ -480,7 +480,7 @@ class DBProvider {
     final Database db = await database;
     int portfolioInstrumentId = await _getPortfolioInstrumentId(op.portfolio.id, op.instrument.id);
 
-    assert(portfolioInstrumentId != null, 'portfolioInstrumentId shouldn'' be null');
+    assert(portfolioInstrumentId != null, 'portfolioInstrumentId shouldn''t be null');
 
     await db.transaction((txn) async {
       await txn.delete('money', where: 'operation_id = ?', whereArgs: [op.id]);

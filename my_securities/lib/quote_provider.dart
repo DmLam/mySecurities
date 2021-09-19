@@ -207,7 +207,9 @@ class QuoteProvider {
         if (q != null)
           result = q.close;
       }
-      _priceCache[_instrument.ticker] = _CachedPrice(result, DateTime.now());
+      if (result != null) {
+        _priceCache[_instrument.ticker] = _CachedPrice(result, DateTime.now());
+      }
     }
     if (result != null && inMainCurrency) {
       result = await _toMainCurrency(result, _instrument.currency);
