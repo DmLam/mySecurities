@@ -39,14 +39,12 @@ class OperationsListView extends StatelessWidget {
 Widget operationsListItem(BuildContext context, Operation operation) {
 
   editOperation() async {
-   bool result = await Navigator.of(context).push(
+   await Navigator.of(context).push(
      MaterialPageRoute(
        builder: (_) => OperationEditDialog(operation),
        fullscreenDialog: true
      ),
    );
-   if (result)
-     operation.update();
   }
 
   deleteOperation() async {

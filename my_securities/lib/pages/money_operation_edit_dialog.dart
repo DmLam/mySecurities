@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:my_securities/common/dialog_panel.dart';
 import 'package:my_securities/common/utils.dart';
+import 'package:my_securities/database.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/models/money_operation.dart';
 import 'package:my_securities/widgets/appbar.dart';
@@ -17,22 +18,37 @@ class MoneyOperationEditDialog extends StatefulWidget {
   MoneyOperationEditDialog(this._moneyOperation, {Key key}) : super(key: key);
 
   @override
-  _MoneyOperationEditDialogState createState() => _MoneyOperationEditDialogState();
+  MoneyOperationEditDialogState createState() => MoneyOperationEditDialogState();
 }
 
-class _MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
+class MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
   final TextEditingController _dateEditController = TextEditingController();
   final TextEditingController _amountEditController = TextEditingController();
 
-  @override
-  void initState() {
+  void _init() async {
+    DateTime date = widget._moneyOperation.date
+        ?? await DBProvider.db.getLastMoneyOperationDate()
+        ?? await DBProvider.db.getLastOperationDate();
+
+    if (date == null) {
+      date = DateTime.now();
+      date = DateTime(date.year, date.month, date.day);
+    }
+    widget._moneyOperation.date = date;
+
     widget._operationAmount = widget._moneyOperation.amount;
     widget._operationDate = widget._moneyOperation.date;
     widget._operationType = widget._moneyOperation.type;
 
-    _dateEditController.text = dateString(widget._moneyOperation.date);
+    _dateEditController.text = dateString(date);
     _amountEditController.text = widget._moneyOperation.amount?.toString();
+  }
+
+  @override
+  void initState() {
     super.initState();
+
+    _init();
   }
 
   @override

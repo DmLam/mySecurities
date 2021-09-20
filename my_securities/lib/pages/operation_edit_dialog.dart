@@ -5,6 +5,7 @@ import 'package:fluttericon/font_awesome_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:my_securities/common/dialog_panel.dart';
 import 'package:my_securities/common/utils.dart';
+import 'package:my_securities/database.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/models/instrument.dart';
 import 'package:my_securities/models/money.dart';
@@ -37,13 +38,31 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
   final TextEditingController _instrumentNameEditController = TextEditingController();
   bool _createMoneyOperation = true;
 
-  _OperationEditDialogState(this._operation) {
+  _OperationEditDialogState(this._operation);
+
+  void _init() async {
+    DateTime date = _operation.date
+        ?? await DBProvider.db.getLastOperationDate()
+        ?? await DBProvider.db.getLastMoneyOperationDate();
+
+    if (date == null) {
+      date = DateTime.now();
+      date = DateTime(date.year, date.month, date.day);
+    }
+    widget._operation.date = date;
+
     _tickerEditController.text = _operation.instrument?.ticker;
     _instrumentNameEditController.text = _operation.instrument?.name;
-    _dateEditController.text = dateString(_operation.date);
+    _dateEditController.text = dateString(widget._operation.date);
     _priceEditController.text = _operation.price?.toString();
     _quantityEditController.text = _operation.quantity?.toString();
     _commissionEditController.text = _operation.commission?.toString();
+  }
+
+  @override void initState() {
+    super.initState();
+
+    _init();
   }
 
   @override
@@ -63,20 +82,12 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
         }
       }
 
-      try {
-        _operation.add(_createMoneyOperation);
-      }
-      catch (e) {
-        if (e is NoCurrencyException)
-          Fluttertoast.showToast(msg: S.of(context).errorNoCurrency);
-        else
-        if (e is NotEnoughMoneyException)
-          Fluttertoast.showToast(msg: S.of(context).errorNotEnoughMoney);
-      }
+      _operation.add(_createMoneyOperation);
     }
 
     editOperation() async {
-      // todo: realise editOperation
+      // check for money operation
+      _operation.update(_createMoneyOperation);
     }
 
     bool _fabEnabled() {
@@ -101,6 +112,24 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
         _operation.instrument.add();
       }
 
+      try {
+        _operation.quantity = int.tryParse(_quantityEditController.text);
+        _operation.price = double.tryParse(_priceEditController.text);
+        _operation.commission =
+            double.tryParse(_commissionEditController.text) ?? 0;
+      }
+      catch (e) {
+        if (e is NoCurrencyException)
+          Fluttertoast.showToast(msg: S.of(context).errorNoCurrency);
+        else
+        if (e is NotEnoughMoneyException)
+          Fluttertoast.showToast(msg: S.of(context).errorNotEnoughMoney);
+        else
+          throw(e);
+
+        return;
+      }
+
       if (_operation.id == null)
         await addOperation();
       else
@@ -111,21 +140,6 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
 
     Future<List> tickerSuggestions(String pattern) async {
       return StockExchangeProvider.stock().search(ticker: _tickerEditController.text);
-    }
-
-    onTickerSuggestionSelected(dynamic suggestion) {
-      if (widget._operationInstrument.ticker != suggestion.ticker) {
-        _tickerEditController.text = suggestion.ticker;
-        _instrumentNameEditController.text = suggestion.name;
-        widget._operationInstrument.ticker = suggestion.ticker;
-        widget._operationInstrument.name = suggestion.name;
-        widget._operationInstrument.isin = suggestion.isin;
-        widget._operationInstrument.type = suggestion.type;
-        widget._operationInstrument.exchange = suggestion.exchange;
-        widget._operationInstrument.currency = suggestion.currency;
-        widget._operationInstrument.additional = suggestion.additional;
-        _operation.instrument = null;
-      }
     }
 
     // build code starts here
@@ -156,7 +170,20 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
                       )
                   ),
                   suggestionsCallback: tickerSuggestions,
-                  onSuggestionSelected: onTickerSuggestionSelected,
+                  onSuggestionSelected: (suggestion) {
+                    if (widget._operationInstrument.ticker != suggestion.ticker) {
+                      _tickerEditController.text = suggestion.ticker;
+                      _instrumentNameEditController.text = suggestion.name;
+                      widget._operationInstrument.ticker = suggestion.ticker;
+                      widget._operationInstrument.name = suggestion.name;
+                      widget._operationInstrument.isin = suggestion.isin;
+                      widget._operationInstrument.type = suggestion.type;
+                      widget._operationInstrument.exchange = suggestion.exchange;
+                      widget._operationInstrument.currency = suggestion.currency;
+                      widget._operationInstrument.additional = suggestion.additional;
+                      _operation.instrument = null;
+                    }
+                  },
                   itemBuilder: (context, suggestion) {
                     return ListTile(
                       title: Text(suggestion.ticker),
@@ -252,9 +279,6 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
                         }
                         return result;
                       },
-                      onChanged: (value) {
-                        _operation.quantity = int.tryParse(value);
-                      },
                     ),
                     onFocusChange: (focused) {
                       if (focused)
@@ -289,9 +313,6 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
                           }
                         }
                         return result;
-                      },
-                      onChanged: (value) {
-                        _operation.price = double.tryParse(value);
                       },
                     ),
                     onFocusChange: (focused) {
@@ -331,9 +352,6 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
                           }
                         }
                         return result;
-                      },
-                      onChanged: (value) {
-                        _operation.commission = double.tryParse(value) ?? 0;
                       },
                     ),
                     onFocusChange: (focused) {

@@ -83,11 +83,11 @@ class MoneyOperation extends ChangeNotifier {
   }
 
   Future<int> add() async {
-    int result = await DBProvider.db.addMoneyOperation(this);
+    id = await DBProvider.db.addMoneyOperation(this);
 
     portfolio.refresh(); // changes nothing, just notify listeners
 
-    return Future.value(result);
+    return Future.value(id);
   }
 
   Future<bool> update() async {
@@ -127,10 +127,7 @@ class MoneyOperationList extends DatabaseList<MoneyOperation>{
       return null;
 
     return
-      items
-        .where((item) => item?.operation?.id == id)
-        .toList()
-        ?.first;
+      items.firstWhere((item) => item.operation?.id == id, orElse: () => null);
   }
 
 }

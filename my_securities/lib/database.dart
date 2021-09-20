@@ -431,10 +431,14 @@ class DBProvider {
 
     await db.transaction((txn) async {
       // if there is no this instrument in this portfolio, then create relation
-      if (portfolioInstrumentId == null)
+      if (portfolioInstrumentId == null) {
+        if (op.instrument.id == null)
+          op.instrument.add(); // here the instrument will be added in separate transaction
+
         portfolioInstrumentId = await txn.insert('portfolio_instrument',
             {'portfolio_id': op.portfolio.id,
               'instrument_id': op.instrument.id});
+      }
 
       op.id = await txn.insert('operation',
           {'portfolio_instrument_id': portfolioInstrumentId,
@@ -462,7 +466,7 @@ class DBProvider {
             'quantity': op.quantity,
             'price': op.price,
             'value': op.value,
-            'comission': op.commission},
+            'commission': op.commission},
           where: 'id = ?',
           whereArgs: [op.id]);
 
@@ -644,7 +648,7 @@ class DBProvider {
 
   Future<List<MoneyOperation>> getPortfolioMoneyOperations(int portfolioId) async {
     final Database db = await database;
-    List<MoneyOperation> result;
+    List<MoneyOperation> result = [];
 
     List<Map<String, dynamic>> operations = await db.rawQuery(_sqlPortfolioMoneyOperations, [portfolioId]);
     if (operations.isNotEmpty) {
@@ -672,13 +676,14 @@ class DBProvider {
     final Database db = await database;
 
     await db.update('money',
-        {
-          'id': mop.id,
-          'currency_id': mop.currency.id,
-          'date': dbDateString(mop.date),
-          'type': mop.type.id,
-          'amount': mop.amount
-        });
+      {
+        'currency_id': mop.currency.id,
+        'date': dbDateString(mop.date),
+        'type': mop.type.id,
+        'amount': mop.amount,
+      },
+      where: 'id = ?',
+      whereArgs: [mop.id]);
   }
 
   deleteMoneyOperation(MoneyOperation mop) async {
@@ -775,5 +780,42 @@ class DBProvider {
 
     return Future.value(result);
   }
+
+  static final _sqlLastOperationDate = 'SELECT max(date) maxdate FROM operation';
+
+  Future<DateTime> getLastOperationDate() async {
+    DateTime result;
+    final Database db = await database;
+
+    List<Map<String, dynamic>> r = await db.rawQuery(_sqlLastOperationDate);
+
+    if (r.isNotEmpty) {
+      String date = r[0]["maxdate"];
+
+      if (date != null)
+        result = DateTime.parse(date);
+    }
+
+    return Future.value(result);
+  }
+
+  static final _sqlLastMoneyOperationDate = 'SELECT max(date) maxdate FROM money';
+
+  Future<DateTime> getLastMoneyOperationDate() async {
+    DateTime result;
+    final Database db = await database;
+
+    List<Map<String, dynamic>> r = await db.rawQuery(_sqlLastMoneyOperationDate);
+
+    if (r.isNotEmpty) {
+      String date = r[0]["maxdate"];
+
+      if (date != null)
+        result = DateTime.parse(date);
+    }
+
+    return Future.value(result);
+  }
+
 }
 
