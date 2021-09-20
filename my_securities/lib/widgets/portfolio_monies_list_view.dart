@@ -57,7 +57,7 @@ class PortfolioMoniesListItem extends StatelessWidget {
                 ]
             )
         ),
-        title: Text(_money.amount.toString(),
+        title: Text(_money.amount.toStringAsFixed(4),
           style: TextStyle(fontSize: 30)
         ),
       ),
