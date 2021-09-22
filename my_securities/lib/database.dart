@@ -817,5 +817,34 @@ class DBProvider {
     return Future.value(result);
   }
 
+  Future<DateTime> getMostLastOperationDate({bool defaultNow: true}) async {
+    DateTime result;
+
+    DateTime lastMoneyOperation = await getLastMoneyOperationDate();
+    DateTime lastOperation = await getLastOperationDate();
+    if (lastOperation == null && lastMoneyOperation == null) {
+      DateTime now = DateTime.now();
+      result = DateTime(now.year, now.month, now.day);
+    }
+    else
+    if (lastOperation == null && lastMoneyOperation != null)
+      result = lastMoneyOperation;
+    else
+    if (lastMoneyOperation == null && lastOperation != null)
+      result = lastOperation;
+    else
+    if (lastOperation.isBefore(lastMoneyOperation))
+      result = lastMoneyOperation;
+    else
+      result = lastOperation;
+
+    if (result == null && defaultNow) {
+      result = DateTime.now();
+      result = DateTime(result.year, result.month, result.day);
+    }
+
+    return Future.value(result);
+  }
+
 }
 

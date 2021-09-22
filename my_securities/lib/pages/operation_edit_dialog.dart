@@ -41,9 +41,10 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
   _OperationEditDialogState(this._operation);
 
   void _init() async {
-    DateTime date = _operation.date
-        ?? await DBProvider.db.getLastOperationDate()
-        ?? await DBProvider.db.getLastMoneyOperationDate();
+    DateTime date = _operation.date;
+
+    if (date == null)
+      date = await DBProvider.db.getMostLastOperationDate();
 
     if (date == null) {
       date = DateTime.now();
@@ -94,8 +95,8 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
       return widget._operationInstrument.ticker != null &&
         widget._operation.date != null &&
         _operation.type != null &&
-        _operation.quantity != null &&
-        _operation.price != null;
+        ((int.tryParse(_quantityEditController.text) ?? 0) != 0) &&
+        ((double.tryParse(_priceEditController.text) ?? 0) != 0);
     }
 
     onFabPressed() async {
@@ -109,7 +110,7 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
             type: widget._operationInstrument.type,
             exchange: widget._operationInstrument.exchange,
             additional: widget._operationInstrument.additional);
-        _operation.instrument.add();
+        await _operation.instrument.add();
       }
 
       try {
@@ -164,6 +165,13 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
                       ),
                       inputFormatters: [UpperCaseTextFormatter()],
                   ),
+                  itemBuilder: (context, suggestion) {
+                    return ListTile(
+                      title: Text(suggestion.ticker),
+                      subtitle: Text(suggestion.name),
+                    );
+                  },
+                  debounceDuration: const Duration(milliseconds: 700),
                   suggestionsBoxDecoration: SuggestionsBoxDecoration(
                       constraints: BoxConstraints(
                         minWidth: MediaQuery.of(context).size.width / 4 * 3,
@@ -183,12 +191,6 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
                       widget._operationInstrument.additional = suggestion.additional;
                       _operation.instrument = null;
                     }
-                  },
-                  itemBuilder: (context, suggestion) {
-                    return ListTile(
-                      title: Text(suggestion.ticker),
-                      subtitle: Text(suggestion.name),
-                    );
                   },
                   noItemsFoundBuilder: (context) {
                     return Container(

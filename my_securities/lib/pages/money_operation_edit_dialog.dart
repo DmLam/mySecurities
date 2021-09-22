@@ -26,14 +26,10 @@ class MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
   final TextEditingController _amountEditController = TextEditingController();
 
   void _init() async {
-    DateTime date = widget._moneyOperation.date
-        ?? await DBProvider.db.getLastMoneyOperationDate()
-        ?? await DBProvider.db.getLastOperationDate();
+    DateTime date = widget._moneyOperation.date;
 
-    if (date == null) {
-      date = DateTime.now();
-      date = DateTime(date.year, date.month, date.day);
-    }
+    if (date == null)
+      date = await DBProvider.db.getMostLastOperationDate();
     widget._moneyOperation.date = date;
 
     widget._operationAmount = widget._moneyOperation.amount;

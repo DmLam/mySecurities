@@ -167,9 +167,11 @@ class MOEXDataProvider implements StockExchangeProvider {
 
   @override
   Future<List> search({String ticker}) async {
+    final int MAX_RESULT_COUNT = 10;
     http.Response response;
     Uri searchURI = Uri.https(_MOEX_URL, '/iss/securities.json', {
       'q': ticker.toUpperCase(),
+      'limit': MAX_RESULT_COUNT.toString(),
       'securities.columns': 'name,shortname,isin,secid,primary_boardid,is_traded,type',
       'iss.meta': 'off',
       'engines.columns': 'id,name',
@@ -230,28 +232,39 @@ class MOEXDataProvider implements StockExchangeProvider {
     return Future.value(result);
   }
 
+  final Map<String, String> _instrumentBoardCache = {};
+
   Future<String> _getInstrumentBoard(String ticker) async {
     String result;
 
     if (ticker.isNotEmpty) {
-      Uri searchURI = Uri.https(_MOEX_URL, '/iss/securities.json', {
-        'q': ticker.toUpperCase(),
-        'securities.columns': 'primary_boardid',
-        'iss.meta': 'off'
-      });
-      try {
-        http.Response response = await http.get(searchURI);
-        if (response.statusCode != 200)
-          throw Exception("Error searching instrument");
+      result = _instrumentBoardCache[ticker];
+      if (result == null) {
+        Uri searchURI = Uri.https(_MOEX_URL, '/iss/securities.json', {
+          'q': ticker.toUpperCase(),
+          'securities.columns': 'secid,primary_boardid',
+          'iss.meta': 'off'
+        });
+        try {
+          http.Response response = await http.get(searchURI);
+          if (response.statusCode != 200)
+            throw Exception("Error searching instrument");
 
-        Map<String, dynamic> r = jsonDecode(response.body);
-        List securities = r['securities']['data'];
-        if (securities.isNotEmpty) {
-          result = securities[0][0];
+          Map<String, dynamic> r = jsonDecode(response.body);
+          List securities = r['securities']['data'];
+          if (securities.isNotEmpty) {
+            for (List sec in securities) {
+              if (sec[0] == ticker) {
+                result = sec[1];
+                _instrumentBoardCache[ticker] = result;
+                break;
+              }
+            }
+          }
         }
-      }
-      catch (Exception) {
-        result = null;
+        catch (e) {
+          result = null;
+        }
       }
     }
 

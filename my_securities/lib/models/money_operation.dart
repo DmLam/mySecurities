@@ -58,11 +58,10 @@ class MoneyOperation extends ChangeNotifier {
   }
 
   MoneyOperation.empty({@required Portfolio portfolio}) {
-    DateTime now = DateTime.now();
-
     this.portfolio = portfolio;
+    date = null;
     type = MoneyOperationType.deposit;
-    date = DateTime(now.year, now.month, now.day);
+    _amount = 0;
   }
 
   MoneyOperation.from(MoneyOperation op) :
