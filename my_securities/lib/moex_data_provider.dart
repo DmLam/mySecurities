@@ -208,7 +208,11 @@ class MOEXDataProvider implements StockExchangeProvider {
             type == 'subfederal_bond' ? InstrumentType.subfederalBond :
             type == 'corporate_bond' ? InstrumentType.corporateBond :
             type == 'stock_index' ? InstrumentType.stockIndex :
+            type == 'depositary_receipt' ? InstrumentType.depositaryReceipt :
             null;
+
+            if (instrumentType == null)
+              throw Exception("Unknown instrument type: $type");
             // получим валюту
             Currency currency = await _getInstrumentCurrency(ticker, board);
             result.add(

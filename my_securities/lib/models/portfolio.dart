@@ -12,6 +12,7 @@ class Portfolio extends ChangeNotifier {
   int _id;
   String _name;
   bool _visible;
+  bool _hideSoldInstruments;
   DateTime _startDate;
 
   InstrumentList _instruments;
@@ -27,6 +28,7 @@ class Portfolio extends ChangeNotifier {
     notifyListeners();
   }
   bool get visible => _visible;
+  bool get hideSoldInstruments => _hideSoldInstruments;
   DateTime get startDate => _startDate;
 
   InstrumentList get instruments => _instruments;
@@ -34,7 +36,7 @@ class Portfolio extends ChangeNotifier {
   MoneyList get monies => _monies;
   MoneyOperationList get moneyOperations => _moneyOperations;
 
-  Portfolio(this._id, this._name, this._visible, this._startDate) {
+  Portfolio(this._id, this._name, this._visible, this._hideSoldInstruments, this._startDate) {
     _loadFromDb();
   }
 
@@ -60,6 +62,7 @@ class Portfolio extends ChangeNotifier {
     _id = portfolio._id,
     _name = portfolio._name,
     _visible = portfolio._visible,
+    _hideSoldInstruments = portfolio._hideSoldInstruments,
     _startDate = portfolio._startDate;
 
   Portfolio.empty() :
@@ -67,6 +70,7 @@ class Portfolio extends ChangeNotifier {
     _id = null,
     _name = "",
     _visible = true,
+    _hideSoldInstruments = false,
     _startDate = null;
 
   factory Portfolio.fromMap(Map<String, dynamic> json) =>
@@ -74,6 +78,7 @@ class Portfolio extends ChangeNotifier {
       json["id"],
       json["name"],
       json["visible"] == 1,
+      json["hide_sold_instruments"] == 1,
       json["start_date"] == null ? null : DateTime.parse(json["start_date"])
     );
 
@@ -82,6 +87,7 @@ class Portfolio extends ChangeNotifier {
     this._owner = source._owner;
     this._name = source._name;
     this._visible = source._visible;
+    this._hideSoldInstruments = source._hideSoldInstruments;
     this._startDate = source._startDate;
 
     notifyListeners();
@@ -93,19 +99,23 @@ class Portfolio extends ChangeNotifier {
     return Future.value(await Model.portfolios._add(portfolio));
   }
 
-  Future<bool> update({String name, bool visible, DateTime startDate}) async {
+  Future<bool> update({String name, bool visible, bool hideSoldInstruments, DateTime startDate}) async {
     bool doUpdate = false;
     bool result;
 
-    if (name != null) {
+    if (name != _name && name != null) {
       _name = name;
       doUpdate = true;
     }
-    if (visible != null) {
+    if (visible != _visible && visible != null) {
       _visible = visible;
       doUpdate = true;
     }
-    if (startDate != null) {
+    if (hideSoldInstruments != _hideSoldInstruments && hideSoldInstruments != null) {
+      _hideSoldInstruments = hideSoldInstruments;
+      doUpdate = true;
+    }
+    if (startDate != _startDate && startDate != null) {
       _startDate = startDate;
       doUpdate = true;
     }

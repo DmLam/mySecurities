@@ -9,10 +9,12 @@ import '../stock_exchange_interface.dart';
 import 'model.dart';
 import 'portfolio.dart';
 
-enum InstrumentType {currency, share, etf, federalBond, subfederalBond, corporateBond, futures, stockIndex}
+enum InstrumentType {currency, share, etf, federalBond, subfederalBond, corporateBond, futures, stockIndex, depositaryReceipt}
 
 extension InstrumentTypeExtension on InstrumentType {
-  int get id => index + 1;
+  static final List<int> databaseId = [1, 2, 3, 4, 4, 4, 5, 6, 7];
+
+  int get id => databaseId[this.index];
 
   String get name => INSTRUMENT_TYPE_NAMES[this.index];
 }
@@ -121,7 +123,7 @@ class Instrument extends ChangeNotifier {
 
   double currentValue() => quantity == null ? 0 : quantity * averagePrice;
 
-  double profit(double currentPrice) => quantity == null ? 0 : quantity * (currentPrice - averagePrice);
+  double profit(double currentPrice) => (quantity ?? 0) == 0 ? 0 : quantity * (currentPrice - averagePrice);
 
   String profitString(double currentPrice, {Currency currency}) => (profit(currentPrice) == 0) ? '' : formatCurrency(profit(currentPrice), currency: currency == null ? this.currency : currency);
 
@@ -204,8 +206,6 @@ extension InstrumentExtension on Instrument {
 class InstrumentList extends DatabaseList<Instrument> {
 
   InstrumentList(Portfolio portfolio) : super(portfolio);
-
-  List<Instrument> get instruments => [...items];
 
   refresh() async {
     await loadFromDb();

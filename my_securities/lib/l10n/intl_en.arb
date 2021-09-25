@@ -24,6 +24,9 @@
   "instrumentTypeShare": "Share",
   "instrumentTypeEtf": "Etf",
   "instrumentTypeBond": "Bond",
+  "instrumentTypeFutures": "Futures",
+  "instrumentTypeIndex": "Stock index",
+  "instrumentTypeDepositaryReceipt": "Depositary receipt",
   "pcs": "pcs",
 
   "db_portfolioAlreadyExists": "Portfolio '{name}' already exists",
@@ -32,13 +35,14 @@
   "portfoliosListView_portfolioStarted": "Started",
   "portfoliosListView_menuEdit": "Edit",
   "portfoliosListView_menuDelete": "Delete",
-  "portfoliosListView_menuVisible": "Visible",
   "portfoliosListView_confirmDeleteDialogTitle": "Portfolio deletion",
   "portfoliosListView_confirmDeleteDialogContent": "Are you sure you want to delete portfolio '{name}'?",
 
   "portfolioEditDialog_Title": "Edit portfolio",
   "portfolioEditDialog_Name": "Name",
   "portfolioEditDialog_startDate": "Creation date",
+  "portfolioEditDialog_visible": "Visible",
+  "portfolioEditDialog_hideSoldInstruments": "Hide sold instruments",
 
   "portfolioInstrumentPageAddOperation": "Add operation",
   "portfolioInstrumentPageAddMoneyOperation": "Add money operation",

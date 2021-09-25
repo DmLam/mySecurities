@@ -11,11 +11,12 @@ import '../exchange.dart';
 
 class MoneyOperationEditDialog extends StatefulWidget {
   final MoneyOperation _moneyOperation;
+  final Currency currency;
   double _operationAmount;
   DateTime _operationDate;
   MoneyOperationType _operationType;
 
-  MoneyOperationEditDialog(this._moneyOperation, {Key key}) : super(key: key);
+  MoneyOperationEditDialog(this._moneyOperation, {this.currency, Key key}) : super(key: key);
 
   @override
   MoneyOperationEditDialogState createState() => MoneyOperationEditDialogState();
@@ -27,6 +28,10 @@ class MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
 
   void _init() async {
     DateTime date = widget._moneyOperation.date;
+
+    if (widget.currency != null) {
+      widget._moneyOperation.currency = widget.currency;
+    }
 
     if (date == null)
       date = await DBProvider.db.getMostLastOperationDate();

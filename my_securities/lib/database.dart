@@ -43,13 +43,14 @@ class DBProvider {
 
   int extractErrorCodeFromErrorMessage(String message) {
     int result = -1;
-    RegExp re = RegExp(r"code (\d+)");
+    if (message != null) {
+      RegExp re = RegExp(r"code (\d+)");
 
-    RegExpMatch match = re.firstMatch(message);
-    if (match != null) {
-      result = int.parse(match[1]);
+      RegExpMatch match = re.firstMatch(message);
+      if (match != null) {
+        result = int.parse(match[1]);
+      }
     }
-
     return result;
   }
 
@@ -81,7 +82,8 @@ class DBProvider {
         '''CREATE TABLE portfolio (
            id INTEGER PRIMARY KEY AUTOINCREMENT,
            name TEXT NOT NULL UNIQUE,
-           visible BOOLEAN NOT NULL CHECK (visible IN (0, 1)) DEFAULT 1)''');
+           visible BOOLEAN NOT NULL CHECK (visible IN (0, 1)) DEFAULT 1,
+           hide_sold_instruments BOOLEAN NOT NULL CHECK (visible IN (0, 1)) DEFAULT 0)''');
   }
   Future<void> _createTableInstrumentType(Database db) async {
     await db.execute('CREATE TABLE instrument_type (id INTEGER PRIMARY KEY, name TEXT NOT NULL);');
@@ -89,6 +91,9 @@ class DBProvider {
     await db.execute("INSERT INTO instrument_type (id, name) VALUES (2, '${INSTRUMENT_TYPE_NAMES[1]}')");
     await db.execute("INSERT INTO instrument_type (id, name) VALUES (3, '${INSTRUMENT_TYPE_NAMES[2]}')");
     await db.execute("INSERT INTO instrument_type (id, name) VALUES (4, '${INSTRUMENT_TYPE_NAMES[3]}')");
+    await db.execute("INSERT INTO instrument_type (id, name) VALUES (5, '${INSTRUMENT_TYPE_NAMES[4]}')");
+    await db.execute("INSERT INTO instrument_type (id, name) VALUES (6, '${INSTRUMENT_TYPE_NAMES[5]}')");
+    await db.execute("INSERT INTO instrument_type (id, name) VALUES (7, '${INSTRUMENT_TYPE_NAMES[6]}')");
   }
   Future<void> _createTableInstrument(Database db) async {
     await db.execute(
@@ -132,6 +137,7 @@ class DBProvider {
           type INTEGER NOT NULL,  
           amount REAL NOT NULL,
           operation_id INTEGER,
+          comment TEXT,
           FOREIGN KEY (portfolio_id) REFERENCES portfolio(id)
             ON DELETE RESTRICT ON UPDATE RESTRICT,
           FOREIGN KEY (currency_id) REFERENCES currency(id)
@@ -154,6 +160,7 @@ class DBProvider {
           price REAL NOT NULL,
           value REAL NOT NULL,
           commission REAL DEFAULT 0,
+          comment TEXT,
           FOREIGN KEY (portfolio_instrument_id) REFERENCES portfolio_instrument(id)
             ON DELETE CASCADE ON UPDATE RESTRICT)''');
     await db.execute(
@@ -216,31 +223,6 @@ class DBProvider {
 
   Future initTables(Database db) async {
     await db.insert("portfolio", {"name": S.current.defaultPortfolioName}, );
-/*
-    await db.insert("instrument",
-      {
-        "isin": "bla-bla-bla",
-        "ticker": "FXWO",
-        "name": "Акции мирового рынка",
-        "currency_id": 1,
-        "instrument_type_id": 3,
-        "exchange_id": 54
-      });
-    await db.insert("portfolio_instrument",
-        {
-          "portfolio_id": 1,
-          "instrument_id": 1
-        });
-    await db.insert("operation",
-      {
-        "portfolio_instrument_id": 1,
-        "date": dbDateString(DateTime(2021, 1, 12)),
-        "type": 0,
-        "quantity": 100,
-        "price": 1.632,
-        "value": 163.2
-      });
-*/
   }
 
   void _onConfigure(Database db) async {
@@ -284,7 +266,7 @@ class DBProvider {
     final Database db = await database;
     await db.execute("INSERT INTO instrument (isin, ticker, name, currency_id, instrument_type_id, exchange_id, additional) values (?, ?, ?, ?, ?, ?, ?)",
         [isin, ticker, name, Currency.values.indexOf(currency) + 1,
-         type.index + 1, exchange.index + 1, additional]);
+         type.id, exchange.index + 1, additional]);
     var result = await db.rawQuery("SELECT MAX(id) as id FROM instrument");
 
     return result.first["id"];
@@ -357,7 +339,10 @@ class DBProvider {
 
   static final String _sqlPortfolioInstruments =
   '''SELECT i.id, pi.portfolio_id, i.isin, i.ticker, i.name, i.currency_id, i.instrument_type_id, i.exchange_id, i.additional, pi.percent, 
-            i.additional, i.image, sum(o.quantity) quantity, sum(o.price * o.quantity) / sum(o.quantity) avgprice, sum(o.value) value, count(o.id) operation_count 
+            i.additional, i.image, 
+            sum((CASE WHEN o.type = 0 THEN  1 ELSE -1 END) * o.quantity) quantity, 
+            round(sum((CASE WHEN o.type = 0 THEN  1 ELSE -1 END) * o.price * o.quantity) / sum((CASE WHEN o.type = 0 THEN  1 ELSE -1 END) * o.quantity), 4) avgprice, 
+            round(sum(o.value), 4) value, count(o.id) operation_count 
      FROM currency c, instrument i, portfolio_instrument pi LEFT OUTER JOIN operation o ON o.portfolio_instrument_id = pi.id 
      WHERE  
        c.id = i.currency_id AND
@@ -447,7 +432,8 @@ class DBProvider {
             'quantity': op.quantity,
             'price': op.price,
             'value': op.value,
-            'commission': op.commission});
+            'commission': op.commission,
+            'comment': op.comment});
 
       if (moneyOperation != null)
         addMoneyOperation(moneyOperation, dbe: txn);
@@ -466,7 +452,8 @@ class DBProvider {
             'quantity': op.quantity,
             'price': op.price,
             'value': op.value,
-            'commission': op.commission},
+            'commission': op.commission,
+            'comment': op.comment},
           where: 'id = ?',
           whereArgs: [op.id]);
 
@@ -644,7 +631,7 @@ class DBProvider {
   }
 
   static final _sqlPortfolioMoneyOperations =
-    'SELECT id, portfolio_id, operation_id, currency_id, date, type, amount FROM money WHERE portfolio_id = ? ORDER BY date, id';
+    'SELECT id, portfolio_id, operation_id, currency_id, date, type, amount, comment FROM money WHERE portfolio_id = ? ORDER BY date, id';
 
   Future<List<MoneyOperation>> getPortfolioMoneyOperations(int portfolioId) async {
     final Database db = await database;
@@ -668,7 +655,8 @@ class DBProvider {
           'date': dbDateString(mop.date),
           'type': mop.type.id,
           'amount': mop.amount,
-          'operation_id': mop.operation?.id
+          'operation_id': mop.operation?.id,
+          'comment': mop.comment
         });
   }
 
@@ -681,6 +669,7 @@ class DBProvider {
         'date': dbDateString(mop.date),
         'type': mop.type.id,
         'amount': mop.amount,
+        'comment': mop.comment
       },
       where: 'id = ?',
       whereArgs: [mop.id]);
@@ -697,7 +686,7 @@ class DBProvider {
     List<Portfolio> result;
 
     List<Map<String, dynamic>> portfolios = await db.rawQuery(
-        '''SELECT p.id, p.name, p.visible,
+        '''SELECT p.id, p.name, p.visible, hide_sold_instruments,
              (SELECT min(o.date) FROM operation o, portfolio_instrument pi WHERE o.portfolio_instrument_id = pi.id  AND pi.portfolio_id = p.id) start_date 
            FROM portfolio p'''
     );
@@ -743,6 +732,7 @@ class DBProvider {
             {
               'name': portfolio.name,
               'visible': portfolio.visible ? 1 : 0,
+              'hide_sold_instruments': portfolio.hideSoldInstruments ? 1 : 0
             },
             where: 'id = ?',
             whereArgs: [portfolio.id]);
@@ -753,6 +743,8 @@ class DBProvider {
         if (code == error_SQLITE_CONSTRAINT_UNIQUE) {
           Fluttertoast.showToast(msg: S.current.db_portfolioAlreadyExists(portfolio.name));
         }
+        else
+          throw(e);
       }
     }
 

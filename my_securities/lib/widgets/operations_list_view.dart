@@ -67,7 +67,7 @@ Widget operationsListItem(BuildContext context, Operation operation) {
     child: ListTile(
       leading: operation.instrument.image == null ? Icon(Icons.attach_money) :
         Image.memory(operation.instrument.image),
-      title: Text('${OPERATION_TYPE_NAMES[operation.type.index]} ${operation.quantity} ${S.of(context).pcs} * ${operation.price} ${operation.instrument.currency.sign}'),
+      title: Text('${operation.type.name} ${operation.quantity} ${S.of(context).pcs} * ${operation.price} ${operation.instrument.currency.sign}'),
       subtitle: Row(mainAxisSize: MainAxisSize.max,
           children: [
             Expanded(flex: 70,

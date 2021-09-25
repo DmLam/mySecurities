@@ -18,12 +18,14 @@ class PortfolioInstrumentsListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<Instrument> items = _portfolio.instruments.where((instrument) => !_portfolio.hideSoldInstruments || instrument.quantity > 0).toList();
+
     return ListView.builder(
       shrinkWrap: true,
-      itemCount: _portfolio.instruments.instruments.length,
+      itemCount: items.length,
       itemBuilder: (BuildContext context, int index) =>
-        ChangeNotifierProvider<Instrument>.value(value: _portfolio.instruments.instruments[index],
-          child: PortfolioInstrumentListItem(_portfolio.instruments.instruments[index]))
+        ChangeNotifierProvider<Instrument>.value(value: items[index],
+          child: PortfolioInstrumentListItem(items[index]))
     );
   }
 }
@@ -106,7 +108,7 @@ class PortfolioInstrumentListItem extends StatelessWidget {
       subtitle: Row(mainAxisSize: MainAxisSize.max, children: [
         Text(
             (_instrument.quantity ?? 0) * (_instrument.averagePrice ?? 0) == 0
-                ? ''
+                ? _instrument.quantityString()
                 : _instrument.quantityString() +
                 ' * ' +
                 _instrument.averagePriceString(),

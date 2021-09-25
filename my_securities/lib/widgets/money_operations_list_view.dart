@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:my_securities/common/message_dialog.dart';
 import 'package:my_securities/common/utils.dart';
 import 'package:my_securities/exchange.dart';
@@ -27,7 +26,8 @@ class MoneyOperationsListView extends StatelessWidget {
         ChangeNotifierProvider<MoneyOperation>.value(
           value: moneyOperations[index],
           child: MoneyOperationsListItem(moneyOperations[index]),
-        )
+        ),
+      shrinkWrap: true,
     );
   }
 }
@@ -63,18 +63,44 @@ class MoneyOperationsListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    TextStyle defaultStyle = DefaultTextStyle.of(context).style;
+    TextStyle largeStyle = const TextStyle(fontSize: 18),
+        middleStyle = const TextStyle(fontSize: 16),
+        greenStyle = const TextStyle(color: Colors.green);
+
     return ListTile(
-      title: Row(children: [
-        Text('${_operation.type.name} ${_operation.currency.sign}${_operation.amount}',
-          style: TextStyle(fontSize: 19)
+      leading: Icon(_operation.type.income ? Icons.add_circle_outline : Icons.remove_circle_outline),
+      minLeadingWidth: 10,
+      title: Container(
+        child: Column(
+          children: [
+            Row(children: [
+              RichText(text: TextSpan(
+                  text: '${_operation.type.name}  ',
+                  style: defaultStyle.merge(middleStyle),
+                  children: [
+                    TextSpan(text: "${_operation.currency.sign}", style: defaultStyle.merge(_operation.type.income ? greenStyle : null)),
+                    TextSpan(text: "${_operation.amount.abs().toStringAsFixed(4)}", style: defaultStyle.merge(largeStyle).merge(_operation.type.income ? greenStyle : null))
+                  ]
+                )
+              ),
+              Expanded(
+                child: Text(dateString(_operation.date),
+                  style: TextStyle(fontStyle: FontStyle.italic, fontSize: 15),
+                  textAlign: TextAlign.right
+                )
+              )
+            ]),
+          ]
         ),
-        Expanded(
-          child: Text(dateString(_operation.date),
-            style: TextStyle(fontStyle: FontStyle.italic, fontSize: 15),
-            textAlign: TextAlign.right
-          )
-        )
-      ]),
+      ),
+      subtitle: Text(_operation.comment ?? "",
+          style: TextStyle(fontSize: 13, fontStyle: FontStyle.italic, fontWeight: FontWeight.w500, color: Colors.blueGrey),
+          maxLines: 1
+      ),
+      contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+      dense: true,
+      visualDensity: VisualDensity(horizontal: 0, vertical: -2),
       trailing: PopupMenuButton(
         itemBuilder: (_) => <PopupMenuItem<String>>[
           PopupMenuItem<String>(
@@ -99,6 +125,10 @@ class MoneyOperationsListItem extends StatelessWidget {
           }
         }
       ),
+      // we can edit only operations not created as concomitant to an operation with securities
+      onTap: _operation.operation != null ?
+          null :
+          () {_editMoneyOperation(context);},
     );
   }
 }

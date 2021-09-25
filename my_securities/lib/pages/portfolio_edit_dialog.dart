@@ -6,14 +6,27 @@ import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/models/portfolio.dart';
 import 'package:my_securities/widgets/appbar.dart';
 
-class PortfolioEditDialog extends StatelessWidget {
+class PortfolioEditDialog extends StatefulWidget {
   final Portfolio _portfolio;
-  final TextEditingController _nameEditController = TextEditingController();
 
   PortfolioEditDialog(this._portfolio, {Key key}) : super(key: key) {
     assert(_portfolio != null);
+  }
 
+  @override
+  State<PortfolioEditDialog> createState() => _PortfolioEditDialogState(_portfolio);
+}
+
+class _PortfolioEditDialogState extends State<PortfolioEditDialog> {
+  Portfolio _portfolio;
+  final TextEditingController _nameEditController = TextEditingController();
+  bool _visible;
+  bool _hideSoldInstruments;
+
+  _PortfolioEditDialogState (this._portfolio): super() {
     _nameEditController.text = _portfolio.name;
+    _visible = _portfolio.visible;
+    _hideSoldInstruments = _portfolio.hideSoldInstruments;
   }
 
   @override
@@ -24,14 +37,14 @@ class PortfolioEditDialog extends StatelessWidget {
     }
 
     onFABPressed() async {
-      _portfolio.update(name: _nameEditController.text);
+      widget._portfolio.update(name: _nameEditController.text, visible: _visible, hideSoldInstruments: _hideSoldInstruments);
       Navigator.pop(context, true);
     }
 
     return Scaffold(
       appBar: MySecuritiesAppBar(pageName: S.of(context).portfolioEditDialog_Title,),
       body: ChangeNotifierProvider<Portfolio>.value(
-        value: _portfolio,
+        value: widget._portfolio,
         child: SingleChildScrollView(
           child: Column(
             children: [
@@ -42,7 +55,7 @@ class PortfolioEditDialog extends StatelessWidget {
                       Row(
                         children: [
                           Expanded(
-                            child:TextField(
+                            child: TextField(
                               controller: _nameEditController,
                               onChanged: (value) {_portfolio.name = value;},
                               decoration: InputDecoration(
@@ -52,6 +65,46 @@ class PortfolioEditDialog extends StatelessWidget {
                               )),
                           ),
                         ]),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Row(
+                                  children: [
+                                    Checkbox(
+                                      value: _hideSoldInstruments,
+                                      onChanged: (bool value) {
+                                        setState(() {_hideSoldInstruments = value;});
+                                      },
+                                    ),
+                                    Text(S.of(context).portfolioEditDialog_hideSoldInstruments)
+                                  ]
+                                )
+                            )
+                          )
+                        ]
+                      ),
+                      Row(
+                          children: [
+                            Expanded(
+                                child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Row(
+                                        children: [
+                                          Checkbox(
+                                            value: _visible,
+                                            onChanged: (bool value) {
+                                              setState(() {_visible = value;});
+                                            },
+                                          ),
+                                          Text(S.of(context).portfolioEditDialog_visible)
+                                        ]
+                                    )
+                                )
+                            )
+                          ]
+                      )
                     ],
                   ),
                 ),
@@ -62,7 +115,7 @@ class PortfolioEditDialog extends StatelessWidget {
       ),
       // don't show FAB if keyboard is opened, because the FAB overflows most bottom editor
       floatingActionButton:
-      Visibility(
+        Visibility(
           visible: isKeyboardOpen(context), // check keyboard is open
           child: FloatingActionButton(
               child: Icon(Icons.done),

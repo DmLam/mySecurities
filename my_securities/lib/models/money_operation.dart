@@ -15,6 +15,8 @@ extension MoneyOperationTypeExtension on MoneyOperationType {
   int get id => index + 1;
 
   String get name => MONEY_OPERATION_TYPE_NAMES[this.index];
+
+  bool get income => this == MoneyOperationType.deposit || this == MoneyOperationType.sell;
 }
 
 // see comment to currencyById
@@ -28,6 +30,7 @@ class MoneyOperation extends ChangeNotifier {
   DateTime date;
   MoneyOperationType type;
   double _amount;
+  String comment;
 
   double get amount => _amount;
   set amount(double value) {
@@ -40,7 +43,7 @@ class MoneyOperation extends ChangeNotifier {
     }
   }
 
-  MoneyOperation({this.id, this.portfolio, this.operation, this.currency, this.date, this.type, amount}):
+  MoneyOperation({this.id, this.portfolio, this.operation, this.currency, this.date, this.type, amount, this.comment}):
     _amount = amount;
 
   factory MoneyOperation.fromMap(Map<String, dynamic> json) {
@@ -53,16 +56,17 @@ class MoneyOperation extends ChangeNotifier {
         currency: currencyById(json["currency_id"]),
         date: DateTime.parse(json["date"]),
         type: moneyOperationTypeById(json["type"]),
-        amount: json["amount"]
+        amount: json["amount"],
+        comment: json["comment"]
     );
   }
 
-  MoneyOperation.empty({@required Portfolio portfolio}) {
-    this.portfolio = portfolio;
-    date = null;
-    type = MoneyOperationType.deposit;
+  MoneyOperation.empty({@required Portfolio portfolio}) :
+    this.portfolio = portfolio,
+    date = null,
+    type = MoneyOperationType.deposit,
     _amount = 0;
-  }
+
 
   MoneyOperation.from(MoneyOperation op) :
     currency = op.currency,
@@ -70,7 +74,8 @@ class MoneyOperation extends ChangeNotifier {
     operation = op.operation,
     date = op.date,
     type = op.type,
-    _amount = op.amount;
+    _amount = op.amount,
+    comment = op.comment;
 
   assign(MoneyOperation op) {
     currency = op.currency;
@@ -78,7 +83,8 @@ class MoneyOperation extends ChangeNotifier {
     operation = op.operation;
     date = op.date;
     type = op.type;
-    amount = op.amount;
+    _amount = op.amount;
+    comment = op.comment;
   }
 
   Future<int> add() async {

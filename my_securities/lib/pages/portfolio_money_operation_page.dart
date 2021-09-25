@@ -21,7 +21,7 @@ class PortfolioMoneyOperationsPage extends StatelessWidget {
 
     addMoneyOperation() {
       Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => MoneyOperationEditDialog(MoneyOperation.empty(portfolio: _portfolio)))
+          MaterialPageRoute(builder: (_) => MoneyOperationEditDialog(MoneyOperation.empty(portfolio: _portfolio), currency: _currency,))
       );
     }
 

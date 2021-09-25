@@ -29,6 +29,7 @@ class Operation extends ChangeNotifier{
   int _quantity;
   double _price;
   double _commission;
+  String comment;
 
   OperationType get type => _type;
   int get quantity => _quantity;
@@ -74,7 +75,7 @@ class Operation extends ChangeNotifier{
 
   Operation({@required int id, @required Portfolio portfolio, Instrument instrument,
       @required DateTime date, @required OperationType type, @required int quantity, @required double price,
-      double commission = 0, MoneyOperation moneyOperation}):
+      double commission = 0, String comment}):
     this.id = id,
     this.portfolio = portfolio,
     this.instrument = instrument,
@@ -82,7 +83,8 @@ class Operation extends ChangeNotifier{
     this._type = type,
     this._quantity = quantity,
     this._price = price,
-    this._commission = commission;
+    this._commission = commission,
+    this.comment = comment;
 
   Operation.empty({@required Portfolio portfolio, Instrument instrument}) {
     this.id = null;
@@ -93,6 +95,7 @@ class Operation extends ChangeNotifier{
     this._quantity = 0;
     this._price = 0;
     this._commission = 0;
+    this.comment = null;
   }
 
   assign(Operation source) {
@@ -104,6 +107,7 @@ class Operation extends ChangeNotifier{
     _quantity = source.quantity;
     _price = source.price;
     _commission = source.commission;
+    comment = source.comment;
 
     notifyListeners();
   }
@@ -116,9 +120,13 @@ class Operation extends ChangeNotifier{
           type: OperationType.values[json["type"]],
           quantity: json["quantity"],
           price: json["price"],
-          commission: json["commission"]
-          // todo - load reference money operation if present
+          commission: json["commission"],
+          comment: json["comment"]
       );
+
+  String moneyOperationComment() {
+    return "${type.name} $quantity ${instrument.name}";
+  }
 
   Future<int> add(bool createMoneyOperation) async {
     MoneyOperation moneyOp;
@@ -129,7 +137,8 @@ class Operation extends ChangeNotifier{
           currency: instrument.currency,
           type: operationTypeToMoneyOperationType(type),
           amount: value + commission,
-          operation: this);
+          operation: this,
+          comment: moneyOperationComment());
 
     await DBProvider.db.addOperation(this, moneyOperation: moneyOp);
     await portfolio.refresh(); // reload instruments, money and operations from db
@@ -184,6 +193,10 @@ class Operation extends ChangeNotifier{
     else
       await portfolio.refresh(); // reload instruments, money and operations from db
   }
+}
+
+extension OperationExtension on Operation {
+
 }
 
 class OperationList extends DatabaseList<Operation> {

@@ -245,6 +245,36 @@ class S {
     );
   }
 
+  /// `Futures`
+  String get instrumentTypeFutures {
+    return Intl.message(
+      'Futures',
+      name: 'instrumentTypeFutures',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Stock index`
+  String get instrumentTypeIndex {
+    return Intl.message(
+      'Stock index',
+      name: 'instrumentTypeIndex',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Depositary receipt`
+  String get instrumentTypeDepositaryReceipt {
+    return Intl.message(
+      'Depositary receipt',
+      name: 'instrumentTypeDepositaryReceipt',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `pcs`
   String get pcs {
     return Intl.message(
@@ -305,16 +335,6 @@ class S {
     );
   }
 
-  /// `Visible`
-  String get portfoliosListView_menuVisible {
-    return Intl.message(
-      'Visible',
-      name: 'portfoliosListView_menuVisible',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Portfolio deletion`
   String get portfoliosListView_confirmDeleteDialogTitle {
     return Intl.message(
@@ -360,6 +380,26 @@ class S {
     return Intl.message(
       'Creation date',
       name: 'portfolioEditDialog_startDate',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Visible`
+  String get portfolioEditDialog_visible {
+    return Intl.message(
+      'Visible',
+      name: 'portfolioEditDialog_visible',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Hide sold instruments`
+  String get portfolioEditDialog_hideSoldInstruments {
+    return Intl.message(
+      'Hide sold instruments',
+      name: 'portfolioEditDialog_hideSoldInstruments',
       desc: '',
       args: [],
     );

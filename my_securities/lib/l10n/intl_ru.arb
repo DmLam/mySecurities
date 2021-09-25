@@ -24,6 +24,9 @@
   "instrumentTypeShare": "Акция",
   "instrumentTypeEtf": "Фонд",
   "instrumentTypeBond": "Облигация",
+  "instrumentTypeFutures": "Фьючерс",
+  "instrumentTypeIndex": "Индеск",
+  "instrumentTypeDepositaryReceipt": "Депозитарная расписка",
   "pcs": "шт",
 
   "db_portfolioAlreadyExists": "Портфель {name} уже существует",
@@ -32,13 +35,14 @@
   "portfoliosListView_portfolioStarted": "Начат",
   "portfoliosListView_menuEdit": "Редактировать",
   "portfoliosListView_menuDelete": "Удалить",
-  "portfoliosListView_menuVisible": "Видимый",
   "portfoliosListView_confirmDeleteDialogTitle": "Удаление портфеля",
   "portfoliosListView_confirmDeleteDialogContent": "Вы уверены, что хотите удалить портфель '{name}'?",
 
   "portfolioEditDialog_Title": "Редактировать портфель",
   "portfolioEditDialog_Name": "Наименование",
   "portfolioEditDialog_startDate": "Дата создания",
+  "portfolioEditDialog_visible": "Видимый",
+  "portfolioEditDialog_hideSoldInstruments": "Скрывать проданные инструменты",
 
   "portfolioInstrumentPageAddOperation": "Добавить операцию",
   "portfolioInstrumentPageAddMoneyOperation": "Добавить операцию с валютой",
