@@ -382,14 +382,14 @@ class DBProvider {
   }
 
   static final String _sqlPortfolioOperations =
-  '''SELECT o.id, pi.portfolio_id, pi.instrument_id, o.date, o.type, o.quantity, o.price, o.value, o.commission, 
+  '''SELECT o.id, pi.portfolio_id, pi.instrument_id, o.date, o.type, o.quantity, o.price, o.value, o.commission, o.comment,
             m.id money_operation_id
      FROM operation o LEFT JOIN money m ON m.operation_id = o.id, portfolio_instrument pi
      WHERE o.portfolio_instrument_id = pi.id
        and pi.portfolio_id = ?
     ''';
   static final String _sqlPortfolioInstrumentOperations =
-  '''SELECT o.id, pi.portfolio_id, pi.instrument_id, o.date, o.type, o.quantity, o.price, o.value, o.commission,
+  '''SELECT o.id, pi.portfolio_id, pi.instrument_id, o.date, o.type, o.quantity, o.price, o.value, o.commission, o.comment,
             m.id money_operation_id
      FROM operation o LEFT JOIN money m ON m.operation_id = o.id, portfolio_instrument pi
      WHERE o.portfolio_instrument_id = pi.id

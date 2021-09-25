@@ -68,6 +68,7 @@
   "operationEditDialog_price": "Цена",
   "operationEditDialog_commission": "Комиссия",
   "operationEditDialog_withdrawmoney": "Списать деньги",
+  "operationEditDialog_comment": "Комментарий",
   "operationEditDialog_notickersuggestion": "Соответствие не найдено",
   "operationEditDialog_noenoughmoney": "Недостаточно средств для проведения операции",
 

@@ -68,6 +68,7 @@
   "operationEditDialog_price": "Price",
   "operationEditDialog_commission": "Commission",
   "operationEditDialog_withdrawmoney": "Withdraw money",
+  "operationEditDialog_comment": "Comment",
   "operationEditDialog_notickersuggestion": "Match not found",
   "operationEditDialog_noenoughmoney": "Not enough money for this operation",
 

@@ -595,6 +595,16 @@ class S {
     );
   }
 
+  /// `Comment`
+  String get operationEditDialog_comment {
+    return Intl.message(
+      'Comment',
+      name: 'operationEditDialog_comment',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Match not found`
   String get operationEditDialog_notickersuggestion {
     return Intl.message(

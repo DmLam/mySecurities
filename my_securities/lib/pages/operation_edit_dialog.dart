@@ -36,6 +36,7 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
   final TextEditingController _quantityEditController = TextEditingController();
   final TextEditingController _commissionEditController = TextEditingController();
   final TextEditingController _instrumentNameEditController = TextEditingController();
+  final TextEditingController _commentEditController = TextEditingController();
   bool _createMoneyOperation = true;
 
   _OperationEditDialogState(this._operation);
@@ -58,6 +59,7 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
     _priceEditController.text = _operation.price?.toString();
     _quantityEditController.text = _operation.quantity?.toString();
     _commissionEditController.text = _operation.commission?.toString();
+    _commentEditController.text = _operation.comment;
   }
 
   @override void initState() {
@@ -373,6 +375,20 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
                       controlAffinity: ListTileControlAffinity.leading,
                       onChanged: (value) => {_createMoneyOperation = value}
                   )
+              )
+            ]),
+            dialogPanel(children: [
+              Expanded(
+                child: TextField(
+                  controller: _commentEditController,
+                  style: TextStyle(fontSize: 18),
+                  decoration: InputDecoration(
+                      icon: Icon(Icons.comment),
+                      labelText: S.of(context).operationEditDialog_comment,
+                      contentPadding: EDIT_UNDERLINE_PADDING
+                  ),
+                  onChanged: (String value) {_operation.comment = value;},
+                )
               )
             ])
           ])

@@ -71,6 +71,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "moneyOperationsListView_menuEdit" : MessageLookupByLibrary.simpleMessage("Edit"),
     "operationEditDialog_Title_add" : MessageLookupByLibrary.simpleMessage("Add operation"),
     "operationEditDialog_Title_edit" : MessageLookupByLibrary.simpleMessage("Edit operation"),
+    "operationEditDialog_comment" : MessageLookupByLibrary.simpleMessage("Comment"),
     "operationEditDialog_commission" : MessageLookupByLibrary.simpleMessage("Commission"),
     "operationEditDialog_date" : MessageLookupByLibrary.simpleMessage("Operation date"),
     "operationEditDialog_instrumentticker" : MessageLookupByLibrary.simpleMessage("Ticker"),
