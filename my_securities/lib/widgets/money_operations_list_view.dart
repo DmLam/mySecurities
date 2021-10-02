@@ -80,7 +80,8 @@ class MoneyOperationsListItem extends StatelessWidget {
                   style: defaultStyle.merge(middleStyle),
                   children: [
                     TextSpan(text: "${_operation.currency.sign}", style: defaultStyle.merge(_operation.type.income ? greenStyle : null)),
-                    TextSpan(text: "${_operation.amount.abs().toStringAsFixed(4)}", style: defaultStyle.merge(largeStyle).merge(_operation.type.income ? greenStyle : null))
+                    TextSpan(text: "${formatCurrency(_operation.amount.abs())}",
+                        style: defaultStyle.merge(largeStyle).merge(_operation.type.income ? greenStyle : null))
                   ]
                 )
               ),

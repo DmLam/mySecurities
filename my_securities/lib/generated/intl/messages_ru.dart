@@ -62,6 +62,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "moneyOperationEditDialog_date" : MessageLookupByLibrary.simpleMessage("Дата операции"),
     "moneyOperationEditDialog_operationtype" : MessageLookupByLibrary.simpleMessage("Тип операции"),
     "moneyOperationTypeBuy" : MessageLookupByLibrary.simpleMessage("Покупка"),
+    "moneyOperationTypeCommission" : MessageLookupByLibrary.simpleMessage("Комиссия"),
     "moneyOperationTypeDeposit" : MessageLookupByLibrary.simpleMessage("Поступление"),
     "moneyOperationTypeSell" : MessageLookupByLibrary.simpleMessage("Продажа"),
     "moneyOperationTypeWithdraw" : MessageLookupByLibrary.simpleMessage("Вывод"),

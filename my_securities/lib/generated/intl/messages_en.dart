@@ -62,6 +62,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "moneyOperationEditDialog_date" : MessageLookupByLibrary.simpleMessage("Operation date"),
     "moneyOperationEditDialog_operationtype" : MessageLookupByLibrary.simpleMessage("Operation type"),
     "moneyOperationTypeBuy" : MessageLookupByLibrary.simpleMessage("Buy"),
+    "moneyOperationTypeCommission" : MessageLookupByLibrary.simpleMessage("Commission"),
     "moneyOperationTypeDeposit" : MessageLookupByLibrary.simpleMessage("Deposit"),
     "moneyOperationTypeSell" : MessageLookupByLibrary.simpleMessage("Sell"),
     "moneyOperationTypeWithdraw" : MessageLookupByLibrary.simpleMessage("Withdraw"),

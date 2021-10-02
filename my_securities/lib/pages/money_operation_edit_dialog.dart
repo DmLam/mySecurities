@@ -69,7 +69,10 @@ class MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
       Navigator.of(context).pop(true);
       widget._moneyOperation.type = widget._operationType;
       widget._moneyOperation.date = widget._operationDate;
-      widget._moneyOperation.amount = widget._operationAmount;
+      if (widget._operationType == MoneyOperationType.withdraw)
+        widget._moneyOperation.amount = -widget._operationAmount;
+      else
+        widget._moneyOperation.amount = widget._operationAmount;
 
       if (widget._moneyOperation.id == null)
         widget._moneyOperation.add();

@@ -205,6 +205,16 @@ class S {
     );
   }
 
+  /// `Commission`
+  String get moneyOperationTypeCommission {
+    return Intl.message(
+      'Commission',
+      name: 'moneyOperationTypeCommission',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Currency`
   String get instrumentTypeCurrency {
     return Intl.message(

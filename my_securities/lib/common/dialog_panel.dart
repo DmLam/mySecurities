@@ -8,7 +8,7 @@ Widget dialogPanel({List<Widget> children, EdgeInsets margin = PANEL_MARGIN, Edg
     Container(
         margin: margin,
         padding: padding,
-//        color: Colors.grey[600],
+//        color: Colors.grey[400],
         child:
         Row(
             crossAxisAlignment: CrossAxisAlignment.end,

@@ -200,7 +200,7 @@ class QuoteProvider {
         result = q._price;
     }
     if (result == null) { // there is no price in cache
-      result = await StockExchangeProvider.stock().getInstrumentCurrentPrice(_instrument.ticker);
+      result = await StockExchangeProvider.stock().getInstrumentPrice(_instrument.ticker);
 
       if (result == null) { // impossible to receive current price (may be exchange is not working now
         Quote q = await DBProvider.db.instrumentLastQuote(_instrument.id);

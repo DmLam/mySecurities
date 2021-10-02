@@ -20,6 +20,7 @@
   "moneyOperationTypeWithdraw": "Withdraw",
   "moneyOperationTypeBuy": "Buy",
   "moneyOperationTypeSell": "Sell",
+  "moneyOperationTypeCommission": "Commission",
   "instrumentTypeCurrency": "Currency",
   "instrumentTypeShare": "Share",
   "instrumentTypeEtf": "Etf",
@@ -71,6 +72,7 @@
   "operationEditDialog_comment": "Comment",
   "operationEditDialog_notickersuggestion": "Match not found",
   "operationEditDialog_noenoughmoney": "Not enough money for this operation",
+  "operationEditDialog_commission": "Commission",
 
   "portfolioMoneyOperations_Title": "{portfolio} money operations",
 

@@ -83,7 +83,8 @@ class DBProvider {
            id INTEGER PRIMARY KEY AUTOINCREMENT,
            name TEXT NOT NULL UNIQUE,
            visible BOOLEAN NOT NULL CHECK (visible IN (0, 1)) DEFAULT 1,
-           hide_sold_instruments BOOLEAN NOT NULL CHECK (visible IN (0, 1)) DEFAULT 0)''');
+           hide_sold_instruments BOOLEAN NOT NULL CHECK (visible IN (0, 1)) DEFAULT 0),
+           commission DOUBLE''');
   }
   Future<void> _createTableInstrumentType(Database db) async {
     await db.execute('CREATE TABLE instrument_type (id INTEGER PRIMARY KEY, name TEXT NOT NULL);');
@@ -122,6 +123,7 @@ class DBProvider {
          portfolio_id INTEGER NOT NULL,
          instrument_id INTEGER NOT NULL,
          percent INTEGER,
+         commission DOUBLE,
          FOREIGN KEY (portfolio_id) REFERENCES portfolio(id) 
            ON DELETE CASCADE ON UPDATE RESTRICT,
          FOREIGN KEY (instrument_id) REFERENCES instrument(id) 
@@ -382,16 +384,14 @@ class DBProvider {
   }
 
   static final String _sqlPortfolioOperations =
-  '''SELECT o.id, pi.portfolio_id, pi.instrument_id, o.date, o.type, o.quantity, o.price, o.value, o.commission, o.comment,
-            m.id money_operation_id
-     FROM operation o LEFT JOIN money m ON m.operation_id = o.id, portfolio_instrument pi
+  '''SELECT o.id, pi.portfolio_id, pi.instrument_id, o.date, o.type, o.quantity, o.price, o.value, o.commission, o.comment
+     FROM operation o, portfolio_instrument pi
      WHERE o.portfolio_instrument_id = pi.id
        and pi.portfolio_id = ?
     ''';
   static final String _sqlPortfolioInstrumentOperations =
-  '''SELECT o.id, pi.portfolio_id, pi.instrument_id, o.date, o.type, o.quantity, o.price, o.value, o.commission, o.comment,
-            m.id money_operation_id
-     FROM operation o LEFT JOIN money m ON m.operation_id = o.id, portfolio_instrument pi
+  '''SELECT o.id, pi.portfolio_id, pi.instrument_id, o.date, o.type, o.quantity, o.price, o.value, o.commission, o.comment
+     FROM operation o, portfolio_instrument pi
      WHERE o.portfolio_instrument_id = pi.id
        and pi.portfolio_id = ?
        and pi.instrument_id = ?
@@ -407,7 +407,7 @@ class DBProvider {
     return operations.isNotEmpty ? operations.map((o) => Operation.fromMap(o)).toList() : <Operation>[];
   }
 
-  Future<int> addOperation(Operation op, {MoneyOperation moneyOperation}) async {
+  Future<int> addOperation(Operation op, {MoneyOperation moneyOperation, commissionOperation}) async {
     assert(op.id == null);
     assert(op.instrument != null);
 
@@ -437,6 +437,8 @@ class DBProvider {
 
       if (moneyOperation != null)
         addMoneyOperation(moneyOperation, dbe: txn);
+      if (commissionOperation != null)
+        addMoneyOperation(commissionOperation, dbe: txn);
     });
 
     return Future.value(op.id);
@@ -616,7 +618,7 @@ class DBProvider {
   }
 
   static final _sqlPortfolioMonies =
-  '''SELECT m.portfolio_id, m.currency_id, sum(case WHEN m.type = 1 THEN m.amount ELSE -m.amount END) amount 
+  '''SELECT m.portfolio_id, m.currency_id, sum(m.amount) amount 
      FROM money m
      WHERE m.portfolio_id = ?
      GROUP BY m.currency_id

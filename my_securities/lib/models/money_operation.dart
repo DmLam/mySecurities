@@ -8,8 +8,7 @@ import 'money.dart';
 import 'operation.dart';
 import 'portfolio.dart';
 
-
-enum MoneyOperationType {deposit, withdraw, buy, sell}  // buy and sell is only for non-money operations (i.e. buying and selling securities)
+enum MoneyOperationType {deposit, withdraw, buy, sell, commission} // buy, sell and commission is only for non-money operations (i.e. buying and selling securities)
 
 extension MoneyOperationTypeExtension on MoneyOperationType {
   int get id => index + 1;
@@ -127,12 +126,12 @@ class MoneyOperationList extends DatabaseList<MoneyOperation>{
     items = await DBProvider.db.getPortfolioMoneyOperations(portfolio.id);
   }
 
-  MoneyOperation byOperationId(int id) {
+  List<MoneyOperation> byOperationId(int id) {
     if (length == null || id == null)
       return null;
 
     return
-      items.firstWhere((item) => item.operation?.id == id, orElse: () => null);
+      items.where((item) => item.operation?.id == id);
   }
 
 }

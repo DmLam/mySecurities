@@ -43,7 +43,7 @@ abstract class StockExchangeProvider {
   Future <List<Quote>> getInstrumentQuotes(String ticker, DateTime from, DateTime to);
   // last quote at previous trade session (yesterday)
   Future<double> getInstrumentLastQuote(String ticker);
-  Future<double> getInstrumentCurrentPrice(String ticker);
+  Future<double> getInstrumentPrice(String ticker, {DateTime date});
   String getCurrencyTicker(Currency currency);
   Future<double> getCurrencyRate(Currency from, Currency to, {DateTime datetime});
   Future<List<Rate>> getCurrencyRates(Currency currency, DateTime from, DateTime to);

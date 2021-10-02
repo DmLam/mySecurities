@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:my_securities/database_list.dart';
 import 'package:my_securities/exchange.dart';
+import 'package:my_securities/generated/l10n.dart';
 import '../constants.dart';
 import '../database.dart';
 import 'money_operation.dart';
@@ -53,7 +54,7 @@ class Operation extends ChangeNotifier{
   }
 
   double _getOperationValue(OperationType type, int quantity, double price, double commission) =>
-      (type == OperationType.buy ? 1 : -1) * ((price * quantity + commission) * 10000).roundToDouble() / 10000;
+      (type == OperationType.buy ? -1 : 1) * ((price * quantity) * 10000).roundToDouble() / 10000;
 
   double get value => _getOperationValue(type, quantity, price, 0);
 
@@ -69,7 +70,7 @@ class Operation extends ChangeNotifier{
     if (m == null)
       throw NoCurrencyException();
     else
-    if (m.amount + value - newValue < 0)
+    if (m.amount - value + newValue < 0)
       throw NotEnoughMoneyException();
   }
 
@@ -124,23 +125,35 @@ class Operation extends ChangeNotifier{
           comment: json["comment"]
       );
 
-  String moneyOperationComment() {
+  String dealOperationComment() {
     return "${type.name} $quantity ${instrument.name}";
   }
 
+  String commissionOperationComment() {
+    return S.current.operationEditDialog_commission;
+  }
+
   Future<int> add(bool createMoneyOperation) async {
-    MoneyOperation moneyOp;
+    MoneyOperation dealOp, commissionOp;
 
     if (createMoneyOperation)
-      moneyOp = MoneyOperation(portfolio: portfolio,
+      dealOp = MoneyOperation(portfolio: portfolio,
           date: date,
           currency: instrument.currency,
           type: operationTypeToMoneyOperationType(type),
-          amount: value + commission,
+          amount: value,
           operation: this,
-          comment: moneyOperationComment());
+          comment: dealOperationComment());
+      if (commission != 0)
+        commissionOp = MoneyOperation(portfolio: portfolio,
+            date: date,
+            currency: instrument.currency,
+            type: MoneyOperationType.commission,
+            amount: -commission,
+            operation: this,
+            comment: commissionOperationComment());
 
-    await DBProvider.db.addOperation(this, moneyOperation: moneyOp);
+    await DBProvider.db.addOperation(this, moneyOperation: dealOp, commissionOperation: commissionOp);
     await portfolio.refresh(); // reload instruments, money and operations from db
 
     return Future.value(id);
@@ -148,20 +161,47 @@ class Operation extends ChangeNotifier{
 
   Future<bool> update(bool createMoneyOperation) async {
     bool result = false;
+    bool wasCommissionOperation = false;
 
     if (id != null) {
       await DBProvider.db.updateOperation(this);
 
-      MoneyOperation mop = portfolio.moneyOperations.byOperationId(id);
-      if (mop != null) {
+      List<MoneyOperation> mops = portfolio.moneyOperations.byOperationId(id);
+      if (mops.isNotEmpty) {
         if (!createMoneyOperation)
-          mop.delete();
+          mops.forEach((mop) {mop.delete();});
         else {
-          mop.currency = instrument.currency;
-          mop.type = operationTypeToMoneyOperationType(this.type);
-          mop.date = date;
-          mop.amount = value + commission;
-          mop.update();
+          for (MoneyOperation mop in mops) {
+            if (mop.type == MoneyOperationType.commission) {
+              wasCommissionOperation = true;
+              mop.currency = instrument.currency;
+              mop.type = MoneyOperationType.commission;
+              mop.date = date;
+              mop.amount = -commission;
+              mop.update();
+            }
+            else {
+              if (commission == 0)
+                mop.delete();
+              else {
+                mop.currency = instrument.currency;
+                mop.type = operationTypeToMoneyOperationType(this.type);
+                mop.date = date;
+                mop.amount = -commission;
+                mop.update();
+              }
+            }
+          }
+          if (createMoneyOperation && !wasCommissionOperation && commission != 0) {
+            MoneyOperation commissionOp = MoneyOperation(portfolio: portfolio,
+                date: date,
+                currency: instrument.currency,
+                type: MoneyOperationType.commission,
+                amount: -commission,
+                operation: this,
+                comment: commissionOperationComment());
+            commissionOp.add();
+          }
         }
       }
       else { // mop == null
@@ -185,11 +225,11 @@ class Operation extends ChangeNotifier{
   }
 
   delete() async {
-    MoneyOperation mop = portfolio.moneyOperations.byOperationId(id);
+    List<MoneyOperation> mops = portfolio.moneyOperations.byOperationId(id);
 
     await DBProvider.db.deleteOperation(this);
-    if (mop != null)
-      await mop.delete();
+    if (mops != null)
+      mops.forEach((element) {element.delete();});
     else
       await portfolio.refresh(); // reload instruments, money and operations from db
   }

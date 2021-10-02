@@ -13,6 +13,7 @@ final List MONEY_OPERATION_TYPE_NAMES = [S.current.moneyOperationTypeDeposit, S.
 // ui constants
 const EdgeInsets EDIT_UNDERLINE_PADDING = EdgeInsets.all(3.0);
 
+// dummy function to init variables in the module like INSTRUMENT_TYPE_NAMES and others
 void constantsInit() {
-  // dummy function to init variables in the module like INSTRUMENT_TYPE_NAMES and others
+
 }

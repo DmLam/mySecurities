@@ -12,6 +12,7 @@ import 'package:my_securities/models/money.dart';
 import 'package:my_securities/models/operation.dart';
 import 'package:my_securities/widgets/appbar.dart';
 import '../constants.dart';
+import '../exchange.dart';
 import '../stock_exchange_interface.dart';
 
 class OperationEditDialog extends StatefulWidget {
@@ -145,6 +146,13 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
       return StockExchangeProvider.stock().search(ticker: _tickerEditController.text);
     }
 
+    receiveInstrumentPrice() async {
+      double price;
+
+      price = await StockExchangeProvider.stock()
+          .getInstrumentPrice(_tickerEditController.text, date: _operation.date);
+      _priceEditController.text = formatCurrency(price);
+    }
     // build code starts here
     return
       Scaffold(
@@ -161,9 +169,9 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
                       // from the list of operations of an instrument
                       enabled: _operation.instrument == null,
                       decoration: InputDecoration(
-                          icon: Icon(FontAwesome.tag),
-                          labelText: S.of(context).operationEditDialog_instrumentticker,
-                          contentPadding: EDIT_UNDERLINE_PADDING
+                        icon: Icon(FontAwesome.tag),
+                        labelText: S.of(context).operationEditDialog_instrumentticker,
+                        contentPadding: EDIT_UNDERLINE_PADDING
                       ),
                       inputFormatters: [UpperCaseTextFormatter()],
                   ),
@@ -192,6 +200,7 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
                       widget._operationInstrument.currency = suggestion.currency;
                       widget._operationInstrument.additional = suggestion.additional;
                       _operation.instrument = null;
+                      receiveInstrumentPrice();
                     }
                   },
                   noItemsFoundBuilder: (context) {

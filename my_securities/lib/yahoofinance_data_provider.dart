@@ -84,7 +84,7 @@ class YahooFinanceDataProvider implements StockExchangeProvider {
   }
 
   Future<double> getInstrumentLastQuote(String ticker) => null;
-  Future<double> getInstrumentCurrentPrice(String ticker) => null;
+  Future<double> getInstrumentPrice(String ticker, {DateTime date}) => null;
   Future <List<Quote>> getInstrumentQuotes(String ticker, DateTime from, DateTime to) => null;
   Future<double> convert(double value, Currency from, Currency to) => null;
   String getCurrencyTicker(Currency currency) => null;
