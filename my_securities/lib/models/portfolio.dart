@@ -10,10 +10,10 @@ import 'money_operation.dart';
 class Portfolio extends ChangeNotifier {
   PortfolioList _owner;
   int _id;
-  String _name;
+  String name;
   bool _visible;
-  bool _hideSoldInstruments;
   DateTime _startDate;
+  double commission;
 
   InstrumentList _instruments;
   OperationList _operations;
@@ -21,14 +21,7 @@ class Portfolio extends ChangeNotifier {
   MoneyOperationList _moneyOperations;
 
   int get id => _id;
-  String get name => _name;
-  set name(String name) {
-    _name = name;
-    DBProvider.db.updatePortfolio(this);
-    notifyListeners();
-  }
   bool get visible => _visible;
-  bool get hideSoldInstruments => _hideSoldInstruments;
   DateTime get startDate => _startDate;
 
   InstrumentList get instruments => _instruments;
@@ -36,7 +29,8 @@ class Portfolio extends ChangeNotifier {
   MoneyList get monies => _monies;
   MoneyOperationList get moneyOperations => _moneyOperations;
 
-  Portfolio(this._id, this._name, this._visible, this._hideSoldInstruments, this._startDate) {
+  Portfolio(this._id, this.name, this._visible, this._startDate, this.commission)
+  {
     _loadFromDb();
   }
 
@@ -60,63 +54,60 @@ class Portfolio extends ChangeNotifier {
   Portfolio.from(Portfolio portfolio) :
     _owner = portfolio._owner,
     _id = portfolio._id,
-    _name = portfolio._name,
+    name = portfolio.name,
     _visible = portfolio._visible,
-    _hideSoldInstruments = portfolio._hideSoldInstruments,
-    _startDate = portfolio._startDate;
+    _startDate = portfolio._startDate,
+    commission = portfolio.commission;
 
   Portfolio.empty() :
     _owner = null,
     _id = null,
-    _name = "",
+    name = "",
     _visible = true,
-    _hideSoldInstruments = false,
-    _startDate = null;
+    _startDate = null,
+    commission = null;
 
   factory Portfolio.fromMap(Map<String, dynamic> json) =>
     Portfolio(
       json["id"],
       json["name"],
       json["visible"] == 1,
-      json["hide_sold_instruments"] == 1,
-      json["start_date"] == null ? null : DateTime.parse(json["start_date"])
-    );
+      json["start_date"] == null ? null : DateTime.parse(json["start_date"]),
+      json["commission"]);
 
   assign(Portfolio source) {
     this._id = source._id;
     this._owner = source._owner;
-    this._name = source._name;
+    this.name = source.name;
     this._visible = source._visible;
-    this._hideSoldInstruments = source._hideSoldInstruments;
     this._startDate = source._startDate;
+    this.commission = source.commission;
 
     notifyListeners();
   }
-
-  Instrument instrumentById(int id) => instruments.byId(id);
 
   Future<int> add(Portfolio portfolio) async {
     return Future.value(await Model.portfolios._add(portfolio));
   }
 
-  Future<bool> update({String name, bool visible, bool hideSoldInstruments, DateTime startDate}) async {
+  Future<bool> update({String name, bool visible, DateTime startDate, double commission}) async {
     bool doUpdate = false;
     bool result;
 
-    if (name != _name && name != null) {
-      _name = name;
+    if (this.name != name && name != null) {
+      this.name = name;
       doUpdate = true;
     }
     if (visible != _visible && visible != null) {
       _visible = visible;
       doUpdate = true;
     }
-    if (hideSoldInstruments != _hideSoldInstruments && hideSoldInstruments != null) {
-      _hideSoldInstruments = hideSoldInstruments;
-      doUpdate = true;
-    }
     if (startDate != _startDate && startDate != null) {
       _startDate = startDate;
+      doUpdate = true;
+    }
+    if (this.commission != commission) {
+      this.commission = commission;
       doUpdate = true;
     }
     if (doUpdate)

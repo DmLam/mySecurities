@@ -28,6 +28,7 @@ class Instrument extends ChangeNotifier {
   InstrumentType type;
   Exchange exchange;
   Currency currency;
+  double commission;
   Uint8List _image;
   String additional;
   int portfolioPercentPlan;
@@ -53,7 +54,7 @@ class Instrument extends ChangeNotifier {
   }
 
   Instrument({int id, @required Portfolio portfolio, String isin = '', @required String ticker,
-    String name = '', Currency currency, InstrumentType type,
+    String name = '', Currency currency, double commission, InstrumentType type,
     Exchange exchange = Exchange.MCX, Uint8List image, String additional,
     int portfolioPercentPlan, int quantity = 0,
     double averagePrice = 0.0, double value = 0.0, int operationCount = 0}):
@@ -64,6 +65,7 @@ class Instrument extends ChangeNotifier {
     this.ticker = ticker,
     this.name = name,
     this.currency = currency,
+    this.commission = commission,
     this.type = type,
     this.exchange = exchange,
     this.additional = additional,
@@ -84,6 +86,7 @@ class Instrument extends ChangeNotifier {
     ticker = source.ticker,
     name = source.name,
     currency = source.currency,
+    commission = source.commission,
     type = source.type,
     _image = source._image,
     additional = source.additional,
@@ -111,6 +114,7 @@ class Instrument extends ChangeNotifier {
           ticker: json["ticker"],
           name: json["name"],
           currency: Currency.values[json["currency_id"] - 1],
+          commission: json["commission"],
           type: InstrumentType.values[json["instrument_type_id"] - 1],
           exchange: Exchange.values[json["exchange_id"] - 1],
           image: json['image'],
@@ -133,6 +137,7 @@ class Instrument extends ChangeNotifier {
     "ticker": ticker,
     "name": name,
     "currency_id": currency.index + 1,
+    "commission": commission,
     "instrument_type_id": type.index + 1,
     "exchange_id": exchange.index + 1,
     "image": image,
@@ -151,6 +156,7 @@ class Instrument extends ChangeNotifier {
     ticker = source.ticker;
     name = source.name;
     currency = source.currency;
+    commission = source.commission;
     type = source.type;
     exchange = source.exchange;
     _image = Uint8List.fromList(source.image);
@@ -182,9 +188,16 @@ class Instrument extends ChangeNotifier {
 
     return Future.value(id);
   }
-  Future<bool> update({int portfolioPercentPlan}) async {
-    if (portfolioPercentPlan != null)
-      portfolioPercentPlan = portfolioPercentPlan;
+  Future<bool> update({int portfolioPercentPlan, double commission}) async {
+    bool doUpdate = false;
+
+    if (portfolioPercentPlan != null && this.portfolioPercentPlan != portfolioPercentPlan) {
+      this.portfolioPercentPlan = portfolioPercentPlan;
+      doUpdate = true;
+    }
+    if (commission != null && this.commission != commission) {
+      this.commission = commission;
+    }
 
     bool result = await DBProvider.db.updateInstrument(this);
 

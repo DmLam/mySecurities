@@ -26,6 +26,10 @@ class SettingsPage extends StatelessWidget {
       PrefCheckbox(
         pref: Preferences.prefSHOW_HIDDEN_PORTFOLIOS,
         title: Text(S.of(context).prefShowHiddenPortfoliosTitle),
+      ),
+      PrefCheckbox(
+        pref: Preferences.prefHIDE_SOLD_INSTRUMENTS,
+        title: Text(S.of(context).prefHideSoldInstruments)
       )
     ]);
   }

@@ -83,8 +83,7 @@ class DBProvider {
            id INTEGER PRIMARY KEY AUTOINCREMENT,
            name TEXT NOT NULL UNIQUE,
            visible BOOLEAN NOT NULL CHECK (visible IN (0, 1)) DEFAULT 1,
-           hide_sold_instruments BOOLEAN NOT NULL CHECK (visible IN (0, 1)) DEFAULT 0),
-           commission DOUBLE''');
+           commission REAL)''');
   }
   Future<void> _createTableInstrumentType(Database db) async {
     await db.execute('CREATE TABLE instrument_type (id INTEGER PRIMARY KEY, name TEXT NOT NULL);');
@@ -175,10 +174,10 @@ class DBProvider {
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           date INTEGER NOT NULL,  
           instrument_id INTEGER NOT NULL,
-          open double NOT NULL,
-          close double NOT NULL,
-          low double NOT NULL,
-          high double NOT NULL,
+          open REAL NOT NULL,
+          close REAL NOT NULL,
+          low REAL NOT NULL,
+          high REAL NOT NULL,
           FOREIGN KEY (instrument_id) REFERENCES instrument(id)
             ON DELETE CASCADE ON UPDATE RESTRICT,
           UNIQUE (instrument_id, date))''');
@@ -295,7 +294,10 @@ class DBProvider {
         txn.update(
             'instrument', row, where: 'id = ?', whereArgs: [instrument.id]);
         txn.update('portfolio_instrument',
-            {"percent": instrument.portfolioPercentPlan},
+            {
+              "percent": instrument.portfolioPercentPlan,
+              "commission": instrument.commission
+            },
             where: 'portfolio_id = ? and instrument_id = ?',
             whereArgs: [instrument.portfolio.id, instrument.id]);
 
@@ -340,7 +342,8 @@ class DBProvider {
   }
 
   static final String _sqlPortfolioInstruments =
-  '''SELECT i.id, pi.portfolio_id, i.isin, i.ticker, i.name, i.currency_id, i.instrument_type_id, i.exchange_id, i.additional, pi.percent, 
+  '''SELECT i.id, pi.portfolio_id, i.isin, i.ticker, i.name, i.currency_id, i.instrument_type_id, i.exchange_id, i.additional, 
+            pi.percent, pi.commission, 
             i.additional, i.image, 
             sum((CASE WHEN o.type = 0 THEN  1 ELSE -1 END) * o.quantity) quantity, 
             round(sum((CASE WHEN o.type = 0 THEN  1 ELSE -1 END) * o.price * o.quantity) / sum((CASE WHEN o.type = 0 THEN  1 ELSE -1 END) * o.quantity), 4) avgprice, 
@@ -688,7 +691,7 @@ class DBProvider {
     List<Portfolio> result;
 
     List<Map<String, dynamic>> portfolios = await db.rawQuery(
-        '''SELECT p.id, p.name, p.visible, hide_sold_instruments,
+        '''SELECT p.id, p.name, p.visible, p.commission,
              (SELECT min(o.date) FROM operation o, portfolio_instrument pi WHERE o.portfolio_instrument_id = pi.id  AND pi.portfolio_id = p.id) start_date 
            FROM portfolio p'''
     );
@@ -734,7 +737,7 @@ class DBProvider {
             {
               'name': portfolio.name,
               'visible': portfolio.visible ? 1 : 0,
-              'hide_sold_instruments': portfolio.hideSoldInstruments ? 1 : 0
+              'commission': portfolio.commission
             },
             where: 'id = ?',
             whereArgs: [portfolio.id]);

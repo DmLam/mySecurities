@@ -10,18 +10,24 @@ import 'package:provider/provider.dart';
 class PortfolioInstrumentEditDialog extends StatelessWidget {
   final Instrument _instrument;
   final TextEditingController _percentEditController = TextEditingController();
+  final TextEditingController _commissionEditController = TextEditingController();
 
   PortfolioInstrumentEditDialog(this._instrument, {Key key}) : super(key: key) {
     _percentEditController.text = _instrument.portfolioPercentPlan?.toString();
+    _commissionEditController.text = _instrument.commission?.toString();
   }
 
   @override
   Widget build(BuildContext context) {
 
-    bool _fabEnabled() => int.tryParse(_percentEditController.text) != null;
+    bool _fabEnabled() => int.tryParse(_percentEditController.text) != null ||
+      double.tryParse(_commissionEditController.text) != null;
 
     onFabPressed() {
-      _instrument.update(portfolioPercentPlan: int.parse(_percentEditController.text));
+      _instrument.update(
+        portfolioPercentPlan: int.tryParse(_percentEditController.text),
+        commission: double.tryParse(_commissionEditController.text)
+      );
 
       Navigator.of(context).pop(true);
     }
@@ -47,7 +53,26 @@ class PortfolioInstrumentEditDialog extends StatelessWidget {
                         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       ),
                       )
-                  ])
+                  ]),
+                  Row(
+                      children: [
+                        Expanded(
+                            child: TextField(
+                              controller: _commissionEditController,
+                              keyboardType: TextInputType.numberWithOptions(signed: false, decimal: true),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(RegExp(r'[0-9\.,]'))
+                              ],
+                              decoration: InputDecoration(
+                                icon: Icon(Icons.monetization_on),
+                                labelText: S.of(context).portfolioEditDialog_Commission,
+                                contentPadding: EdgeInsets.all(3.0),
+                                suffix: Text('%', style: TextStyle(fontSize: 22)),
+                              ),
+                            )
+                        ),
+                      ]),
+
                 ])
               )
             ]),

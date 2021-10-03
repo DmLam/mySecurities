@@ -8,17 +8,20 @@ import 'package:my_securities/pages/portfolio_instrument_edit_dialog.dart';
 import 'package:my_securities/pages/portfolio_operations_page.dart';
 import 'package:provider/provider.dart';
 import '../exchange.dart';
+import '../preferences.dart';
 import '../quote_provider.dart';
 
 
 class PortfolioInstrumentsListView extends StatelessWidget {
   final Portfolio _portfolio;
+  final Preferences _preferences;
 
-  PortfolioInstrumentsListView(this._portfolio, {Key key}): super(key: key);
+  PortfolioInstrumentsListView(this._portfolio, this._preferences, {Key key}): super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    List<Instrument> items = _portfolio.instruments.where((instrument) => !_portfolio.hideSoldInstruments || instrument.quantity > 0).toList();
+    bool hideSoldInstruments = _preferences.hideSoldInstruments;
+    List<Instrument> items = _portfolio.instruments.where((instrument) => !hideSoldInstruments || instrument.quantity > 0).toList();
 
     return ListView.builder(
       shrinkWrap: true,

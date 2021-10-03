@@ -39,6 +39,8 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
   final TextEditingController _instrumentNameEditController = TextEditingController();
   final TextEditingController _commentEditController = TextEditingController();
   bool _createMoneyOperation = true;
+  bool _priceEdited = false;
+  bool _commissionEdited = false;
 
   _OperationEditDialogState(this._operation);
 
@@ -61,12 +63,24 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
     _quantityEditController.text = _operation.quantity?.toString();
     _commissionEditController.text = _operation.commission?.toString();
     _commentEditController.text = _operation.comment;
+    receiveInstrumentPrice();
   }
 
   @override void initState() {
     super.initState();
 
     _init();
+  }
+
+  receiveInstrumentPrice() async {
+    if (!_priceEdited && (_tickerEditController.text != null)) {
+      double price;
+
+      price = await StockExchangeProvider.stock()
+          .getInstrumentPrice(
+          _tickerEditController.text, date: _operation.date);
+      _priceEditController.text = formatCurrency(price);
+    }
   }
 
   @override
@@ -142,17 +156,39 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
       Navigator.of(context).pop(true);
     }
 
+    void focusChange(TextEditingController controller, bool focused) {
+      if (focused)
+        controller.selection =
+            TextSelection(
+                baseOffset: 0,
+                extentOffset: controller.value.text.length
+            );
+    }
+
+    void recalcCommission() async {
+      if (!_commissionEdited) {
+        int quantity = int.tryParse(_quantityEditController.text) ?? 0;
+        double price = double.tryParse(_priceEditController.text) ?? 0;
+
+        if (quantity != 0 && price != 0) {
+          double commission = _operation.portfolio.commission;
+          String ticker = _tickerEditController.text;
+          if ((ticker ?? '') != '') {
+            Instrument instrument = _operation.portfolio.instruments.byTicker(ticker);
+            if (instrument != null && (instrument.commission  != null))
+              commission = instrument.commission;
+          }
+
+          if (commission != null)
+            _commissionEditController.text = formatCurrency((quantity * price * commission).ceilToDouble() / 100, digits: 2);
+        }
+      }
+    }
+
     Future<List> tickerSuggestions(String pattern) async {
       return StockExchangeProvider.stock().search(ticker: _tickerEditController.text);
     }
 
-    receiveInstrumentPrice() async {
-      double price;
-
-      price = await StockExchangeProvider.stock()
-          .getInstrumentPrice(_tickerEditController.text, date: _operation.date);
-      _priceEditController.text = formatCurrency(price);
-    }
     // build code starts here
     return
       Scaffold(
@@ -242,8 +278,11 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
                         lastDate: DateTime.now()).then((value)
                         {
                           if (value != null) {
-                            _operation.date = value;
-                            _dateEditController.text = dateString(value);
+                            if (_operation.date != value) {
+                              _operation.date = value;
+                              _dateEditController.text = dateString(value);
+                              receiveInstrumentPrice();
+                            }
                           }
                         });
                   }
@@ -292,14 +331,12 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
                         }
                         return result;
                       },
+                      onChanged: (text) {
+                        recalcCommission();
+                      },
                     ),
                     onFocusChange: (focused) {
-                      if (focused)
-                        _quantityEditController.selection =
-                            TextSelection(
-                                baseOffset: 0,
-                                extentOffset: _quantityEditController.value.text.length
-                            );
+                      focusChange(_quantityEditController, focused);
                     },
                   ),
               ),
@@ -327,14 +364,13 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
                         }
                         return result;
                       },
+                      onChanged: (text) {
+                        _priceEdited = text != null && text != '';
+                        recalcCommission();
+                      }
                     ),
                     onFocusChange: (focused) {
-                      if (focused)
-                        _priceEditController.selection =
-                            TextSelection(
-                                baseOffset: 0,
-                                extentOffset: _priceEditController.value.text.length
-                            );
+                      focusChange(_priceEditController, focused);
                     },
                   )
               ),
@@ -350,7 +386,10 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(RegExp(r'[0-9\.,]'))
                       ],
-                      style: TextStyle(fontSize: 18),
+                      style: TextStyle(fontSize: 18,
+//                          color: _commissionEdited ? Theme.of(context).textTheme.bodyText2.color :
+//                            Theme.of(context).primaryColor
+                      ),
                       decoration: InputDecoration(
                           icon: Icon(Icons.monetization_on),
                           labelText: S.of(context).operationEditDialog_commission,
@@ -366,14 +405,12 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
                         }
                         return result;
                       },
+                      onChanged: (text) {
+                        _commissionEdited = text != null && text != '';
+                      },
                     ),
                     onFocusChange: (focused) {
-                      if (focused)
-                        _commissionEditController.selection =
-                            TextSelection(
-                                baseOffset: 0,
-                                extentOffset: _commissionEditController.value.text.length
-                            );
+                      focusChange(_commissionEditController, focused);
                     },
                   )
               ),

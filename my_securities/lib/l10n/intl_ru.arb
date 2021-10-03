@@ -43,7 +43,7 @@
   "portfolioEditDialog_Name": "Наименование",
   "portfolioEditDialog_startDate": "Дата создания",
   "portfolioEditDialog_visible": "Видимый",
-  "portfolioEditDialog_hideSoldInstruments": "Скрывать проданные инструменты",
+  "portfolioEditDialog_Commission": "Коммиссия",
 
   "portfolioInstrumentPageAddOperation": "Добавить операцию",
   "portfolioInstrumentPageAddMoneyOperation": "Добавить операцию с валютой",
@@ -52,6 +52,7 @@
 
   "portfolioInstrumentEditDialog_Title": "Настройка инструмента",
   "portfolioInstrumentEditDialog_percent": "Процент в портфеле '{portfolio_name}'",
+  "portfolioInstrumentEditDialog_commission": "Комиссия для портфеля '{portfolio_name}'",
 
   "operationsListViewItem_menuEdit": "Редактировать",
   "operationsListViewItem_menuDelete": "Удалить",
@@ -72,7 +73,6 @@
   "operationEditDialog_comment": "Комментарий",
   "operationEditDialog_notickersuggestion": "Соответствие не найдено",
   "operationEditDialog_noenoughmoney": "Недостаточно средств для проведения операции",
-  "operationEditDialog_commission": "Комиссия",
 
   "portfolioMoneyOperations_Title": "Операции с валютой в {portfolio}",
 
@@ -92,5 +92,6 @@
   "prefMainCurrencyTitle": "Основная валюта",
   "prefTitleAppearance": "Внешний вид",
   "prefDarkTheme": "Темная тема",
-  "prefShowHiddenPortfoliosTitle": "Показывать скрытые портфели"
+  "prefShowHiddenPortfoliosTitle": "Показывать скрытые портфели",
+  "prefHideSoldInstruments": "Скрывать проданные инструменты"
 }

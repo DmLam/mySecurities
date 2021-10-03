@@ -405,11 +405,11 @@ class S {
     );
   }
 
-  /// `Hide sold instruments`
-  String get portfolioEditDialog_hideSoldInstruments {
+  /// `Commission`
+  String get portfolioEditDialog_Commission {
     return Intl.message(
-      'Hide sold instruments',
-      name: 'portfolioEditDialog_hideSoldInstruments',
+      'Commission',
+      name: 'portfolioEditDialog_Commission',
       desc: '',
       args: [],
     );
@@ -460,6 +460,16 @@ class S {
     return Intl.message(
       'Percent in \'$portfolio_name\' portfolio',
       name: 'portfolioInstrumentEditDialog_percent',
+      desc: '',
+      args: [portfolio_name],
+    );
+  }
+
+  /// `Commission for '{portfolio_name}' portfolio`
+  String portfolioInstrumentEditDialog_commission(Object portfolio_name) {
+    return Intl.message(
+      'Commission for \'$portfolio_name\' portfolio',
+      name: 'portfolioInstrumentEditDialog_commission',
       desc: '',
       args: [portfolio_name],
     );
@@ -790,6 +800,16 @@ class S {
     return Intl.message(
       'Show hidden portfolios',
       name: 'prefShowHiddenPortfoliosTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Hide sold instruments`
+  String get prefHideSoldInstruments {
+    return Intl.message(
+      'Hide sold instruments',
+      name: 'prefHideSoldInstruments',
       desc: '',
       args: [],
     );

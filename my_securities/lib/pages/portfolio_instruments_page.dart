@@ -11,6 +11,8 @@ import 'package:my_securities/widgets/appbar.dart';
 import 'package:my_securities/widgets/portfolio_instruments_list_view.dart';
 import 'package:my_securities/models/portfolio.dart';
 
+import '../preferences.dart';
+
 class PortfolioInstrumentsPage extends StatelessWidget {
   final Portfolio _portfolio;
 
@@ -41,7 +43,7 @@ class PortfolioInstrumentsPage extends StatelessWidget {
               Portfolio portfolio = context.watch<Portfolio>();
 
               return Column(children: [
-                PortfolioInstrumentsListView(portfolio),
+                PortfolioInstrumentsListView(portfolio, context.watch<Preferences>()),
                 PortfolioMoniesListView(portfolio)
               ]);
             }

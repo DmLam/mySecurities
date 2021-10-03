@@ -43,7 +43,7 @@
   "portfolioEditDialog_Name": "Name",
   "portfolioEditDialog_startDate": "Creation date",
   "portfolioEditDialog_visible": "Visible",
-  "portfolioEditDialog_hideSoldInstruments": "Hide sold instruments",
+  "portfolioEditDialog_Commission": "Commission",
 
   "portfolioInstrumentPageAddOperation": "Add operation",
   "portfolioInstrumentPageAddMoneyOperation": "Add money operation",
@@ -52,6 +52,7 @@
 
   "portfolioInstrumentEditDialog_Title": "Instrument settings",
   "portfolioInstrumentEditDialog_percent": "Percent in '{portfolio_name}' portfolio",
+  "portfolioInstrumentEditDialog_commission": "Commission for '{portfolio_name}' portfolio",
 
   "operationsListViewItem_menuEdit": "Edit",
   "operationsListViewItem_menuDelete": "Delete",
@@ -72,7 +73,6 @@
   "operationEditDialog_comment": "Comment",
   "operationEditDialog_notickersuggestion": "Match not found",
   "operationEditDialog_noenoughmoney": "Not enough money for this operation",
-  "operationEditDialog_commission": "Commission",
 
   "portfolioMoneyOperations_Title": "{portfolio} money operations",
 
@@ -92,6 +92,7 @@
   "prefMainCurrencyTitle": "Main currency",
   "prefTitleAppearance": "Appearance",
   "prefDarkTheme": "Dark theme",
-  "prefShowHiddenPortfoliosTitle": "Show hidden portfolios"
+  "prefShowHiddenPortfoliosTitle": "Show hidden portfolios",
+  "prefHideSoldInstruments": "Hide sold instruments"
 
 }

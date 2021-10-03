@@ -131,7 +131,7 @@ class MoneyOperationList extends DatabaseList<MoneyOperation>{
       return null;
 
     return
-      items.where((item) => item.operation?.id == id);
+      items.where((item) => item.operation?.id == id).toList();
   }
 
 }

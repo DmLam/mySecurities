@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:my_securities/common/dialog_panel.dart';
 import 'package:my_securities/common/utils.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/models/portfolio.dart';
 import 'package:my_securities/widgets/appbar.dart';
+import 'package:fluttericon/font_awesome_icons.dart';
+
 
 class PortfolioEditDialog extends StatefulWidget {
   final Portfolio _portfolio;
@@ -20,13 +23,23 @@ class PortfolioEditDialog extends StatefulWidget {
 class _PortfolioEditDialogState extends State<PortfolioEditDialog> {
   Portfolio _portfolio;
   final TextEditingController _nameEditController = TextEditingController();
+  final TextEditingController _commissionEditController = TextEditingController();
+  String _name;
   bool _visible;
-  bool _hideSoldInstruments;
+  double _commission;
 
-  _PortfolioEditDialogState (this._portfolio): super() {
-    _nameEditController.text = _portfolio.name;
+
+  _PortfolioEditDialogState (this._portfolio);
+
+  @override
+  initState() {
+    super.initState();
+
+    _name = _portfolio.name;
     _visible = _portfolio.visible;
-    _hideSoldInstruments = _portfolio.hideSoldInstruments;
+    _commission = _portfolio.commission;
+    _nameEditController.text = _name;
+    _commissionEditController.text = _commission?.toString();
   }
 
   @override
@@ -37,7 +50,7 @@ class _PortfolioEditDialogState extends State<PortfolioEditDialog> {
     }
 
     onFABPressed() async {
-      widget._portfolio.update(name: _nameEditController.text, visible: _visible, hideSoldInstruments: _hideSoldInstruments);
+      widget._portfolio.update(name: _name, visible: _visible, commission: _commission);
       Navigator.pop(context, true);
     }
 
@@ -57,34 +70,34 @@ class _PortfolioEditDialogState extends State<PortfolioEditDialog> {
                           Expanded(
                             child: TextField(
                               controller: _nameEditController,
-                              onChanged: (value) {_portfolio.name = value;},
+                              onChanged: (value) {_name = value;},
                               decoration: InputDecoration(
                                 icon: Icon(Icons.perm_identity),
                                 labelText: S.of(context).portfolioEditDialog_Name,
                                 contentPadding: EdgeInsets.all(3.0)
-                              )),
+                              )
+                            ),
                           ),
                         ]),
                       Row(
-                        children: [
-                          Expanded(
-                            child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Row(
-                                  children: [
-                                    Checkbox(
-                                      value: _hideSoldInstruments,
-                                      onChanged: (bool value) {
-                                        setState(() {_hideSoldInstruments = value;});
-                                      },
-                                    ),
-                                    Text(S.of(context).portfolioEditDialog_hideSoldInstruments)
-                                  ]
-                                )
-                            )
-                          )
-                        ]
-                      ),
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                  controller: _commissionEditController,
+                                  keyboardType: TextInputType.numberWithOptions(signed: false, decimal: true),
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.allow(RegExp(r'[0-9\.,]'))
+                                  ],
+                                  decoration: InputDecoration(
+                                    icon: Icon(Icons.monetization_on),
+                                    labelText: S.of(context).portfolioEditDialog_Commission,
+                                    contentPadding: EdgeInsets.all(3.0),
+                                    suffix: Text('%', style: TextStyle(fontSize: 22)),
+                                  ),
+                                  onChanged: (value) {_commission = double.parse(value);},
+                              )
+                            ),
+                          ]),
                       Row(
                           children: [
                             Expanded(
@@ -104,7 +117,7 @@ class _PortfolioEditDialogState extends State<PortfolioEditDialog> {
                                 )
                             )
                           ]
-                      )
+                      ),
                     ],
                   ),
                 ),
