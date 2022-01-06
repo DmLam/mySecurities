@@ -60,6 +60,7 @@
   "operationsListView_confirmDeleteDialogContent": "Вы уверены, что хотите удалить операцию '{description}'?",
 
   "portfolioOperations_Title": "Операции в {portfolio}",
+  "operationsByInstrument_Title": "Операции по {ticker} в {portfolio}",
 
   "operationEditDialog_Title_add": "Добавить операцию",
   "operationEditDialog_Title_edit": "Редактировать операцию",

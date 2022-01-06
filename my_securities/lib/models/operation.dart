@@ -63,15 +63,17 @@ class Operation extends ChangeNotifier{
   String priceString() => price == null ? '' : formatCurrency(price);
 
   checkMoneyAmount(OperationType newType, int newQuantity, double newPrice, double newCommission) {
-    double newValue = _getOperationValue(newType, newQuantity, newPrice, newCommission);
-    Money m = portfolio.monies.byCurrency(instrument.currency);
+    if (instrument != null) {
+      double newValue = _getOperationValue(
+          newType, newQuantity, newPrice, newCommission);
+      Money m = portfolio.monies.byCurrency(instrument.currency);
 
-    // check there is enough money for the operation
-    if (m == null)
-      throw NoCurrencyException();
-    else
-    if (m.amount - value + newValue < 0)
-      throw NotEnoughMoneyException();
+      // check is there enough money for the operation
+      if (m == null)
+        throw NoCurrencyException();
+      else if (m.amount - value + newValue < 0)
+        throw NotEnoughMoneyException();
+    }
   }
 
   Operation({@required int id, @required Portfolio portfolio, Instrument instrument,

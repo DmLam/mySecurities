@@ -19,6 +19,13 @@ class PortfolioOperationsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    String appBarTitle() {
+      return
+        _instrument == null ?
+          S.of(context).portfolioOperations_Title(_portfolio.name) :
+          S.of(context).operationsByInstrument_Title(_portfolio.name, _instrument.ticker);
+    }
+
     addOperation() async {
       await Navigator.of(context).push(
         MaterialPageRoute(
@@ -30,7 +37,7 @@ class PortfolioOperationsPage extends StatelessWidget {
 
     return
       Scaffold(
-        appBar: MySecuritiesAppBar(pageName: S.of(context).portfolioOperations_Title(_portfolio.name)),
+        appBar: MySecuritiesAppBar(pageName: appBarTitle()),
         body: ChangeNotifierProvider<Portfolio>.value(
             value: _portfolio,
             child: OperationsListView(ticker: _instrument.ticker)),

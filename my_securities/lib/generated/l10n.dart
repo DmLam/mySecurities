@@ -515,13 +515,23 @@ class S {
     );
   }
 
-  /// `{portfolio} operations`
+  /// `{portfolio} transactions`
   String portfolioOperations_Title(Object portfolio) {
     return Intl.message(
-      '$portfolio operations',
+      '$portfolio transactions',
       name: 'portfolioOperations_Title',
       desc: '',
       args: [portfolio],
+    );
+  }
+
+  /// `{portfolio} transactions on {ticker}`
+  String operationsByInstrument_Title(Object portfolio, Object ticker) {
+    return Intl.message(
+      '$portfolio transactions on $ticker',
+      name: 'operationsByInstrument_Title',
+      desc: '',
+      args: [portfolio, ticker],
     );
   }
 

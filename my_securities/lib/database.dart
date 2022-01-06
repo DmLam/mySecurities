@@ -636,7 +636,8 @@ class DBProvider {
   }
 
   static final _sqlPortfolioMoneyOperations =
-    'SELECT id, portfolio_id, operation_id, currency_id, date, type, amount, comment FROM money WHERE portfolio_id = ? ORDER BY date, id';
+  '''SELECT id, portfolio_id, operation_id, currency_id, date, type, amount, comment 
+     FROM money WHERE portfolio_id = ? ORDER BY date desc, id''';
 
   Future<List<MoneyOperation>> getPortfolioMoneyOperations(int portfolioId) async {
     final Database db = await database;

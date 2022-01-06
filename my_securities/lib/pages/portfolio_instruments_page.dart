@@ -42,10 +42,25 @@ class PortfolioInstrumentsPage extends StatelessWidget {
             builder: (context, _) {
               Portfolio portfolio = context.watch<Portfolio>();
 
-              return Column(children: [
-                PortfolioInstrumentsListView(portfolio, context.watch<Preferences>()),
-                PortfolioMoniesListView(portfolio)
-              ]);
+              return  LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints viewportConstraints) {
+                  return SingleChildScrollView(
+                      child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                              minHeight: viewportConstraints.maxHeight),
+                          child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children:
+                              [
+                                PortfolioInstrumentsListView(
+                                    portfolio, context.watch<Preferences>()),
+                                PortfolioMoniesListView(portfolio),
+                              ]
+                          )
+                      )
+                  );
+                }
+              );
             }
           ),
         floatingActionButton: SpeedDial(
