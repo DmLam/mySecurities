@@ -14,7 +14,7 @@ class PortfolioMoniesListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.builder(
         shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(), // needed to make SingleChildScrollView on instruments page scrollable
         itemCount: _portfolio.monies.length,
         itemBuilder: (BuildContext context, int index) =>
           ChangeNotifierProvider<Money>.value(

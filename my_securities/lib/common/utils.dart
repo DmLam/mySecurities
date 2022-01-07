@@ -21,3 +21,7 @@ DateTime currentTime() => timeOf(DateTime.now());
 
 String dateString(DateTime date) =>
     DateFormat.yMd(ui.window.locale.languageCode).format(dateOf(date));
+
+void InternalException(String error) {
+  throw Exception("Internal exception: $error");
+}

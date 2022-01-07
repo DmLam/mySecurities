@@ -45,8 +45,12 @@
   "portfolioEditDialog_visible": "Видимый",
   "portfolioEditDialog_Commission": "Коммиссия",
 
+  "portfolioInstrumentPageMenuImportOperations": "Импортировать операции",
   "portfolioInstrumentPageAddOperation": "Добавить операцию",
   "portfolioInstrumentPageAddMoneyOperation": "Добавить операцию с валютой",
+
+  "importPortfolioOperationsPageTitle": "Импорт операций {portfolio_name}",
+  "importPortfolioOperationsPageSelectFile": "Выберите xlsx-файл для загрузки",
 
   "portfolioInstrumentListView_menuEdit": "Редактировать",
 

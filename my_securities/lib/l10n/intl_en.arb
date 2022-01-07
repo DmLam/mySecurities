@@ -45,8 +45,12 @@
   "portfolioEditDialog_visible": "Visible",
   "portfolioEditDialog_Commission": "Commission",
 
+  "portfolioInstrumentPageMenuImportOperations": "Import operations",
   "portfolioInstrumentPageAddOperation": "Add operation",
   "portfolioInstrumentPageAddMoneyOperation": "Add money operation",
+
+  "importPortfolioOperationsPageTitle": "Import operations into {portfolio_name}",
+  "importPortfolioOperationsPageSelectFile": "Select xlsx file for import",
 
   "portfolioInstrumentListView_menuEdit": "Edit",
 

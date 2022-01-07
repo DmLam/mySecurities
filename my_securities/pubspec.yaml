@@ -32,12 +32,13 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_typeahead: ^1.9.3
-  xml: ^4.5.1
+  xml: ^5.3.1
   fluttericon: ^1.0.7
   flutter_speed_dial: 3.0.5
-  flutter_svg: ^0.19.3
+  flutter_svg: ^1.0.0
   http_proxy: ^1.1.0
-  fluttertoast: 8.0.6
+  fluttertoast: ^8.0.6
+  file_picker: ^2.1.7
   pref: ^2.1.0 # https://pub.dev/packages/pref
 
 
@@ -48,6 +49,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  mockito: ^5.0.17
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

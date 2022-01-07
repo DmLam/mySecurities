@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:my_securities/common/utils.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -277,7 +278,7 @@ class DBProvider {
     bool result = false;
 
     if (instrument.id == null)
-      Fluttertoast.showToast(msg: "Internal error: updating instrument without id");
+      InternalException("Updating instrument without id");
     else {
       final Database db = await database;
       db.transaction((txn) async {

@@ -415,6 +415,16 @@ class S {
     );
   }
 
+  /// `Import operations`
+  String get portfolioInstrumentPageMenuImportOperations {
+    return Intl.message(
+      'Import operations',
+      name: 'portfolioInstrumentPageMenuImportOperations',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Add operation`
   String get portfolioInstrumentPageAddOperation {
     return Intl.message(
@@ -430,6 +440,26 @@ class S {
     return Intl.message(
       'Add money operation',
       name: 'portfolioInstrumentPageAddMoneyOperation',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Import operations into {portfolio_name}`
+  String importPortfolioOperationsPageTitle(Object portfolio_name) {
+    return Intl.message(
+      'Import operations into $portfolio_name',
+      name: 'importPortfolioOperationsPageTitle',
+      desc: '',
+      args: [portfolio_name],
+    );
+  }
+
+  /// `Select xlsx file for import`
+  String get importPortfolioOperationsPageSelectFile {
+    return Intl.message(
+      'Select xlsx file for import',
+      name: 'importPortfolioOperationsPageSelectFile',
       desc: '',
       args: [],
     );
