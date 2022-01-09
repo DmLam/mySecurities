@@ -1,13 +1,16 @@
 import 'package:my_securities/models/portfolio.dart';
 
 class Model {
-  static PortfolioList _portfolios;
+  static PortfolioList? _portfolios;
 
   static PortfolioList get portfolios {
-    if (_portfolios == null)
-      _portfolios = PortfolioList();
+    PortfolioList result = _portfolios ?? PortfolioList();
 
-    return _portfolios;
+    if (_portfolios == null) {
+      _portfolios = result;
+    }
+
+    return result;
   }
 }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_securities/common/types.dart';
 import 'package:my_securities/models/operation.dart';
 import 'instrument.dart';
 import 'package:my_securities/database.dart';
@@ -8,21 +9,21 @@ import 'money.dart';
 import 'money_operation.dart';
 
 class Portfolio extends ChangeNotifier {
-  PortfolioList _owner;
-  int _id;
+  PortfolioList? _owner;
+  int? _id;
   String name;
   bool _visible;
-  DateTime _startDate;
-  double commission;
+  DateTime? _startDate;
+  double? commission;
 
-  InstrumentList _instruments;
-  OperationList _operations;
-  MoneyList _monies;
-  MoneyOperationList _moneyOperations;
+  late final InstrumentList _instruments;
+  late final OperationList _operations;
+  late final MoneyList _monies;
+  late final MoneyOperationList _moneyOperations;
 
-  int get id => _id;
+  int? get id => _id;
   bool get visible => _visible;
-  DateTime get startDate => _startDate;
+  DateTime? get startDate => _startDate;
 
   InstrumentList get instruments => _instruments;
   OperationList get operations => _operations;
@@ -90,9 +91,9 @@ class Portfolio extends ChangeNotifier {
     return Future.value(await Model.portfolios._add(portfolio));
   }
 
-  Future<bool> update({String name, bool visible, DateTime startDate, double commission}) async {
+  Future<bool> update({String? name, bool? visible, DateTime? startDate, double? commission}) async {
     bool doUpdate = false;
-    bool result;
+    bool result = false;
 
     if (this.name != name && name != null) {
       this.name = name;
@@ -124,8 +125,8 @@ class Portfolio extends ChangeNotifier {
 }
 
 class PortfolioList extends ChangeNotifier {
-  List<Portfolio> _items;
-  Future _ready;
+  List<Portfolio> _items = [];
+  late final Future _ready;
 
   Future get ready => _ready;
 
@@ -137,7 +138,7 @@ class PortfolioList extends ChangeNotifier {
   }
 
   Portfolio portfolioById(int id) {
-    Portfolio result;
+    Portfolio? result;
 
     for(Portfolio item in _items) {
       if (item.id == id) {
@@ -145,6 +146,10 @@ class PortfolioList extends ChangeNotifier {
         break;
       }
     }
+
+    if (result == null)
+      throw InternalException("Portfolio [$id] not found");
+
     return result;
   }
 
@@ -155,6 +160,7 @@ class PortfolioList extends ChangeNotifier {
 
   Future _init() async{
     await _loadFromDb();
+    return Future.value(null);
   }
 
   Future<int> _add(Portfolio portfolio) async {

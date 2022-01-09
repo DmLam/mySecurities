@@ -6,13 +6,12 @@ import 'package:my_securities/common/utils.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/models/portfolio.dart';
 import 'package:my_securities/widgets/appbar.dart';
-import 'package:fluttericon/font_awesome_icons.dart';
 
 
 class PortfolioEditDialog extends StatefulWidget {
   final Portfolio _portfolio;
 
-  PortfolioEditDialog(this._portfolio, {Key key}) : super(key: key) {
+  PortfolioEditDialog(this._portfolio, {Key? key}) : super(key: key) {
     assert(_portfolio != null);
   }
 

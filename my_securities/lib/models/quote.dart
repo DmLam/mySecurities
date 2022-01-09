@@ -2,7 +2,7 @@ class Quote {
   DateTime date;
   double open, low, high, close;
 
-  Quote({this.date, this.open, this.low, this.high, this.close});
+  Quote({required this.date, required this.open, required this.low, required this.high, required this.close});
 
   factory Quote.fromMap(Map<String, dynamic> json) =>
       Quote(date: DateTime.parse(json["date"]),

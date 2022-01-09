@@ -11,6 +11,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:my_securities/models/portfolio.dart';
 import 'package:my_securities/models/instrument.dart';
 import 'package:my_securities/models/operation.dart';
+import 'common/types.dart';
 import 'constants.dart';
 import 'exchange.dart';
 import 'models/money.dart';
@@ -29,27 +30,31 @@ class DBProvider {
   DBProvider._();
 
   static final DBProvider db = DBProvider._();
-  static Database _database;
+  static Database? _database;
 
   final int error_SQLITE_CONSTRAINT_UNIQUE = 2067; // ignore: non_constant_identifier_names
   final int error_SQLITE_CONSTRAINT_TRIGGER = 1811; // ignore: non_constant_identifier_names
 
   Future<Database> get database async {
-    if (_database != null)
-      return _database;
+    Database db = _database ?? await initDB();
 
-    await initDB();
-    return _database;
+    if (_database == null)
+      _database = db;
+
+    return Future.value(db);
   }
 
-  int extractErrorCodeFromErrorMessage(String message) {
+  int extractErrorCodeFromErrorMessage(String? message) {
     int result = -1;
     if (message != null) {
       RegExp re = RegExp(r"code (\d+)");
 
-      RegExpMatch match = re.firstMatch(message);
+      RegExpMatch? match = re.firstMatch(message);
       if (match != null) {
-        result = int.parse(match[1]);
+        String? matchValue = match[1];
+
+        if (matchValue != null)
+          result = int.parse(matchValue);
       }
     }
     return result;
@@ -75,7 +80,7 @@ class DBProvider {
     await db.execute('CREATE TABLE exchange (id INTEGER PRIMARY KEY, name TEXT NOT NULL, shortname TEXT NOT NULL, country TEXT NOT NULL)');
     for (Exchange ex in Exchange.values) {
       if (ex != Exchange.ASX)
-        await db.insert('exchange', {'id': ex.index + 1, 'name': EXCHANGES[ex.name()]['name'], 'shortname': ex.name(), 'country': EXCHANGES[ex.name()]['country']});
+        await db.insert('exchange', {'id': ex.index + 1, 'name': EXCHANGES[ex.name()]?['name'], 'shortname': ex.name(), 'country': EXCHANGES[ex.name()]?['country']});
     }
   }
   Future<void> _createTablePortfolio(Database db) async{
@@ -250,11 +255,11 @@ class DBProvider {
   void _onDowngrade(Database db, int oldVersion, int newVersion) async {
   }
 
-  initDB() async {
+  Future<Database> initDB() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, "mysecurities.db");
 //    await deleteDatabase(path); // пока идет отладка
-    await openDatabase(path,
+    return openDatabase(path,
       version: CURRENT_DB_VERSION,
       onConfigure: _onConfigure,
       onOpen: _onOpen,
@@ -264,7 +269,7 @@ class DBProvider {
     );
   }
 
-  Future<int> addInstrument(String ticker, String isin, String name, Currency currency, InstrumentType type, Exchange exchange, String additional) async {
+  Future<int> addInstrument(String ticker, String isin, String name, Currency currency, InstrumentType type, Exchange exchange, String? additional) async {
     final Database db = await database;
     await db.execute("INSERT INTO instrument (isin, ticker, name, currency_id, instrument_type_id, exchange_id, additional) values (?, ?, ?, ?, ?, ?, ?)",
         [isin, ticker, name, Currency.values.indexOf(currency) + 1,
@@ -278,7 +283,7 @@ class DBProvider {
     bool result = false;
 
     if (instrument.id == null)
-      InternalException("Updating instrument without id");
+      throw InternalException("Updating instrument without id");
     else {
       final Database db = await database;
       db.transaction((txn) async {
@@ -314,8 +319,8 @@ class DBProvider {
     await db.execute('UPDATE instrument SET image = ? WHERE id = ?', [image, instrumentId]);
   }
 
-  Future<int> getInstrumentId(String isin) async {
-    int result;
+  Future<int?> getInstrumentId(String isin) async {
+    int? result;
     final Database db = await database;
     var instrument = await db.rawQuery("SELECT id FROM instrument WHERE isin = ?", [isin]);
     var r = instrument.isNotEmpty ? instrument.first['id'] : null;
@@ -335,7 +340,7 @@ class DBProvider {
            GROUP BY i.id   
            HAVING i.id is not null''';
 
-  Future<List<Instrument>> getInstruments() async {
+  Future<List<Instrument>?> getInstruments() async {
     final Database db = await database;
     var instruments = await db.rawQuery(_sqlInstruments);
 
@@ -372,17 +377,15 @@ class DBProvider {
      });
    }
 
-  Future<int> _getPortfolioInstrumentId(int portfolioId, int instrumentId) async {
+  Future<int?> _getPortfolioInstrumentId(int portfolioId, int instrumentId) async {
     final Database db = await database;
-    int result;
+    int? result;
 
-    if (instrumentId != null) {
-      var pi = await db.query('portfolio_instrument', columns: ['id'],
-          where: 'portfolio_id=? and instrument_id=?',
-          whereArgs: [portfolioId, instrumentId]);
+    var pi = await db.query('portfolio_instrument', columns: ['id'],
+        where: 'portfolio_id=? and instrument_id=?',
+        whereArgs: [portfolioId, instrumentId]);
 
-      result = pi.isEmpty ? null : pi[0]['id'];
-    }
+    result = pi.isEmpty ? null : pi[0]['id'];
 
     return  Future.value(result);
   }
@@ -401,7 +404,7 @@ class DBProvider {
        and pi.instrument_id = ?
     ''';
 
-  Future<List<Operation>> getPortfolioOperations(int portfolioId, {int instrumentId}) async {
+  Future<List<Operation>> getPortfolioOperations(int portfolioId, {int? instrumentId}) async {
     final Database db = await database;
     List<Map<String, dynamic>> operations =
       instrumentId == null ?
@@ -411,12 +414,23 @@ class DBProvider {
     return operations.isNotEmpty ? operations.map((o) => Operation.fromMap(o)).toList() : <Operation>[];
   }
 
-  Future<int> addOperation(Operation op, {MoneyOperation moneyOperation, commissionOperation}) async {
-    assert(op.id == null);
-    assert(op.instrument != null);
+  Future<int> addOperation(Operation op, {MoneyOperation? moneyOperation, commissionOperation}) async {
+    DateTime? operationDate = op.date;
+    int? portfolioId = op.portfolio.id, instrumentId = op.instrument.id;
+
+    if (op.id == null)
+      throw InternalException("Operation already exists");
+//    if (op.instrument == null)
+//      throw InternalException("Operation's instrument is unassigned");
+    if (operationDate == null)
+      throw InternalException("Operation's date is unassigned");
+    if (portfolioId == null)
+      throw InternalException("Operation's portfolio id is unassigned");
+    if (instrumentId == null)
+      throw InternalException("Operation's instrument id is unassigned");
 
     final Database db = await database;
-    int portfolioInstrumentId = await _getPortfolioInstrumentId(op.portfolio.id, op.instrument.id);
+    int? portfolioInstrumentId = await _getPortfolioInstrumentId(portfolioId, instrumentId);
 
     await db.transaction((txn) async {
       // if there is no this instrument in this portfolio, then create relation
@@ -431,7 +445,7 @@ class DBProvider {
 
       op.id = await txn.insert('operation',
           {'portfolio_instrument_id': portfolioInstrumentId,
-            'date': dbDateString(op.date),
+            'date': dbDateString(operationDate),
             'type': op.type.index,
             'quantity': op.quantity,
             'price': op.price,
@@ -450,10 +464,17 @@ class DBProvider {
 
   updateOperation(Operation op) async {
     final Database db = await database;
+    DateTime? operationDate = op.date;
+    int? moneyOperationTypeId = operationTypeToMoneyOperationType(op.type)?.id;
+    
+    if (operationDate == null)
+      throw InternalException("Operation's date is unassigned");
+    if (moneyOperationTypeId == null)
+      throw InternalException("Money operation type is unkknown");
 
     await db.transaction((txn) async {
       txn.update('operation',
-          {'date': dbDateString(op.date),
+          {'date': dbDateString(operationDate),
             'type': op.type.index,
             'quantity': op.quantity,
             'price': op.price,
@@ -465,8 +486,8 @@ class DBProvider {
 
       txn.update('money',
           {'currency_id': op.instrument.currency.id,
-            'date': dbDateString(op.date),
-            'type': operationTypeToMoneyOperationType(op.type).id,
+            'date': dbDateString(operationDate),
+            'type': moneyOperationTypeId,
             'amount': op.value - op.commission},
           where: 'operation_id = ?',
           whereArgs: [op.id]);
@@ -475,9 +496,17 @@ class DBProvider {
 
   deleteOperation(Operation op) async {
     final Database db = await database;
-    int portfolioInstrumentId = await _getPortfolioInstrumentId(op.portfolio.id, op.instrument.id);
+    int? portfolioId = op.portfolio.id, instrumentId = op.instrument.id, portfolioInstrumentId;
 
-    assert(portfolioInstrumentId != null, 'portfolioInstrumentId shouldn''t be null');
+    if (portfolioId == null)
+      throw InternalException("Operation's portfolio id is unassigned");
+    if (instrumentId == null)
+      throw InternalException("Operation's instrument id is unassigned");
+
+    portfolioInstrumentId = await _getPortfolioInstrumentId(portfolioId, instrumentId);
+
+    if (portfolioInstrumentId == null)
+      throw InternalException('Portfolio''s instrument id shouldn''t be null');
 
     await db.transaction((txn) async {
       await txn.delete('money', where: 'operation_id = ?', whereArgs: [op.id]);
@@ -533,9 +562,9 @@ class DBProvider {
          WHERE o.portfolio_instrument_id = pi.id and po.instrument_id = ?
       ''';
 
-  Future<DateTime> instrumentFirstOperationDate(int instrumentId) async {
+  Future<DateTime?> instrumentFirstOperationDate(int instrumentId) async {
     final Database db = await database;
-    DateTime result;
+    DateTime? result;
     List<Map<String, dynamic>> r = await db.rawQuery(sqlInstrumentFirstOperationDate, [instrumentId]);
 
     if (r.isNotEmpty) {
@@ -545,10 +574,14 @@ class DBProvider {
     }
     return Future.value(result);
   }
-  Future<DateTime> portfolioInstrumentFirstOperationDate(int portfolioId, int instrumentId) async {
+  Future<DateTime?> portfolioInstrumentFirstOperationDate(int portfolioId, int instrumentId) async {
     final Database db = await database;
-    DateTime result;
-    int portfolioInstrumentId = await _getPortfolioInstrumentId(portfolioId, instrumentId);
+    DateTime? result;
+    int? portfolioInstrumentId = await _getPortfolioInstrumentId(portfolioId, instrumentId);
+
+    if (portfolioInstrumentId == null)
+      throw InternalException('Portfolio''s instrument id shouldn''t be null');
+
     List<Map<String, dynamic>> r = await db.rawQuery('SELECT min(date) date FROM operation WHERE portfolio_instrument_id = ?', [portfolioInstrumentId]);
 
     if (r.isNotEmpty) {
@@ -559,9 +592,9 @@ class DBProvider {
     return Future.value(result);
   }
 
-  Future<DateTime> instrumentLastQuoteUpdate(int instrumentId) async {
+  Future<DateTime?> instrumentLastQuoteUpdate(int instrumentId) async {
     final Database db = await database;
-    DateTime result;
+    DateTime? result;
     List<Map<String, dynamic>> r = await db.query('instrument', columns: ['last_quote_update'], where: 'id = ?', whereArgs: [instrumentId]);
 
     if (r.isNotEmpty) {
@@ -573,9 +606,9 @@ class DBProvider {
     return Future.value(result);
   }
 
-  Future<DateTime> lastRateUpdate() async {
+  Future<DateTime?> lastRateUpdate() async {
     final Database db = await database;
-    DateTime result;
+    DateTime? result;
     List<Map<String, dynamic>> r = await db.rawQuery('SELECT max(date) date FROM rate');
 
     if (r.isNotEmpty) {
@@ -586,9 +619,9 @@ class DBProvider {
     return Future.value(result);
   }
 
-  Future<DateTime> instrumentFirstQuoteDate(int instrumentId) async {
+  Future<DateTime?> instrumentFirstQuoteDate(int instrumentId) async {
     final Database db = await database;
-    DateTime result;
+    DateTime? result;
     List<Map<String, dynamic>> r = await db.rawQuery('SELECT min(date) date FROM quote WHERE instrument_id = ?', [instrumentId]);
 
     if (r.isNotEmpty) {
@@ -605,9 +638,9 @@ class DBProvider {
     db.update('instrument', {'last_quote_update': dbDateString(updateDate)}, where: 'id = ?', whereArgs: [instrumentId]);
   }
 
-  Future<Quote> instrumentLastQuote(int instrumentId) async {
+  Future<Quote?> instrumentLastQuote(int instrumentId) async {
     final Database db = await database;
-    Quote result;
+    Quote? result;
 
     List<Map<String, dynamic>> r = await db.rawQuery(
       '''SELECT date, open, low, high, close FROM quote 
@@ -652,15 +685,24 @@ class DBProvider {
     return Future.value(result);
   }
 
-  addMoneyOperation(MoneyOperation mop, {DatabaseExecutor dbe}) async {
+  addMoneyOperation(MoneyOperation mop, {DatabaseExecutor? dbe}) async {
     final DatabaseExecutor dbx = dbe ?? await database;
+    int? mopCurrencyId = mop.currency?.id, mopTypeId = mop.type?.id;
+    DateTime? mopDate = mop.date;
+
+    if (mopCurrencyId == null)
+      throw InternalException("Money operation's currency is unknown");
+    if (mopTypeId == null)
+      throw InternalException("Money operation's type is unknown");
+    if (mopDate == null)
+      throw InternalException("Money operation's date is unassigned");
 
     await dbx.insert( 'money',
         {
           'portfolio_id': mop.portfolio.id,
-          'currency_id': mop.currency.id,
-          'date': dbDateString(mop.date),
-          'type': mop.type.id,
+          'currency_id': mopCurrencyId,
+          'date': dbDateString(mopDate),
+          'type': mopTypeId,
           'amount': mop.amount,
           'operation_id': mop.operation?.id,
           'comment': mop.comment
@@ -669,12 +711,22 @@ class DBProvider {
 
   updateMoneyOperation(MoneyOperation mop) async {
     final Database db = await database;
+    int? mopCurrencyId = mop.currency?.id, mopTypeId = mop.type?.id;
+    DateTime? mopDate = mop.date;
+
+    if (mopCurrencyId == null)
+      throw InternalException("Money operation's currency is unknown");
+    if (mopTypeId == null)
+      throw InternalException("Money operation's type is unknown");
+    if (mopDate == null)
+      throw InternalException("Money operation's date is unassigned");
+
 
     await db.update('money',
       {
-        'currency_id': mop.currency.id,
-        'date': dbDateString(mop.date),
-        'type': mop.type.id,
+        'currency_id': mopCurrencyId,
+        'date': dbDateString(mopDate),
+        'type': mopTypeId,
         'amount': mop.amount,
         'comment': mop.comment
       },
@@ -706,21 +758,24 @@ class DBProvider {
     return result;
   }
 
-  Future<int> addPortfolio(Portfolio portfolio) async {
+  Future<int?> addPortfolio(Portfolio portfolio) async {
     assert(portfolio.id == null, 'Internal error: adding portfolio with id');
 
-    int result;
+    int? result;
     final Database db = await database;
 
     try {
       result = await db.insert('portfolio', {'name': portfolio.name});
     }
     catch (e) {
-      int code = extractErrorCodeFromErrorMessage(e.message);
+      // todo: проверить поведение при попытке завести портфель второй раз
+      int code = extractErrorCodeFromErrorMessage(e.toString());
       if (code == error_SQLITE_CONSTRAINT_UNIQUE) {
         Fluttertoast.showToast(
             msg: S.current.db_portfolioAlreadyExists(portfolio.name));
       }
+      else
+        throw e;
     }
 
     return Future.value(result);
@@ -731,7 +786,7 @@ class DBProvider {
     final Database db = await database;
 
     if (portfolio.id == null)
-      Fluttertoast.showToast(msg: "Internal error: updating portfolio without id");
+      throw InternalException("Updating portfolio without id");
     else {
       try {
         await db.update(
@@ -746,7 +801,8 @@ class DBProvider {
         result = true;
       }
       catch(e) {
-        int code = extractErrorCodeFromErrorMessage(e.message);
+        // проверить поведение при попытке изменить имя на уже существующее
+        int code = extractErrorCodeFromErrorMessage(e.toString());
         if (code == error_SQLITE_CONSTRAINT_UNIQUE) {
           Fluttertoast.showToast(msg: S.current.db_portfolioAlreadyExists(portfolio.name));
         }
@@ -770,7 +826,8 @@ class DBProvider {
         result = true;
       }
       catch(e) {
-        int code = extractErrorCodeFromErrorMessage(e.message);
+        // todo: проверить поведение при попытке удалить портфель с внешними ссылками
+        int code = extractErrorCodeFromErrorMessage(e.toString());
         if (code == error_SQLITE_CONSTRAINT_TRIGGER) {
           Fluttertoast.showToast(msg: S.current.db_portfolioNotEmpty);
         }
@@ -782,14 +839,14 @@ class DBProvider {
 
   static final _sqlLastOperationDate = 'SELECT max(date) maxdate FROM operation';
 
-  Future<DateTime> getLastOperationDate() async {
-    DateTime result;
+  Future<DateTime?> getLastOperationDate() async {
+    DateTime? result;
     final Database db = await database;
 
     List<Map<String, dynamic>> r = await db.rawQuery(_sqlLastOperationDate);
 
     if (r.isNotEmpty) {
-      String date = r[0]["maxdate"];
+      String? date = r[0]["maxdate"];
 
       if (date != null)
         result = DateTime.parse(date);
@@ -800,14 +857,14 @@ class DBProvider {
 
   static final _sqlLastMoneyOperationDate = 'SELECT max(date) maxdate FROM money';
 
-  Future<DateTime> getLastMoneyOperationDate() async {
-    DateTime result;
+  Future<DateTime?> getLastMoneyOperationDate() async {
+    DateTime? result;
     final Database db = await database;
 
     List<Map<String, dynamic>> r = await db.rawQuery(_sqlLastMoneyOperationDate);
 
     if (r.isNotEmpty) {
-      String date = r[0]["maxdate"];
+      String? date = r[0]["maxdate"];
 
       if (date != null)
         result = DateTime.parse(date);
@@ -816,11 +873,11 @@ class DBProvider {
     return Future.value(result);
   }
 
-  Future<DateTime> getMostLastOperationDate({bool defaultNow: true}) async {
-    DateTime result;
+  Future<DateTime?> getMostLastOperationDate({bool defaultNow: true}) async {
+    DateTime? result;
 
-    DateTime lastMoneyOperation = await getLastMoneyOperationDate();
-    DateTime lastOperation = await getLastOperationDate();
+    DateTime? lastMoneyOperation = await getLastMoneyOperationDate();
+    DateTime? lastOperation = await getLastOperationDate();
     if (lastOperation == null && lastMoneyOperation == null) {
       DateTime now = DateTime.now();
       result = DateTime(now.year, now.month, now.day);
@@ -832,7 +889,7 @@ class DBProvider {
     if (lastMoneyOperation == null && lastOperation != null)
       result = lastOperation;
     else
-    if (lastOperation.isBefore(lastMoneyOperation))
+    if (lastMoneyOperation != null && (lastOperation?.isBefore(lastMoneyOperation) ?? false))
       result = lastMoneyOperation;
     else
       result = lastOperation;

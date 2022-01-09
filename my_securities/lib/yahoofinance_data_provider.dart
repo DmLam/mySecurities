@@ -14,15 +14,15 @@ class YahooFinanceDataProvider implements StockExchangeProvider {
 // https://query1.finance.yahoo.com/v1/finance/search?q=t&lang=en-US&region=US&quotesCount=6&newsCount=4&enableFuzzyQuery=false&quotesQueryId=tss_match_phrase_query&multiQuoteQueryId=multi_quote_single_token_query&newsQueryId=news_cie_vespa&enableCb=true&enableNavLinks=true&enableEnhancedTrivialQuery=true
 
   @override
-  Future<Uint8List> getInstrumentImage(Instrument instrument) async {
+  Future<Uint8List?> getInstrumentImage(Instrument instrument) async {
     return null;
   }
 
   @override
-  Future<List> search({String ticker}) async {
+  Future<List?> search({required String ticker}) async {
     Map<String, dynamic> r;
     http.Response response;
-    List result;
+    List? result;
     Uri uri = Uri.https(_QUERY_URI, _SEARCH,
         {
           'q': ticker,
@@ -48,7 +48,7 @@ class YahooFinanceDataProvider implements StockExchangeProvider {
       for (var quote in r.values) {
         String ticker, name, shortName;
         Exchange exchange;
-        InstrumentType type;
+        InstrumentType? type;
 
         ticker = quote['symbol'];
         exchange = exchangeFromName(quote['exchange']);
@@ -69,25 +69,26 @@ class YahooFinanceDataProvider implements StockExchangeProvider {
         }
 
         result.add(
-          SearchItem(
-            exchange: exchange,
-            ticker: ticker,
-            name: name,
-            shortName: shortName,
-            type: type
-          )
-        );
+            SearchItem(
+                exchange: exchange,
+                isin: '', // НЕЛЬЗЯ ТАК, но будем разбираться если вдруг задействуем Yahoo
+                ticker: ticker,
+                name: name,
+                shortName: shortName,
+                currency: Currency.RUB, // НЕЛЬЗЯ ТАК, но будем разбираться если вдруг задействуем Yahoo
+                type: type
+            ));
+        }
       }
-    }
 
     return Future.value(result);
   }
 
-  Future<double> getInstrumentLastQuote(String ticker) => null;
-  Future<double> getInstrumentPrice(String ticker, {DateTime date}) => null;
-  Future <List<Quote>> getInstrumentQuotes(String ticker, DateTime from, DateTime to) => null;
-  Future<double> convert(double value, Currency from, Currency to) => null;
-  String getCurrencyTicker(Currency currency) => null;
-  Future<double> getCurrencyRate(Currency from, Currency to, {DateTime datetime}) => null;
-  Future<List<Rate>> getCurrencyRates(Currency currency, DateTime from, DateTime to) => null;
+  Future<double?> getInstrumentLastQuote(String ticker) => Future.value(null);
+  Future<double?> getInstrumentPrice(String ticker, {DateTime? date}) => Future.value(null);
+  Future<List<Quote>> getInstrumentQuotes(String ticker, DateTime from, DateTime to) => Future.value([]);
+  Future<double> convert(double value, Currency from, Currency to) => Future.value(null);
+  String? getCurrencyTicker(Currency currency) => null;
+  Future<double?> getCurrencyRate(Currency from, Currency to, {DateTime? datetime}) => Future.value(null);
+  Future<List<Rate>> getCurrencyRates(Currency currency, DateTime from, DateTime? to) => Future.value([]);
 }

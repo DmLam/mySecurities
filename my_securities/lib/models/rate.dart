@@ -5,7 +5,7 @@ class Rate {
   DateTime date;
   double open, low, high, close;
 
-  Rate({this.currency, this.date, this.open, this.low, this.high, this.close});
+  Rate({required this.currency, required this.date, required this.open, required this.low, required this.high, required this.close});
 
   factory Rate.fromMap(Map<String, dynamic> json) =>
       Rate(currency: Currency.values[json["currency_id"] - 1],

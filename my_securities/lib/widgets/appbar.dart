@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_securities/common/types.dart';
 import 'package:my_securities/common/utils.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/pages/settings_page.dart';
@@ -13,7 +14,7 @@ class MySecuritiesAppBar extends StatefulWidget implements PreferredSizeWidget {
   MySecuritiesAppBar({Key key, this.menuItems, this.menuHandlers, this.pageName, this.showSettingsMenu = true}) :
         preferredSize = Size.fromHeight(kToolbarHeight), super(key: key) {
     if (menuItems?.length != menuHandlers?.length) {
-      InternalException("Count of menu items should be equal to count of menu handlers");
+      throw InternalException("Count of menu items should be equal to count of menu handlers");
     }
   }
 

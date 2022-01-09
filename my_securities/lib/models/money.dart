@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:my_securities/common/types.dart';
 import 'package:my_securities/database_list.dart';
 import 'package:my_securities/models/portfolio.dart';
 
@@ -11,7 +12,7 @@ class Money extends ChangeNotifier {
   Currency currency;
   double amount;
 
-  Money({this.portfolio, this.currency, this.amount});
+  Money({required this.portfolio, required this.currency, required this.amount});
 
   factory Money.fromMap(Map<String, dynamic> json) =>
       Money(
@@ -25,10 +26,10 @@ class MoneyList extends DatabaseList<Money> {
 
   MoneyList(Portfolio portfolio) : super(portfolio);
 
-  Money byCurrency(Currency currency) {
-    Money result;
+  Money? byCurrency(Currency? currency) {
+    Money? result;
 
-    if (items.length > 0)
+    if (currency != null && items.length > 0)
       result = items.where((element) => (element.currency == currency)).first;
     return result;
   }
@@ -38,6 +39,10 @@ class MoneyList extends DatabaseList<Money> {
   }
 
   loadFromDb() async {
-    items = await DBProvider.db.getPortfolioMonies(portfolio.id);
+    int? portfolioId = portfolio.id;
+    if (portfolioId == null)
+      throw InternalException("Attempt to load moneys for portfolio with id == null");
+
+    items = await DBProvider.db.getPortfolioMonies(portfolioId);
   }
 }

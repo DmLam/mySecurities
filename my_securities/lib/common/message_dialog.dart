@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-Future<String> messageDialog(BuildContext context, String title, String content,
-    List<String> actions) async {
-  String result;
+Future<String> messageDialog(BuildContext context,
+  {required String title, required String content,
+    required List<String> actions, required String defaultResult}) async {
+  String result = defaultResult;
 
   AlertDialog alertDialog = AlertDialog(
     title: Text(title),

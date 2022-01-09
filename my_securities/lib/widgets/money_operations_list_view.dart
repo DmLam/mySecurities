@@ -49,9 +49,10 @@ class MoneyOperationsListItem extends StatelessWidget {
     String operationDate = dateString(_operation.date);
     String operationDescription = '"${_operation.type.name} ${_operation.currency.sign}${_operation.amount} from $operationDate"';
     String confirmation = await messageDialog(context,
-        S.of(context).moneyOperationsListView_confirmDeleteDialogTitle,
-        S.of(context).moneyOperationsListView_confirmDeleteDialogContent(operationDescription),
-        [S.of(context).dialogAction_Continue, S.of(context).dialogAction_Cancel]);
+        title: S.of(context).moneyOperationsListView_confirmDeleteDialogTitle,
+        content: S.of(context).moneyOperationsListView_confirmDeleteDialogContent(operationDescription),
+        actions: [S.of(context).dialogAction_Continue, S.of(context).dialogAction_Cancel],
+        defaultResult: S.of(context).dialogAction_Cancel);
 
     if (confirmation == S.of(context).dialogAction_Continue) {
       _operation.delete();

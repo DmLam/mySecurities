@@ -37,11 +37,11 @@ class PortfolioInstrumentsListView extends StatelessWidget {
 class PortfolioInstrumentListItem extends StatelessWidget {
   final Instrument _instrument;
 
-  PortfolioInstrumentListItem(this._instrument, {Key key}) : super(key: key);
+  PortfolioInstrumentListItem(this._instrument, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    Uint8List imageBytes = context.watch<Instrument>().image;
+    Uint8List? imageBytes = context.watch<Instrument>().image;
     Widget image = imageBytes == null ? Icon(Icons.attach_money) :
                    Image.memory(imageBytes, width: 30, height: 30);
     Future<double> priceFuture =

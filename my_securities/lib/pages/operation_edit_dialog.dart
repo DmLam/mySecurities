@@ -16,11 +16,11 @@ import '../exchange.dart';
 import '../stock_exchange_interface.dart';
 
 class OperationEditDialog extends StatefulWidget {
-  final Operation _operation;
-  final Instrument _operationInstrument;
+  final Operation? _operation;
+  final Instrument? _operationInstrument;
 
-  OperationEditDialog(this._operation, {Key key}) :
-    _operationInstrument = _operation.instrument ?? Instrument.empty(),
+  OperationEditDialog(this._operation, {Key? key}) :
+    _operationInstrument = _operation?.instrument,
     super(key: key);
 
   @override
@@ -30,7 +30,7 @@ class OperationEditDialog extends StatefulWidget {
 }
 
 class _OperationEditDialogState extends State<OperationEditDialog> {
-  Operation _operation;
+  Operation? _operation;
   final TextEditingController _tickerEditController = TextEditingController();
   final TextEditingController _dateEditController = TextEditingController();
   final TextEditingController _priceEditController = TextEditingController();
@@ -45,24 +45,19 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
   _OperationEditDialogState(this._operation);
 
   void _init() async {
-    DateTime date = _operation.date;
+    DateTime date = _operation?.date ??
+        await DBProvider.db.getMostLastOperationDate() ??
+        dateOf(DateTime.now());
 
-    if (date == null)
-      date = await DBProvider.db.getMostLastOperationDate();
-
-    if (date == null) {
-      date = DateTime.now();
-      date = DateTime(date.year, date.month, date.day);
-    }
     widget._operation.date = date;
 
-    _tickerEditController.text = _operation.instrument?.ticker;
-    _instrumentNameEditController.text = _operation.instrument?.name;
+    _tickerEditController.text = _operation?.instrument?.ticker ?? "";
+    _instrumentNameEditController.text = _operation?.instrument?.name ?? "";
     _dateEditController.text = dateString(widget._operation.date);
-    _priceEditController.text = _operation.price?.toString();
-    _quantityEditController.text = _operation.quantity?.toString();
-    _commissionEditController.text = _operation.commission?.toString();
-    _commentEditController.text = _operation.comment;
+    _priceEditController.text = _operation?.price?.toString() ?? "";
+    _quantityEditController.text = _operation.quantity?.toString() ?? "";
+    _commissionEditController.text = _operation.commission?.toString() ?? "";
+    _commentEditController.text = _operation.comment ?? "";
     receiveInstrumentPrice();
   }
 

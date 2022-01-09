@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:my_securities/common/types.dart';
 import 'package:my_securities/database_list.dart';
 import 'package:my_securities/generated/l10n.dart';
 import '../exchange.dart';
@@ -20,7 +21,7 @@ extension InstrumentTypeExtension on InstrumentType {
 }
 
 class Instrument extends ChangeNotifier {
-  int id;
+  int? id;
   Portfolio _portfolio;
   String isin;
   String ticker;
@@ -29,16 +30,16 @@ class Instrument extends ChangeNotifier {
   Exchange exchange;
   Currency currency;
   double commission;
-  Uint8List _image;
-  String additional;
-  int portfolioPercentPlan;
+  Uint8List? _image;
+  String? additional;
+  int? portfolioPercentPlan;
   int quantity;
   double _averagePrice;
   double _value;
   int _operationCount;
 
   Portfolio get portfolio => _portfolio;
-  Uint8List get image {
+  Uint8List? get image {
     if (_image == null)
       _loadImage();
 
@@ -51,14 +52,17 @@ class Instrument extends ChangeNotifier {
   _initId() async {
     if (id == null)
       id = await DBProvider.db.getInstrumentId(isin);
+
+    if (id == null)
+      throw InternalException("Impossible to initialize instrument");
   }
 
-  Instrument({int id, @required Portfolio portfolio, String isin = '', @required String ticker,
-    String name = '', Currency currency, double commission, InstrumentType type,
-    Exchange exchange = Exchange.MCX, Uint8List image, String additional,
-    int portfolioPercentPlan, int quantity = 0,
+  Instrument({int? id, required Portfolio portfolio, String isin = '',
+    required String ticker, String name = '', required Currency currency,
+    required double commission, required InstrumentType type,
+    Exchange exchange = Exchange.MCX, Uint8List? image, String? additional,
+    int? portfolioPercentPlan, int quantity = 0,
     double averagePrice = 0.0, double value = 0.0, int operationCount = 0}):
-    assert(portfolio != null),
     _portfolio = portfolio,
     this.id = id,
     this.isin = isin,
@@ -97,15 +101,6 @@ class Instrument extends ChangeNotifier {
     _value = source._value,
     _operationCount = source._operationCount;
 
-  Instrument.empty():
-    id = null,
-    exchange = Exchange.MCX,
-    quantity = 0,
-    _averagePrice = 0,
-    _value = 0,
-    _operationCount = 0;
-
-
   factory Instrument.fromMap(Map<String, dynamic> json) =>
       Instrument(
           id: json["id"],
@@ -125,11 +120,11 @@ class Instrument extends ChangeNotifier {
           value: json["value"],
           operationCount: json["operation_count"]);
 
-  double currentValue() => quantity == null ? 0 : quantity * averagePrice;
+  double currentValue() => quantity * averagePrice;
 
   double profit(double currentPrice) => (quantity ?? 0) == 0 ? 0 : quantity * (currentPrice - averagePrice);
 
-  String profitString(double currentPrice, {Currency currency}) => (profit(currentPrice) == 0) ? '' : formatCurrency(profit(currentPrice), currency: currency == null ? this.currency : currency);
+  String profitString(double currentPrice, {Currency? currency}) => (profit(currentPrice) == 0) ? '' : formatCurrency(profit(currentPrice), currency: currency == null ? this.currency : currency);
 
   Map<String, dynamic> toMap() => {
     "id": id,
@@ -159,7 +154,10 @@ class Instrument extends ChangeNotifier {
     commission = source.commission;
     type = source.type;
     exchange = source.exchange;
-    _image = Uint8List.fromList(source.image);
+    final img = source.image;
+    if (img != null) {
+      _image = Uint8List.fromList(img);
+    }
     additional = source.additional;
     portfolioPercentPlan = source.portfolioPercentPlan;
     quantity = source.quantity;
@@ -169,12 +167,16 @@ class Instrument extends ChangeNotifier {
   }
 
   _loadImage() async {
-    Uint8List newImage = await StockExchangeProvider.stock().getInstrumentImage(this);
+    Uint8List? newImage = await StockExchangeProvider.stock().getInstrumentImage(this);
+    final id = this.id;
     // comparing lengths is the dirty way to check that image had been changed
     if ((_image == null && newImage != null) || (newImage?.length != _image?.length) ) {
       _image = newImage;
-      DBProvider.db.setInstrumentImage(id, _image);
-      notifyListeners();
+      final img = _image; // need to do so because of null-safety. See https://dart.dev/tools/non-promotion-reasons#property-or-this
+      if (img != null && id != null) {
+        DBProvider.db.setInstrumentImage(id, img);
+        notifyListeners();
+      }
     }
   }
 
@@ -188,8 +190,9 @@ class Instrument extends ChangeNotifier {
 
     return Future.value(id);
   }
-  Future<bool> update({int portfolioPercentPlan, double commission}) async {
+  Future<bool> update({int? portfolioPercentPlan, double? commission}) async {
     bool doUpdate = false;
+    bool result = false;
 
     if (portfolioPercentPlan != null && this.portfolioPercentPlan != portfolioPercentPlan) {
       this.portfolioPercentPlan = portfolioPercentPlan;
@@ -197,9 +200,11 @@ class Instrument extends ChangeNotifier {
     }
     if (commission != null && this.commission != commission) {
       this.commission = commission;
+      doUpdate = true;
     }
 
-    bool result = await DBProvider.db.updateInstrument(this);
+    if (doUpdate)
+      result = await DBProvider.db.updateInstrument(this);
 
     notifyListeners();
 
@@ -209,11 +214,11 @@ class Instrument extends ChangeNotifier {
 
 extension InstrumentExtension on Instrument {
 
-  String valueString({Currency currency}) => value == null ? '' : formatCurrency(value, currency: currency == null ? this.currency : currency);
+  String valueString({Currency? currency}) => formatCurrency(value, currency: currency == null ? this.currency : currency);
 
   String quantityString() => quantity == null ? '' : quantity.toString() + ' ' + S.current.pcs;
 
-  String averagePriceString({Currency currency}) => averagePrice == null ? '' : formatCurrency(averagePrice, currency: currency == null ? this.currency : currency) ;
+  String averagePriceString({Currency? currency}) => formatCurrency(averagePrice, currency: currency == null ? this.currency : currency) ;
 }
 
 class InstrumentList extends DatabaseList<Instrument> {
@@ -224,8 +229,8 @@ class InstrumentList extends DatabaseList<Instrument> {
     await loadFromDb();
   }
 
-  Instrument byId(int id) {
-    Instrument result;
+  Instrument? byId(int id) {
+    Instrument? result;
 
     for(Instrument instrument in items) {
       if (instrument.id == id) {
@@ -237,8 +242,8 @@ class InstrumentList extends DatabaseList<Instrument> {
     return result;
   }
 
-  Instrument byTicker(String ticker) {
-    Instrument result;
+  Instrument? byTicker(String ticker) {
+    Instrument? result;
 
     for(Instrument instrument in items) {
       if (instrument.ticker == ticker) {
@@ -251,6 +256,9 @@ class InstrumentList extends DatabaseList<Instrument> {
   }
 
   loadFromDb() async {
-    items = await DBProvider.db.getPortfolioInstruments(portfolio.id);
+    int? portfolioId = portfolio.id;
+
+    if (portfolioId != null)
+      items = await DBProvider.db.getPortfolioInstruments(portfolioId);
   }
 }

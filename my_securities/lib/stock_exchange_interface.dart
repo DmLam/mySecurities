@@ -11,12 +11,13 @@ class SearchItem {
   final String isin;
   final String ticker;
   final String name;
-  final String shortName;
-  final InstrumentType type;
+  final String? shortName;
+  final InstrumentType? type;
   final Currency currency;
-  final String additional;
+  final String? additional;
 
-  SearchItem({this.exchange, this.ticker, this.name, this.shortName, this.isin, this.type, this.currency, this.additional});
+  SearchItem({required this.exchange, required this.ticker, required this.name, this.shortName,
+    required this.isin, this.type, required this.currency, this.additional});
 }
 
   class TimestampedQuote {
@@ -27,25 +28,27 @@ class SearchItem {
   }
 
 abstract class StockExchangeProvider {
-  static StockExchangeProvider _stock;
+  static StockExchangeProvider? _stock;
 
   StockExchangeProvider();
 
   factory StockExchangeProvider.stock() {
-    if (_stock == null)
-      _stock = MOEXDataProvider();
+    StockExchangeProvider sep = _stock ?? MOEXDataProvider();
 
-    return _stock;
+    if (_stock == null)
+      _stock = sep;
+
+    return sep;
   }
 
-  Future<List> search({String ticker});
-  Future<Uint8List> getInstrumentImage(Instrument instrument);
-  Future <List<Quote>> getInstrumentQuotes(String ticker, DateTime from, DateTime to);
+  Future<List?> search({required String ticker});
+  Future<Uint8List?> getInstrumentImage(Instrument instrument);
+  Future<List<Quote>> getInstrumentQuotes(String ticker, DateTime from, DateTime to);
   // last quote at previous trade session (yesterday)
-  Future<double> getInstrumentLastQuote(String ticker);
-  Future<double> getInstrumentPrice(String ticker, {DateTime date});
-  String getCurrencyTicker(Currency currency);
-  Future<double> getCurrencyRate(Currency from, Currency to, {DateTime datetime});
-  Future<List<Rate>> getCurrencyRates(Currency currency, DateTime from, DateTime to);
+  Future<double?> getInstrumentLastQuote(String ticker);
+  Future<double?> getInstrumentPrice(String ticker, {DateTime? date});
+  String? getCurrencyTicker(Currency currency);
+  Future<double?> getCurrencyRate(Currency from, Currency to, {DateTime? datetime});
+  Future<List<Rate>> getCurrencyRates(Currency currency, DateTime from, DateTime? to);
 }
 

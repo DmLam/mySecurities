@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 const EdgeInsets PANEL_PADDING = EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0);
 const EdgeInsets PANEL_MARGIN = EdgeInsets.all(6.0);
 
-Widget dialogPanel({List<Widget> children, EdgeInsets margin = PANEL_MARGIN, EdgeInsets padding = PANEL_PADDING}) {
+Widget dialogPanel({required List<Widget> children, EdgeInsets margin = PANEL_MARGIN, EdgeInsets padding = PANEL_PADDING}) {
   return
     Container(
         margin: margin,

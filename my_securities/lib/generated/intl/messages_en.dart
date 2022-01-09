@@ -17,7 +17,6 @@ final messages = new MessageLookup();
 typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 
 class MessageLookup extends MessageLookupByLibrary {
-  String get localeName => 'en';
 
   static m0(name) => "Portfolio \'${name}\' already exists";
 

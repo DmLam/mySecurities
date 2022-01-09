@@ -61,9 +61,11 @@ class PortfolioListViewItem extends StatelessWidget {
   _deletePortfolio(BuildContext context) async {
     String portfolioName = context.read<Portfolio>().name;
     String confirmation = await messageDialog(context,
-        S.of(context).portfoliosListView_confirmDeleteDialogTitle,
-        S.of(context).portfoliosListView_confirmDeleteDialogContent(portfolioName),
-        [S.of(context).dialogAction_Continue, S.of(context).dialogAction_Cancel]);
+        title: S.of(context).portfoliosListView_confirmDeleteDialogTitle,
+        content: S.of(context).portfoliosListView_confirmDeleteDialogContent(portfolioName),
+        actions: [S.of(context).dialogAction_Continue, S.of(context).dialogAction_Cancel],
+        defaultResult: S.of(context).dialogAction_Cancel
+    );
 
     if (confirmation == S.of(context).dialogAction_Continue)
       _portfolio.delete();

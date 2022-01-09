@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:my_securities/common/types.dart';
 import 'package:my_securities/database_list.dart';
 import '../constants.dart';
 import '../database.dart';
@@ -22,19 +23,19 @@ extension MoneyOperationTypeExtension on MoneyOperationType {
 MoneyOperationType moneyOperationTypeById(int id) => MoneyOperationType.values[id - 1];
 
 class MoneyOperation extends ChangeNotifier {
-  int id;
+  int? id;
   Portfolio portfolio;
-  Operation operation;
-  Currency currency;
-  DateTime date;
-  MoneyOperationType type;
+  Operation? operation;
+  Currency? currency;
+  DateTime? date;
+  MoneyOperationType? type;
   double _amount;
-  String comment;
+  String? comment;
 
   double get amount => _amount;
   set amount(double value) {
     if (_amount != value) {
-      Money money = portfolio.monies.byCurrency(currency);
+      Money? money = portfolio.monies.byCurrency(currency);
 
       if (money != null)
         money.amount += value - _amount;
@@ -42,7 +43,7 @@ class MoneyOperation extends ChangeNotifier {
     }
   }
 
-  MoneyOperation({this.id, this.portfolio, this.operation, this.currency, this.date, this.type, amount, this.comment}):
+  MoneyOperation({this.id, required this.portfolio, this.operation, this.currency, this.date, this.type, amount, this.comment}):
     _amount = amount;
 
   factory MoneyOperation.fromMap(Map<String, dynamic> json) {
@@ -60,7 +61,7 @@ class MoneyOperation extends ChangeNotifier {
     );
   }
 
-  MoneyOperation.empty({@required Portfolio portfolio}) :
+  MoneyOperation.empty({required Portfolio portfolio}) :
     this.portfolio = portfolio,
     date = null,
     type = MoneyOperationType.deposit,
@@ -95,7 +96,7 @@ class MoneyOperation extends ChangeNotifier {
   }
 
   Future<bool> update() async {
-    bool result;
+    bool result = false;
 
     if (id != null) {
       await DBProvider.db.updateMoneyOperation(this);
@@ -118,16 +119,20 @@ class MoneyOperationList extends DatabaseList<MoneyOperation>{
 
   MoneyOperationList(Portfolio portfolio): super(portfolio);
 
-  List<MoneyOperation> byCurrency(Currency currency) =>
+  List<MoneyOperation>? byCurrency(Currency? currency) =>
       length == 0 ? null :
       items.where((item) => currency == null || item.currency == currency).toList();
 
   loadFromDb() async {
-    items = await DBProvider.db.getPortfolioMoneyOperations(portfolio.id);
+    int? portfolioId = portfolio.id;
+    if (portfolioId == null)
+      throw InternalException("Attempt to load money operations for portfolio with id == null");
+
+    items = await DBProvider.db.getPortfolioMoneyOperations(portfolioId);
   }
 
-  List<MoneyOperation> byOperationId(int id) {
-    if (length == null || id == null)
+  List<MoneyOperation>? byOperationId(int? id) {
+    if (id == null)
       return null;
 
     return
@@ -136,7 +141,7 @@ class MoneyOperationList extends DatabaseList<MoneyOperation>{
 
 }
 
-MoneyOperationType operationTypeToMoneyOperationType(OperationType op) {
+MoneyOperationType? operationTypeToMoneyOperationType(OperationType op) {
   return op == OperationType.buy ? MoneyOperationType.buy :
   op == OperationType.sell ? MoneyOperationType.sell : null;
 }

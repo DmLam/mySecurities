@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
+import 'package:my_securities/common/utils.dart';
 import 'package:my_securities/database_list.dart';
 import 'package:my_securities/exchange.dart';
 import 'package:my_securities/generated/l10n.dart';
+import '../common/types.dart';
 import '../constants.dart';
 import '../database.dart';
 import 'money_operation.dart';
@@ -22,15 +24,15 @@ class NoCurrencyException implements Exception {}
 class NotEnoughMoneyException implements Exception {}
 
 class Operation extends ChangeNotifier{
-  int id;
+  int? id;
   Portfolio portfolio;
   Instrument instrument;
-  DateTime date;
+  DateTime? date;
   OperationType _type;
   int _quantity;
   double _price;
   double _commission;
-  String comment;
+  String? comment;
 
   OperationType get type => _type;
   int get quantity => _quantity;
@@ -66,7 +68,7 @@ class Operation extends ChangeNotifier{
     if (instrument != null) {
       double newValue = _getOperationValue(
           newType, newQuantity, newPrice, newCommission);
-      Money m = portfolio.monies.byCurrency(instrument.currency);
+      Money? m = portfolio.monies.byCurrency(instrument.currency);
 
       // check is there enough money for the operation
       if (m == null)
@@ -76,9 +78,9 @@ class Operation extends ChangeNotifier{
     }
   }
 
-  Operation({@required int id, @required Portfolio portfolio, Instrument instrument,
-      @required DateTime date, @required OperationType type, @required int quantity, @required double price,
-      double commission = 0, String comment}):
+  Operation({required int id, required Portfolio portfolio, required Instrument instrument,
+      required DateTime date, required OperationType type, required int quantity, required double price,
+      double commission = 0, String? comment}):
     this.id = id,
     this.portfolio = portfolio,
     this.instrument = instrument,
@@ -89,17 +91,16 @@ class Operation extends ChangeNotifier{
     this._commission = commission,
     this.comment = comment;
 
-  Operation.empty({@required Portfolio portfolio, Instrument instrument}) {
-    this.id = null;
-    this.portfolio = portfolio;
-    this.instrument = instrument;
-    this.date = null;
-    this._type = OperationType.buy;
-    this._quantity = 0;
-    this._price = 0;
-    this._commission = 0;
+  Operation.empty({required Portfolio portfolio, required Instrument instrument}) :
+    this.id = null,
+    this.portfolio = portfolio,
+    this.instrument = instrument,
+    this.date = null,
+    this._type = OperationType.buy,
+    this._quantity = 0,
+    this._price = 0,
+    this._commission = 0,
     this.comment = null;
-  }
 
   assign(Operation source) {
     id = source.id;
@@ -115,10 +116,18 @@ class Operation extends ChangeNotifier{
     notifyListeners();
   }
 
-  factory Operation.fromMap(Map<String, dynamic> json) =>
-      Operation(id: json["id"],
-          portfolio: Model.portfolios.portfolioById(json["portfolio_id"]),
-          instrument: Model.portfolios.portfolioById(json["portfolio_id"]).instruments.byId(json["instrument_id"]),
+  factory Operation.fromMap(Map<String, dynamic> json) {
+    final int portfolioId = json["portfolio_id"];
+    final int instrumentId = json["instrument_id"];
+    final Portfolio portfolio = Model.portfolios.portfolioById(portfolioId);
+    late final Instrument? instrument = portfolio.instruments.byId(instrumentId);
+
+    if (instrument == null)
+      throw InternalException("Instrument [id = $instrumentId] not found in portfolio [id = $portfolioId]");
+    else
+      return Operation(id: json["id"],
+          portfolio: portfolio,
+          instrument: instrument,
           date: DateTime.parse(json["date"]),
           type: OperationType.values[json["type"]],
           quantity: json["quantity"],
@@ -126,6 +135,7 @@ class Operation extends ChangeNotifier{
           commission: json["commission"],
           comment: json["comment"]
       );
+  }
 
   String dealOperationComment() {
     return "${type.name} $quantity ${instrument.name}";
@@ -136,7 +146,7 @@ class Operation extends ChangeNotifier{
   }
 
   Future<int> add(bool createMoneyOperation) async {
-    MoneyOperation dealOp, commissionOp;
+    MoneyOperation? dealOp, commissionOp;
 
     if (createMoneyOperation)
       dealOp = MoneyOperation(portfolio: portfolio,
@@ -168,8 +178,8 @@ class Operation extends ChangeNotifier{
     if (id != null) {
       await DBProvider.db.updateOperation(this);
 
-      List<MoneyOperation> mops = portfolio.moneyOperations.byOperationId(id);
-      if (mops.isNotEmpty) {
+      List<MoneyOperation>? mops = portfolio.moneyOperations.byOperationId(id);
+      if (mops != null && mops.isNotEmpty) {
         if (!createMoneyOperation)
           mops.forEach((mop) {mop.delete();});
         else {
@@ -206,7 +216,7 @@ class Operation extends ChangeNotifier{
           }
         }
       }
-      else { // mop == null
+      else { // mops == null
         if (createMoneyOperation) {
           MoneyOperation mop = MoneyOperation(portfolio: portfolio,
               date: date,
@@ -227,7 +237,7 @@ class Operation extends ChangeNotifier{
   }
 
   delete() async {
-    List<MoneyOperation> mops = portfolio.moneyOperations.byOperationId(id);
+    List<MoneyOperation>? mops = portfolio.moneyOperations.byOperationId(id);
 
     await DBProvider.db.deleteOperation(this);
     if (mops != null)
@@ -237,20 +247,20 @@ class Operation extends ChangeNotifier{
   }
 }
 
-extension OperationExtension on Operation {
-
-}
-
 class OperationList extends DatabaseList<Operation> {
 
   OperationList(Portfolio portfolio) : super(portfolio);
 
   List<Operation> byInstrument(Instrument instrument) =>
-    items.where((op) => instrument == null || op.instrument == instrument).toList();
+    items.where((op) => op.instrument == instrument).toList();
 
-  Operation byId(int id) => id == null ? null : items.firstWhere((item) => item.id == id, orElse: () => null);
+  Operation? byId(int? id) => id == null ? null : items.firstWhere((item) => item.id == id, orElse: null);
 
   loadFromDb() async {
-    items = await DBProvider.db.getPortfolioOperations(portfolio.id);
+    int? portfolioId = portfolio.id;
+    if (portfolioId == null)
+      throw InternalException("Attempt to load operations for portfolio with id == null");
+
+    items = await DBProvider.db.getPortfolioOperations(portfolioId);
   }
 }

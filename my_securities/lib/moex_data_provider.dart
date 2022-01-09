@@ -38,14 +38,13 @@ class MOEXDataProvider implements StockExchangeProvider {
   Map<int, _Market> _markets = Map<int, _Market>();
   Map<String, _Board> _boards = Map<String, _Board>();
 
-  Future<Uint8List> _svgToPng(Uint8List svgBytes) async {
-    final DrawableRoot svgDrawableRoot = await svg.fromSvgBytes(svgBytes, null);
+  Future<Uint8List?> _svgToPng(Uint8List svgBytes) async {
+    final DrawableRoot svgDrawableRoot = await svg.fromSvgBytes(svgBytes, '');
     final ui.Picture picture = svgDrawableRoot.toPicture(size: Size(30, 30));
     final ui.Image image = await picture.toImage(30, 30);
-    final ByteData bytes = await image.toByteData(
-        format: ui.ImageByteFormat.png);
+    final ByteData? bytes = await image.toByteData(format: ui.ImageByteFormat.png);
 
-    return bytes.buffer.asUint8List();
+    return bytes?.buffer?.asUint8List();
   }
 
   Future _initMoex() async {
@@ -77,7 +76,7 @@ class MOEXDataProvider implements StockExchangeProvider {
     }
   }
 
-  String getCurrencyTicker(Currency currency) {
+  String? getCurrencyTicker(Currency currency) {
     switch (currency) {
       case Currency.RUB:
         return null;
@@ -107,9 +106,9 @@ class MOEXDataProvider implements StockExchangeProvider {
   List<String> _noImageInstruments = [];
 
   @override
-  Future<Uint8List> getInstrumentImage(Instrument instrument) async {
-    Uint8List result;
-    String type;
+  Future<Uint8List?> getInstrumentImage(Instrument instrument) async {
+    Uint8List? result;
+    String? type;
 
     // if we already have tried to get this image and didn't received -
     // don't try again
@@ -142,20 +141,23 @@ class MOEXDataProvider implements StockExchangeProvider {
           // https://api-marketplace.moex.com//media/1238/yandex.svg
           RegExp reImageURL = RegExp(
               r"https://api-marketplace.moex.com//(media/\d+/\w+.svg)");
-          RegExpMatch matches = reImageURL.firstMatch(response.body);
+          RegExpMatch? matches = reImageURL.firstMatch(response.body);
 
-          if (matches.start < matches.end) {
-            Uri imageURI = Uri.https(
-                'api-marketplace.moex.com', matches.group(1));
+          if (matches != null && matches.start < matches.end) {
+            String? path = matches.group(1);
 
-            response = await http.get(imageURI);
-            if (response.statusCode == 200) {
-              Uint8List pngData = await _svgToPng(response.bodyBytes);
+            if (path != null) {
+              Uri imageURI = Uri.https('api-marketplace.moex.com', path);
 
-              result = pngData;
+              response = await http.get(imageURI);
+              if (response.statusCode == 200 && response.bodyBytes != null) {
+                Uint8List? pngData = await _svgToPng(response.bodyBytes);
+
+                result = pngData;
+              }
+              else if (response.statusCode == 404)
+                _noImageInstruments.add(instrument.ticker);
             }
-            else if (response.statusCode == 404)
-              _noImageInstruments.add(instrument.ticker);
           }
         }
       }
@@ -168,7 +170,7 @@ class MOEXDataProvider implements StockExchangeProvider {
   }
 
   @override
-  Future<List> search({String ticker}) async {
+  Future<List?> search({required String ticker}) async {
     final MAX_RESULT_COUNT = 10;
     http.Response response;
     Uri searchURI = Uri.https(_MOEX_URL, '/iss/securities.json', {
@@ -179,7 +181,7 @@ class MOEXDataProvider implements StockExchangeProvider {
       'engines.columns': 'id,name',
       'markets.columns': 'id,trade_engine_id,board_id,market_name'
     });
-    List result;
+    List? result;
 
     if (ticker.isNotEmpty && ticker.length > 1) {
       try {
@@ -201,7 +203,7 @@ class MOEXDataProvider implements StockExchangeProvider {
             String ticker = row[3];
             String board = row[4];
             String type = row[6];
-            InstrumentType instrumentType =
+            InstrumentType? instrumentType =
             type == 'currency' ? InstrumentType.currency :
             type == 'common_share' ? InstrumentType.share :
             type.endsWith('ppif') ? InstrumentType.etf :
@@ -216,17 +218,18 @@ class MOEXDataProvider implements StockExchangeProvider {
             if (instrumentType == null)
               throw Exception("Unknown instrument type: $type");
             // получим валюту
-            Currency currency = await _getInstrumentCurrency(ticker, board);
-            result.add(
-                SearchItem(
-                    exchange: Exchange.MCX,
-                    ticker: ticker,
-                    name: name,
-                    shortName: shortName,
-                    isin: isin,
-                    type: instrumentType,
-                    currency: currency,
-                    additional: board));
+            final Currency? currency = await _getInstrumentCurrency(ticker, board);
+            if (currency != null)
+              result.add(
+                  SearchItem(
+                      exchange: Exchange.MCX,
+                      ticker: ticker,
+                      name: name,
+                      shortName: shortName,
+                      isin: isin,
+                      type: instrumentType,
+                      currency: currency,
+                      additional: board));
           }
         }
       }
@@ -240,8 +243,8 @@ class MOEXDataProvider implements StockExchangeProvider {
 
   final Map<String, String> _instrumentBoardCache = {};
 
-  Future<String> _getInstrumentBoard(String ticker) async {
-    String result;
+  Future<String?> _getInstrumentBoard(String ticker) async {
+    String? result;
 
     if (ticker.isNotEmpty) {
       result = _instrumentBoardCache[ticker];
@@ -262,7 +265,8 @@ class MOEXDataProvider implements StockExchangeProvider {
             for (List sec in securities) {
               if (sec[0] == ticker) {
                 result = sec[1];
-                _instrumentBoardCache[ticker] = result;
+                if (result != null)
+                  _instrumentBoardCache[ticker] = result;
                 break;
               }
             }
@@ -277,19 +281,19 @@ class MOEXDataProvider implements StockExchangeProvider {
     return Future.value(result);
   }
 
-  Future<String> _getBoardMarket(String boardName) async {
+  Future<String?> _getBoardMarket(String boardName) async {
     await _initMoex();
 
-    return _markets[_boards[boardName].marketId].name;
+    return _markets[_boards[boardName]?.marketId]?.name;
   }
 
-  Future<String> _getBoardEngine(String boardName) async {
+  Future<String?> _getBoardEngine(String boardName) async {
     _initMoex();
 
-    return _engines[_markets[_boards[boardName].marketId].engineId];
+    return _engines[_markets[_boards[boardName]?.marketId]?.engineId];
   }
 
-  Currency _currencyIdToCurrency(String currencyId) {
+  Currency? _currencyIdToCurrency(String currencyId) {
     switch (currencyId) {
       case 'SUR':
       case 'RUB':
@@ -315,10 +319,10 @@ class MOEXDataProvider implements StockExchangeProvider {
     return null;
   }
 
-  Future<Currency> _getInstrumentCurrency(String ticker, String board) async {
-    Currency result;
+  Future<Currency?> _getInstrumentCurrency(String ticker, String board) async {
+    Currency? result;
     http.Response response;
-    String market = await _getBoardMarket(board), engine = await _getBoardEngine(board);
+    String? market = await _getBoardMarket(board), engine = await _getBoardEngine(board);
     Uri searchURI = Uri.https(_MOEX_URL,
         '/iss/engines/$engine/markets/$market/boards/$board/securities/$ticker.json',
         {
@@ -349,11 +353,11 @@ class MOEXDataProvider implements StockExchangeProvider {
   }
 
   @override
-  Future<double> getInstrumentLastQuote(String ticker) async {
-    double result;
-    String board = await _getInstrumentBoard(ticker);
+  Future<double?> getInstrumentLastQuote(String ticker) async {
+    double? result;
+    String? board = await _getInstrumentBoard(ticker);
     if (board != null) {
-      String market = await _getBoardMarket(board), engine = await _getBoardEngine(board);
+      String? market = await _getBoardMarket(board), engine = await _getBoardEngine(board);
       Uri searchURI = Uri.https(_MOEX_URL,
           '/iss/engines/$engine/markets/$market/boards/$board/securities/$ticker.json',
           {
@@ -381,41 +385,47 @@ class MOEXDataProvider implements StockExchangeProvider {
     return Future.value(result);
   }
 
-  Future<double> _getInsrtumentHistoryPrice(String ticker, DateTime date) async {
-    double result;
-    String board = await _getInstrumentBoard(ticker);
+  Future<double?> _getInstrumentHistoryPrice(String ticker, DateTime date) async {
+    double? result;
+    String? board = await _getInstrumentBoard(ticker);
 
     if (board != null) {
-      String market = await _getBoardMarket(board);
-      String engine = await _getBoardEngine(board);
-      String from = DateFormat('yyyy-MM-dd').format(date);
-      Uri searchURI = Uri.https(_MOEX_URL,
-          '/iss/history/engines/$engine/markets/$market/sessions/total/securities/$ticker.json',
-          {
-            'iss.only': 'history',
-            'history.columns': 'BOARDID,CLOSE',
-            'iss.meta': 'off',
-            'from': from,
-            'till': from
-          });
+      final String? market = await _getBoardMarket(board);
 
-      try {
-        http.Response response = await http.get(searchURI);
-        if (response.statusCode != 200)
-          throw Exception("Error retrieving quote");
+      if (market != null) {
+        final String? engine = await _getBoardEngine(board);
 
-        Map<String, dynamic> r = jsonDecode(response.body);
-        List data = r['history']['data'];
+        if (engine != null) {
+          final String from = DateFormat('yyyy-MM-dd').format(date);
+          Uri searchURI = Uri.https(_MOEX_URL,
+              '/iss/history/engines/$engine/markets/$market/sessions/total/securities/$ticker.json',
+              {
+                'iss.only': 'history',
+                'history.columns': 'BOARDID,CLOSE',
+                'iss.meta': 'off',
+                'from': from,
+                'till': from
+              });
 
-        List row = data.firstWhere((e) => e[0] == board, orElse: null);
+          try {
+            http.Response response = await http.get(searchURI);
+            if (response.statusCode != 200)
+              throw Exception("Error retrieving quote");
 
-        if (row != null && row[1] != null &&
-            (row[1] is int || row[1] is double)) {
-          result = row[1].toDouble();
+            Map<String, dynamic> r = jsonDecode(response.body);
+            List data = r['history']['data'];
+
+            List? row = data.firstWhere((e) => e[0] == board, orElse: null);
+
+            if (row != null && row[1] != null &&
+                (row[1] is int || row[1] is double)) {
+              result = row[1].toDouble();
+            }
+          }
+          catch (Exception) {
+            result = null;
+          }
         }
-      }
-      catch (Exception) {
-        result = null;
       }
     }
 
@@ -423,52 +433,60 @@ class MOEXDataProvider implements StockExchangeProvider {
   }
 
   @override
-  Future<double> getInstrumentPrice(String ticker, {DateTime date}) async {
-    double result;
+  Future<double?> getInstrumentPrice(String ticker, {DateTime? date}) async {
+    double? result;
 
     date ??= DateTime.now();
     date = dateOf(date); // delete time from date
 
     if (date.isBefore(currentDate()))
-      result = await _getInsrtumentHistoryPrice(ticker, date);
+      result = await _getInstrumentHistoryPrice(ticker, date);
     else {
-      String board = await _getInstrumentBoard(ticker);
+      final String? board = await _getInstrumentBoard(ticker);
 
       if (board != null) {
-        String market = await _getBoardMarket(board);
-        String engine = await _getBoardEngine(board);
-        Uri searchURI = Uri.https(_MOEX_URL,
-            '/iss/engines/$engine/markets/$market/boards/$board/securities/$ticker.json',
-            {
-              'iss.only': 'marketdata,securities',
-              'marketdata.columns': 'SECID,LAST',
-              'securities.columns': 'SECID,PREVPRICE',
-              'iss.meta': 'off'
-            });
+        final String? market = await _getBoardMarket(board);
 
-        try {
-          http.Response response = await http.get(searchURI);
-          if (response.statusCode != 200)
-            throw Exception("Error retrieving quote");
+        if (market != null) {
+          final String? engine = await _getBoardEngine(board);
 
-          Map<String, dynamic> r = jsonDecode(response.body);
+          if (engine != null) {
+            Uri searchURI = Uri.https(_MOEX_URL,
+                '/iss/engines/$engine/markets/$market/boards/$board/securities/$ticker.json',
+                {
+                  'iss.only': 'marketdata,securities',
+                  'marketdata.columns': 'SECID,LAST',
+                  'securities.columns': 'SECID,PREVPRICE',
+                  'iss.meta': 'off'
+                });
 
-          List data = r['marketdata']['data'];
+            try {
+              http.Response response = await http.get(searchURI);
+              if (response.statusCode != 200)
+                throw Exception("Error retrieving quote");
 
-          if (data != null && data[0][1] != null && (data[0][1] is double || data[0][1] is int)) {
-            result = data[0][1].toDouble();
-          }
-          else {
-            // биржа не работает и текущей цены нет, есть только последняя цена на вчера
-            data = r['securities']['data'];
+              Map<String, dynamic> r = jsonDecode(response.body);
 
-            if (data != null && data[0][1] != null && (data[0][1] is double || data[0][1] is int)) {
-              result = data[0][1].toDouble();
+              List? data = r['marketdata']['data'];
+
+              if (data != null && data[0][1] != null &&
+                  (data[0][1] is double || data[0][1] is int)) {
+                result = data[0][1].toDouble();
+              }
+              else {
+                // биржа не работает и текущей цены нет, есть только последняя цена на вчера
+                data = r['securities']['data'];
+
+                if (data != null && data[0][1] != null &&
+                    (data[0][1] is double || data[0][1] is int)) {
+                  result = data[0][1].toDouble();
+                }
+              }
+            }
+            catch (Exception) {
+              result = null;
             }
           }
-        }
-        catch (Exception) {
-          result = null;
         }
       }
     }
@@ -477,75 +495,82 @@ class MOEXDataProvider implements StockExchangeProvider {
   }
 
   @override
-  Future<List<Quote>> getInstrumentQuotes(String ticker, DateTime from, DateTime to) async {
-    List<Quote> result;
-    String board = await _getInstrumentBoard(ticker);
+  Future<List<Quote>> getInstrumentQuotes(String ticker, DateTime from, DateTime? to) async {
+    List<Quote> result = [];
+    String? board = await _getInstrumentBoard(ticker);
 
     if (board != null) {
-      try {
-        int received,
-            start = 0;
-        result = <Quote>[];
-        // Данные отдаются порциями по 100 строк, поэтому крутим цикл пока не получим все
-        do {
-          Uri searchURI;
-          Map<String, String> queryParams = {
-            'from': DateFormat('yyyy-MM-dd').format(from),
-            'history.columns': 'TRADEDATE,OPEN,CLOSE,HIGH,LOW',
-            'iss.only': 'securities',
-            'iss.meta': 'off',
-            'start': start.toString()
-          };
-          if (to != null) {
-            queryParams['till'] = DateFormat('yyyy-MM-dd').format(
-                DateTime(to.year, to.month, to.day));
+      final String? market = await _getBoardMarket(board);
+      if (market != null) {
+        final String? engine = await _getBoardEngine(board);
+
+        if (engine != null) {
+          try {
+            int received,
+                start = 0;
+            result = <Quote>[];
+            // Данные отдаются порциями по 100 строк, поэтому крутим цикл пока не получим все
+            do {
+              Uri searchURI;
+              Map<String, String> queryParams = {
+                'from': DateFormat('yyyy-MM-dd').format(from),
+                'history.columns': 'TRADEDATE,OPEN,CLOSE,HIGH,LOW',
+                'iss.only': 'securities',
+                'iss.meta': 'off',
+                'start': start.toString()
+              };
+              if (to != null) {
+                queryParams['till'] = DateFormat('yyyy-MM-dd').format(
+                    DateTime(to.year, to.month, to.day));
+              }
+              searchURI = Uri.https(_MOEX_URL,
+                  '/iss/history/engines/$engine/markets/$market/boards/$board/securities/$ticker.json',
+                  queryParams);
+              http.Response response = await http.get(searchURI);
+
+              if (response.statusCode != 200)
+                throw Exception("Error retrieving quotes");
+
+              Map<String, dynamic> r = jsonDecode(response.body);
+              List data = r['history']['data'];
+
+              received = 0;
+              for (var row in data) {
+                DateTime date = DateTime.parse(row[0]);
+                double open = row[1]?.toDouble() ?? 0.0;
+                double low = row[2]?.toDouble() ?? 0.0;
+                double high = row[3]?.toDouble() ?? 0.0;
+                double close = row[4]?.toDouble() ?? 0.0;
+
+                result.add(Quote(date: date,
+                    open: open,
+                    low: low,
+                    high: high,
+                    close: close
+                ));
+                received++;
+              }
+              start += received;
+            } while (received > 0);
           }
-          String market = await _getBoardMarket(board), engine = await _getBoardEngine(board);
-          searchURI = Uri.https(_MOEX_URL,
-              '/iss/history/engines/$engine/markets/$market/boards/$board/securities/$ticker.json',
-              queryParams);
-          http.Response response = await http.get(searchURI);
-
-          if (response.statusCode != 200)
-            throw Exception("Error retrieving quotes");
-
-          Map<String, dynamic> r = jsonDecode(response.body);
-          List data = r['history']['data'];
-
-          received = 0;
-          for (var row in data) {
-            DateTime date = DateTime.parse(row[0]);
-            double open = row[1]?.toDouble() ?? 0.0;
-            double low = row[2]?.toDouble() ?? 0.0;
-            double high = row[3]?.toDouble() ?? 0.0;
-            double close = row[4]?.toDouble() ?? 0.0;
-
-            result.add(Quote(date: date,
-              open: open,
-              low: low,
-              high: high,
-              close: close
-            ));
-            received++;
+          catch (Exception) {
+            result = [];
           }
-          start += received;
-        } while (received > 0);
-      }
-      catch (Exception) {
-        result = null;
+        }
       }
     }
+
     return Future.value(result);
   }
 
-  Future<double> _currencyRate(String ticker, DateTime datetime) async {
-    double result;
+  Future<double>? _currencyRate(String ticker, DateTime? datetime) async {
+    double? result;
 
     if (datetime == null) {
       result = await getInstrumentPrice(ticker);
     }
     else {
-      List<Quote> ql = await getInstrumentQuotes(ticker, datetime, datetime);
+      List<Quote>? ql = await getInstrumentQuotes(ticker, datetime, datetime);
       if (ql == null || ql.length == 0)
         throw Exception("Can't retrieve rate for " + ticker);
       result = ql[0].close;
@@ -554,26 +579,35 @@ class MOEXDataProvider implements StockExchangeProvider {
     return Future.value(result);
   }
 
-  Future<double> getCurrencyRate(Currency from, Currency to, {DateTime datetime}) async{
-    double result;
+  Future<double?> getCurrencyRate(Currency from, Currency to, {DateTime? datetime}) async{
+    double? result;
 
     if (from == to)
       result = 1.0;
     else {
       if (from != Currency.RUB && to != Currency.RUB) {
-        result = await getCurrencyRate(from, Currency.RUB, datetime: datetime);
-        result = result * await getCurrencyRate(Currency.RUB, to, datetime: datetime);
+        double? rateFrom = await getCurrencyRate(from, Currency.RUB, datetime: datetime);
+        double? rateTo = await getCurrencyRate(Currency.RUB, to, datetime: datetime);
+
+        if (rateFrom != null && rateTo != null)
+          result = rateFrom * rateTo;
       }
       else {
         if (from == Currency.RUB) {
-          String ticker = getCurrencyTicker(to);
+          String? ticker = getCurrencyTicker(to);
 
-          result = await _currencyRate(ticker, datetime);
+          if (ticker != null)
+            result = await _currencyRate(ticker, datetime);
         }
         else {
-          String ticker = getCurrencyTicker(from);
+          String? ticker = getCurrencyTicker(from);
 
-          result = 1 / await _currencyRate(ticker, datetime);
+          if (ticker != null) {
+            double? rate = await _currencyRate(ticker, datetime);
+
+            if (rate != null)
+              result = 1 / rate;
+          }
         }
       }
     }
@@ -581,18 +615,22 @@ class MOEXDataProvider implements StockExchangeProvider {
     return Future.value(result);
   }
 
-  Future<List<Rate>> getCurrencyRates(Currency currency, DateTime from, DateTime to) async {
-    List<Quote> quotes = await getInstrumentQuotes(getCurrencyTicker(currency), from, to);
-    List<Rate> result = <Rate>[];
+  Future<List<Rate>> getCurrencyRates(Currency currency, DateTime from, DateTime? to) async {
+    List<Rate> result = [];
+    String? ticker = getCurrencyTicker(currency);
 
-    if (quotes != null) {
-      for (Quote quote in quotes) {
-        result.add(Rate(currency: currency,
-            date: quote.date,
-            open: quote.open,
-            low: quote.low,
-            high: quote.high,
-            close: quote.close));
+    if (ticker != null) {
+      List<Quote>? quotes = await getInstrumentQuotes(ticker, from, to);
+
+      if (quotes != null) {
+        for (Quote quote in quotes) {
+          result.add(Rate(currency: currency,
+              date: quote.date,
+              open: quote.open,
+              low: quote.low,
+              high: quote.high,
+              close: quote.close));
+        }
       }
     }
     return Future.value(result);

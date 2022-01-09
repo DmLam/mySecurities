@@ -2,10 +2,11 @@ import 'dart:collection';
 import 'package:meta/meta.dart';
 import 'package:my_securities/models/portfolio.dart';
 
+// List class with property 'ready' signalling that list values have been loaded from db
 abstract class DatabaseList<E> extends ListBase<E> {
   Portfolio _portfolio;
   @protected List<E> items = [];
-  Future _ready;
+  late final Future _ready;
 
   DatabaseList(this._portfolio) {
     _ready = _init();
@@ -21,7 +22,7 @@ abstract class DatabaseList<E> extends ListBase<E> {
 
   Future get ready => _ready;
 
-  _init() async {
+  Future _init() async {
     await loadFromDb();
     return Future.value(null);
   }

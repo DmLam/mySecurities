@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+
 bool isKeyboardOpen(BuildContext context) => MediaQuery.of(context).viewInsets.bottom == 0.0;
 
 String languageCode(BuildContext context) => Localizations.localeOf(context).languageCode;
@@ -21,7 +22,3 @@ DateTime currentTime() => timeOf(DateTime.now());
 
 String dateString(DateTime date) =>
     DateFormat.yMd(ui.window.locale.languageCode).format(dateOf(date));
-
-void InternalException(String error) {
-  throw Exception("Internal exception: $error");
-}

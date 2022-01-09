@@ -129,22 +129,21 @@ Currency currencyById(int id) => Currency.values[id - 1];
 
 const CURRENCY_ROUND_ACCURACY = 4;
 
-String formatCurrency(double d, {int digits = CURRENCY_ROUND_ACCURACY, Currency currency}) {
+String formatCurrency(double d, {int digits = CURRENCY_ROUND_ACCURACY, Currency? currency}) {
   String s;
 
-  if (d != null) {
-    s = d.toStringAsFixed(digits);
-    while (s.length > 1 && s.substring(s.length - 1) == '0') {
-      s = s.substring(0, s.length - 1);
-    }
-    if (s.length > 1 && s.substring(s.length - 1) == '.') {
-      s += '0';
-    }
-
-    if (currency != null) {
-      s += ' ' + CurrencySigns[currency.index];
-    }
+  s = d.toStringAsFixed(digits);
+  while (s.length > 1 && s.substring(s.length - 1) == '0') {
+    s = s.substring(0, s.length - 1);
   }
+  if (s.length > 1 && s.substring(s.length - 1) == '.') {
+    s += '0';
+  }
+
+  if (currency != null) {
+    s += ' ' + CurrencySigns[currency.index];
+  }
+
   return s;
 }
 
