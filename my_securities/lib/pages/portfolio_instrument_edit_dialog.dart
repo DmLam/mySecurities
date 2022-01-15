@@ -13,8 +13,8 @@ class PortfolioInstrumentEditDialog extends StatelessWidget {
   final TextEditingController _commissionEditController = TextEditingController();
 
   PortfolioInstrumentEditDialog(this._instrument, {Key? key}) : super(key: key) {
-    _percentEditController.text = _instrument.portfolioPercentPlan?.toString();
-    _commissionEditController.text = _instrument.commission?.toString();
+    _percentEditController.text = _instrument.portfolioPercentPlan?.toString() ?? "";
+    _commissionEditController.text = _instrument.commission?.toString() ?? "";
   }
 
   @override

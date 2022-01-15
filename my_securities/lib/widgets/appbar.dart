@@ -6,16 +6,16 @@ import 'package:my_securities/pages/settings_page.dart';
 
 // идея взята https://stackoverflow.com/questions/53294006/how-to-create-a-custom-appbar-widget
 class MySecuritiesAppBar extends StatefulWidget implements PreferredSizeWidget {
-  final String pageName;
-  final List<String> menuItems;
-  final List<VoidCallback> menuHandlers;
+  final String? pageName;
+  final List<String>? menuItems;
+  final List<VoidCallback>? menuHandlers;
   final bool showSettingsMenu;
 
-  MySecuritiesAppBar({Key key, this.menuItems, this.menuHandlers, this.pageName, this.showSettingsMenu = true}) :
-        preferredSize = Size.fromHeight(kToolbarHeight), super(key: key) {
-    if (menuItems?.length != menuHandlers?.length) {
-      throw InternalException("Count of menu items should be equal to count of menu handlers");
-    }
+  MySecuritiesAppBar({Key? key, this.menuItems, this.menuHandlers, this.pageName, this.showSettingsMenu = true}) :
+        preferredSize = Size.fromHeight(kToolbarHeight),
+        super(key: key)
+  {
+    assert(menuItems?.length == menuHandlers?.length, "Count of menu items should be equal to count of menu handlers");
   }
 
   @override
@@ -26,14 +26,15 @@ class MySecuritiesAppBar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _MySecuritiesAppBarState extends State<MySecuritiesAppBar>{
-  final String _pageName;
-  final List<String> menuItems;
-  final List<VoidCallback> menuHandlers;
+  final String? _pageName;
+  final List<String>? menuItems;
+  final List<VoidCallback>? menuHandlers;
   final bool showSettingsMenu;
 
   _MySecuritiesAppBarState(this._pageName, this.menuItems, this.menuHandlers, this.showSettingsMenu);
 
   List<PopupMenuItem> popupMenuItemBuilder(BuildContext context) {
+    final List<String>? menuItems = this.menuItems;
     List<PopupMenuItem> result = [];
 
     if (menuItems != null)
@@ -56,13 +57,16 @@ class _MySecuritiesAppBarState extends State<MySecuritiesAppBar>{
 
   @override
   Widget build(BuildContext context) {
+    final String? pageName = this._pageName;
+    final String title = pageName == null ? S.of(context).applicationTitle : pageName;
+
     return AppBar(
-      title: Text(_pageName == null ? S.of(context).applicationTitle : _pageName,
+      title: Text(title,
           style: TextStyle(fontStyle: _pageName == null ? FontStyle.normal : FontStyle.italic)),
       actions: [
         PopupMenuButton(
           itemBuilder: popupMenuItemBuilder,
-          onSelected: (value) {handleMenuSelection(context, value);}
+          onSelected: (value) {handleMenuSelection(context, value.toString());}
         )
       ],
     );
@@ -77,11 +81,15 @@ class _MySecuritiesAppBarState extends State<MySecuritiesAppBar>{
   }
 
   void handleMenuSelection(BuildContext context, String value) {
+    final List<String>? menuItems = this.menuItems;
+    final List<VoidCallback>? menuHandlers = this.menuHandlers;
+
     if (value == S.of(context).appBar_settings) {
       showSettingsPage(context);
     }
     else {
-      menuHandlers[menuItems.indexOf(value)]();
+      if (menuItems != null && menuHandlers != null)
+        menuHandlers[menuItems.indexOf(value)]();
     }
   }
 }

@@ -19,10 +19,10 @@ class YahooFinanceDataProvider implements StockExchangeProvider {
   }
 
   @override
-  Future<List?> search({required String ticker}) async {
+  Future<List<SearchItem>> search({required String ticker}) async {
     Map<String, dynamic> r;
     http.Response response;
-    List? result;
+    List<SearchItem> result = [];
     Uri uri = Uri.https(_QUERY_URI, _SEARCH,
         {
           'q': ticker,
@@ -48,7 +48,7 @@ class YahooFinanceDataProvider implements StockExchangeProvider {
       for (var quote in r.values) {
         String ticker, name, shortName;
         Exchange exchange;
-        InstrumentType? type;
+        InstrumentType type = InstrumentType.currency;
 
         ticker = quote['symbol'];
         exchange = exchangeFromName(quote['exchange']);
@@ -59,7 +59,7 @@ class YahooFinanceDataProvider implements StockExchangeProvider {
             type = InstrumentType.etf;
             break;
           case 'EQUITY':
-            type = null;
+            type = InstrumentType.depositaryReceipt;
             break;
           case 'INDEX':
             type = InstrumentType.stockIndex;

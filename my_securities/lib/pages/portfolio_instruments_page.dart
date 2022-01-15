@@ -19,7 +19,7 @@ import '../preferences.dart';
 class PortfolioInstrumentsPage extends StatelessWidget {
   final Portfolio _portfolio;
 
-  PortfolioInstrumentsPage(this._portfolio, {Key key}) : super(key: key);
+  PortfolioInstrumentsPage(this._portfolio, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -170,8 +170,8 @@ class MOEXDataProvider implements StockExchangeProvider {
   }
 
   @override
-  Future<List?> search({required String ticker}) async {
-    final MAX_RESULT_COUNT = 10;
+  Future<List<SearchItem>> search({required String ticker}) async {
+    const MAX_RESULT_COUNT = 10;
     http.Response response;
     Uri searchURI = Uri.https(_MOEX_URL, '/iss/securities.json', {
       'q': ticker.toUpperCase(),
@@ -181,7 +181,7 @@ class MOEXDataProvider implements StockExchangeProvider {
       'engines.columns': 'id,name',
       'markets.columns': 'id,trade_engine_id,board_id,market_name'
     });
-    List? result;
+    List<SearchItem> result = [];
 
     if (ticker.isNotEmpty && ticker.length > 1) {
       try {
@@ -189,7 +189,6 @@ class MOEXDataProvider implements StockExchangeProvider {
         if (response.statusCode != 200)
           throw Exception("Error searching instrument");
 
-        result = [];
         Map<String, dynamic> r = jsonDecode(response.body);
         List securities = r['securities']['data'];
 
@@ -234,7 +233,7 @@ class MOEXDataProvider implements StockExchangeProvider {
         }
       }
       catch (E) {
-        result = null;
+        // do nothing, simply return empty list
       }
     }
 

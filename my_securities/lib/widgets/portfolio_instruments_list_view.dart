@@ -16,7 +16,7 @@ class PortfolioInstrumentsListView extends StatelessWidget {
   final Portfolio _portfolio;
   final Preferences _preferences;
 
-  PortfolioInstrumentsListView(this._portfolio, this._preferences, {Key key}): super(key: key);
+  PortfolioInstrumentsListView(this._portfolio, this._preferences, {Key? key}): super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +44,7 @@ class PortfolioInstrumentListItem extends StatelessWidget {
     Uint8List? imageBytes = context.watch<Instrument>().image;
     Widget image = imageBytes == null ? Icon(Icons.attach_money) :
                    Image.memory(imageBytes, width: 30, height: 30);
-    Future<double> priceFuture =
+    Future<double?> priceFuture =
       QuoteProvider.of(_instrument).getCurrentPrice();
 
     void editPortfolioInstrument() {
@@ -89,7 +89,7 @@ class PortfolioInstrumentListItem extends StatelessWidget {
             child: Column(children: [
               Text(_instrument.valueString(),
                   style: TextStyle(fontSize: 12), textAlign: TextAlign.right),
-              futureBuilder<double>(
+              futureBuilder<double?>(
                   future: priceFuture,
                   resultWidget: (price) {
                     double profit = 0;
@@ -118,7 +118,7 @@ class PortfolioInstrumentListItem extends StatelessWidget {
                 _instrument.averagePriceString(),
             style: TextStyle(fontSize: 12)),
         Text('  '),
-        futureBuilder<double>(
+        futureBuilder<double?>(
             future: priceFuture,
             resultWidget: (price) {
               return Row(children: [

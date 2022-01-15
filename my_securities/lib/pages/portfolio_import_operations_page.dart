@@ -8,18 +8,21 @@ import 'package:file_picker/file_picker.dart';
 class ImportPortfolioOperationsPage extends StatelessWidget {
   final Portfolio _portfolio;
 
-  ImportPortfolioOperationsPage(this._portfolio, {Key key}): super(key: key);
+  ImportPortfolioOperationsPage(this._portfolio, {Key? key}): super(key: key);
 
   @override
   Widget build(BuildContext context) {
 
     selectFile() async {
-      FilePickerResult result = await FilePicker.platform.pickFiles(
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
         allowMultiple: false,
         type: FileType.custom,
         allowedExtensions: ['xls', 'xlsx']
       );
-      Fluttertoast.showToast(msg: result.files.length.toString());
+
+      if (result != null) {
+        Fluttertoast.showToast(msg: result.files.length.toString());
+      }
     }
 
     return Scaffold(

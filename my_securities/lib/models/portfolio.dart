@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_securities/common/types.dart';
+import 'package:my_securities/common/utils.dart';
 import 'package:my_securities/models/operation.dart';
 import 'instrument.dart';
 import 'package:my_securities/database.dart';
@@ -13,7 +14,7 @@ class Portfolio extends ChangeNotifier {
   int? _id;
   String name;
   bool _visible;
-  DateTime? _startDate;
+  DateTime _startDate;
   double? commission;
 
   late final InstrumentList _instruments;
@@ -23,7 +24,7 @@ class Portfolio extends ChangeNotifier {
 
   int? get id => _id;
   bool get visible => _visible;
-  DateTime? get startDate => _startDate;
+  DateTime get startDate => _startDate;
 
   InstrumentList get instruments => _instruments;
   OperationList get operations => _operations;
@@ -65,7 +66,7 @@ class Portfolio extends ChangeNotifier {
     _id = null,
     name = "",
     _visible = true,
-    _startDate = null,
+    _startDate = currentDate(),
     commission = null;
 
   factory Portfolio.fromMap(Map<String, dynamic> json) =>
@@ -73,7 +74,7 @@ class Portfolio extends ChangeNotifier {
       json["id"],
       json["name"],
       json["visible"] == 1,
-      json["start_date"] == null ? null : DateTime.parse(json["start_date"]),
+      DateTime.parse(json["start_date"]),
       json["commission"]);
 
   assign(Portfolio source) {
@@ -163,8 +164,8 @@ class PortfolioList extends ChangeNotifier {
     return Future.value(null);
   }
 
-  Future<int> _add(Portfolio portfolio) async {
-    int result = await DBProvider.db.addPortfolio(portfolio);
+  Future<int?> _add(Portfolio portfolio) async {
+    int? result = await DBProvider.db.addPortfolio(portfolio);
 
     await _loadFromDb();
     notifyListeners();

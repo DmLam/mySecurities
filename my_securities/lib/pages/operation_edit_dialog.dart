@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:fluttericon/font_awesome_icons.dart';
+import 'package:fluttericon/font_awesome_icons.dart';  // todo: check the library version
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:my_securities/common/dialog_panel.dart';
 import 'package:my_securities/common/utils.dart';
@@ -16,11 +16,11 @@ import '../exchange.dart';
 import '../stock_exchange_interface.dart';
 
 class OperationEditDialog extends StatefulWidget {
-  final Operation? _operation;
+  final Operation _operation;
   final Instrument? _operationInstrument;
 
   OperationEditDialog(this._operation, {Key? key}) :
-    _operationInstrument = _operation?.instrument,
+    _operationInstrument = _operation.instrument,
     super(key: key);
 
   @override
@@ -30,7 +30,8 @@ class OperationEditDialog extends StatefulWidget {
 }
 
 class _OperationEditDialogState extends State<OperationEditDialog> {
-  Operation? _operation;
+  Operation _operation;
+  late DateTime operationDate;
   final TextEditingController _tickerEditController = TextEditingController();
   final TextEditingController _dateEditController = TextEditingController();
   final TextEditingController _priceEditController = TextEditingController();
@@ -45,19 +46,18 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
   _OperationEditDialogState(this._operation);
 
   void _init() async {
-    DateTime date = _operation?.date ??
-        await DBProvider.db.getMostLastOperationDate() ??
-        dateOf(DateTime.now());
+    operationDate = _operation?.date ??
+        await DBProvider.db.getMostLastOperationDate() ?? currentDate();
 
-    widget._operation.date = date;
+    widget._operation.date = operationDate;
 
     _tickerEditController.text = _operation?.instrument?.ticker ?? "";
     _instrumentNameEditController.text = _operation?.instrument?.name ?? "";
-    _dateEditController.text = dateString(widget._operation.date);
+    _dateEditController.text = dateString(operationDate);
     _priceEditController.text = _operation?.price?.toString() ?? "";
-    _quantityEditController.text = _operation.quantity?.toString() ?? "";
-    _commissionEditController.text = _operation.commission?.toString() ?? "";
-    _commentEditController.text = _operation.comment ?? "";
+    _quantityEditController.text = _operation?.quantity?.toString() ?? "";
+    _commissionEditController.text = _operation?.commission?.toString() ?? "";
+    _commentEditController.text = _operation?.comment ?? "";
     receiveInstrumentPrice();
   }
 
@@ -68,25 +68,24 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
   }
 
   receiveInstrumentPrice() async {
-    if (!_priceEdited && (_tickerEditController.text != null)) {
-      double price;
-
-      price = await StockExchangeProvider.stock()
+    if (!_priceEdited && (_tickerEditController.text != "")) {
+      double? price = await StockExchangeProvider.stock()
           .getInstrumentPrice(
           _tickerEditController.text, date: _operation.date);
-      _priceEditController.text = formatCurrency(price);
+      if (price != null)
+        _priceEditController.text = formatCurrency(price);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    String pageName = _operation.id == null ?
+    String pageName = _operation?.id == null ?
       S.of(context).operationEditDialog_Title_add :
       S.of(context).operationEditDialog_Title_edit;
 
     addOperation() async {
       if (_createMoneyOperation) {
-        Money money = _operation.portfolio.monies.byCurrency(_operation.instrument.currency);
+        Money? money = _operation.portfolio.monies.byCurrency(_operation.instrument?.currency);
 
         if ((_operation.type == OperationType.buy) &&
             (money == null || money.amount < _operation.value)) {
@@ -104,7 +103,7 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
     }
 
     bool _fabEnabled() {
-      return widget._operationInstrument.ticker != null &&
+      return widget._operationInstrument?.ticker != null &&
         widget._operation.date != null &&
         _operation.type != null &&
         ((int.tryParse(_quantityEditController.text) ?? 0) != 0) &&
@@ -113,23 +112,39 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
 
     onFabPressed() async {
       if (_operation.instrument == null) {
-        _operation.instrument = Instrument(
-            portfolio: _operation.portfolio,
-            ticker: widget._operationInstrument.ticker,
-            isin: widget._operationInstrument.isin,
-            name: widget._operationInstrument.name,
-            currency: widget._operationInstrument.currency,
-            type: widget._operationInstrument.type,
-            exchange: widget._operationInstrument.exchange,
-            additional: widget._operationInstrument.additional);
-        await _operation.instrument.add();
+        String? ticker = widget._operationInstrument?.ticker;
+        String? isin = widget._operationInstrument?.isin;
+        String? name = widget._operationInstrument?.name;
+        String? additional = widget._operationInstrument?.additional;
+        Currency? currency = widget._operationInstrument?.currency;
+        InstrumentType? type = widget._operationInstrument?.type;
+        Exchange? exchange = widget._operationInstrument?.exchange;
+
+        if (ticker != null && isin != null && name != null && currency != null && type != null &&
+            exchange != null) {
+          _operation.instrument = Instrument(
+              portfolio: _operation.portfolio,
+              ticker: ticker,
+              isin: isin,
+              name: name,
+              currency: currency,
+              type: type,
+              exchange: exchange,
+              additional: additional);
+          await widget._operationInstrument?.add();
+        }
       }
 
       try {
-        _operation.quantity = int.tryParse(_quantityEditController.text);
-        _operation.price = double.tryParse(_priceEditController.text);
-        _operation.commission =
-            double.tryParse(_commissionEditController.text) ?? 0;
+        int? quantity = int.tryParse(_quantityEditController.text);
+        double? price = double.tryParse(_priceEditController.text);
+        double comission = double.tryParse(_commissionEditController.text) ?? 0;
+
+        if (quantity != null && price != null) {
+          _operation.quantity = quantity;
+          _operation.price = price;
+          _operation.commission = comission;
+        }
       }
       catch (e) {
         if (e is NoCurrencyException)
@@ -166,10 +181,10 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
         double price = double.tryParse(_priceEditController.text) ?? 0;
 
         if (quantity != 0 && price != 0) {
-          double commission = _operation.portfolio.commission;
+          double? commission = _operation.portfolio.commission;
           String ticker = _tickerEditController.text;
           if ((ticker ?? '') != '') {
-            Instrument instrument = _operation.portfolio.instruments.byTicker(ticker);
+            Instrument? instrument = _operation.portfolio.instruments.byTicker(ticker);
             if (instrument != null && (instrument.commission  != null))
               commission = instrument.commission;
           }
@@ -180,8 +195,24 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
       }
     }
 
-    Future<List> tickerSuggestions(String pattern) async {
+    Future<List<SearchItem>> tickerSuggestions(String pattern) async {
       return StockExchangeProvider.stock().search(ticker: _tickerEditController.text);
+    }
+
+    suggestionSelected(SearchItem suggestion) {
+      if (widget._operationInstrument?.ticker != suggestion.ticker) {
+        _tickerEditController.text = suggestion.ticker;
+        _instrumentNameEditController.text = suggestion.name;
+        widget._operationInstrument?.ticker = suggestion.ticker;
+        widget._operationInstrument?.name = suggestion.name;
+        widget._operationInstrument?.isin = suggestion.isin;
+        widget._operationInstrument?.type = suggestion.type;
+        widget._operationInstrument?.exchange = suggestion.exchange;
+        widget._operationInstrument?.currency = suggestion.currency;
+        widget._operationInstrument?.additional = suggestion.additional;
+        _operation.instrument = null;
+        receiveInstrumentPrice();
+      }
     }
 
     // build code starts here
@@ -206,7 +237,7 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
                       ),
                       inputFormatters: [UpperCaseTextFormatter()],
                   ),
-                  itemBuilder: (context, suggestion) {
+                  itemBuilder: (BuildContext context, SearchItem suggestion) {
                     return ListTile(
                       title: Text(suggestion.ticker),
                       subtitle: Text(suggestion.name),
@@ -219,21 +250,7 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
                       )
                   ),
                   suggestionsCallback: tickerSuggestions,
-                  onSuggestionSelected: (suggestion) {
-                    if (widget._operationInstrument.ticker != suggestion.ticker) {
-                      _tickerEditController.text = suggestion.ticker;
-                      _instrumentNameEditController.text = suggestion.name;
-                      widget._operationInstrument.ticker = suggestion.ticker;
-                      widget._operationInstrument.name = suggestion.name;
-                      widget._operationInstrument.isin = suggestion.isin;
-                      widget._operationInstrument.type = suggestion.type;
-                      widget._operationInstrument.exchange = suggestion.exchange;
-                      widget._operationInstrument.currency = suggestion.currency;
-                      widget._operationInstrument.additional = suggestion.additional;
-                      _operation.instrument = null;
-                      receiveInstrumentPrice();
-                    }
-                  },
+                  onSuggestionSelected: suggestionSelected,
                   noItemsFoundBuilder: (context) {
                     return Container(
                         padding: EdgeInsets.all(5.0),
@@ -268,7 +285,7 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
                   onTap: () {
                     showDatePicker(
                         context: context,
-                        initialDate: _operation.date,
+                        initialDate: _operation.date ?? currentDate(),
                         firstDate: DateTime(2000),
                         lastDate: DateTime.now()).then((value)
                         {
@@ -287,7 +304,7 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
               Expanded(flex: 45,
                    // operation type
                   child: DropdownButtonFormField(
-                      value: OPERATION_TYPE_NAMES[_operation.type.index],
+                      value: _operation.type?.name,
                       items: OperationType.values.map((type) => DropdownMenuItem(value: OPERATION_TYPE_NAMES[type.index], child: Text(OPERATION_TYPE_NAMES[type.index]))).toList(),
                       decoration: InputDecoration(
                           icon: Icon(Icons.calculate),
@@ -295,7 +312,10 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
                           contentPadding: EdgeInsets.all(3.0)
                       ),
                       isExpanded: true,
-                      onChanged: (type) {_operation.type = OperationType.values[OPERATION_TYPE_NAMES.indexOf(type)];}
+                      onChanged: (String? type) {
+                        if (type != null)
+                          _operation.type = OperationType.values[OPERATION_TYPE_NAMES.indexOf(type)];
+                      }
                   )
               )
             ]),
@@ -318,7 +338,7 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
                       ),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) {
-                        String result;
+                        String? result;
                         if (value != null && value != '') {
                           if (_operation.quantity == null) {
                             result = S.of(context).errorInvalidValue;
@@ -351,7 +371,7 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
                       ),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) {
-                        String result;
+                        String? result;
                         if (value != null && value != '') {
                           if (_operation.price == null) {
                             result = S.of(context).errorInvalidValue;
@@ -392,7 +412,7 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
                       ),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) {
-                        String result;
+                        String? result;
                         if (value != null && value != '') {
                           if (_operation.commission == null) {
                             result = S.of(context).errorInvalidValue;
@@ -414,7 +434,7 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
                       title: Text(S.of(context).operationEditDialog_withdrawmoney),
                       value: true,
                       controlAffinity: ListTileControlAffinity.leading,
-                      onChanged: (value) => {_createMoneyOperation = value}
+                      onChanged: (bool? value) => {_createMoneyOperation = (value ?? false)}
                   )
               )
             ]),
@@ -452,7 +472,7 @@ class UpperCaseTextFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
     return TextEditingValue(
-      text: newValue.text?.toUpperCase(),
+      text: newValue.text?.toUpperCase() ?? "",
       selection: newValue.selection,
     );
   }

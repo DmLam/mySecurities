@@ -26,49 +26,49 @@ class NotEnoughMoneyException implements Exception {}
 class Operation extends ChangeNotifier{
   int? id;
   Portfolio portfolio;
-  Instrument instrument;
+  Instrument? instrument;
   DateTime? date;
-  OperationType _type;
-  int _quantity;
-  double _price;
-  double _commission;
+  OperationType? _type;
+  int? _quantity;
+  double? _price;
+  double? _commission;
   String? comment;
 
-  OperationType get type => _type;
-  int get quantity => _quantity;
-  double get price => _price;
-  double get commission => _commission;
-  set quantity(int newQuantity) {
+  OperationType? get type => _type;
+  int? get quantity => _quantity;
+  double? get price => _price;
+  double? get commission => _commission;
+  set quantity(int? newQuantity) {
     checkMoneyAmount(_type, newQuantity, _price, _commission);
     _quantity = newQuantity;
   }
-  set price(double newPrice) {
+  set price(double? newPrice) {
     checkMoneyAmount(_type, _quantity, newPrice, _commission);
     _price = newPrice;
   }
-  set type(OperationType newType) {
+  set type(OperationType? newType) {
     checkMoneyAmount(newType, _quantity, _price, _commission);
     _type = newType;
   }
-  set commission(double newCommission) {
+  set commission(double? newCommission) {
     checkMoneyAmount(_type, _quantity, _price, newCommission);
     _commission = newCommission;
   }
 
-  double _getOperationValue(OperationType type, int quantity, double price, double commission) =>
-      (type == OperationType.buy ? -1 : 1) * ((price * quantity) * 10000).roundToDouble() / 10000;
+  double _getOperationValue(OperationType? type, int? quantity, double? price) =>
+      (type == OperationType.buy ? -1 : 1) * (((price ?? 0) * (quantity ?? 0)) * 10000).roundToDouble() / 10000;
 
-  double get value => _getOperationValue(type, quantity, price, 0);
+  double get value => _getOperationValue(type, quantity, price);
 
   String valueString() => value == null ? '' : formatCurrency(value);
 
   String priceString() => price == null ? '' : formatCurrency(price);
 
-  checkMoneyAmount(OperationType newType, int newQuantity, double newPrice, double newCommission) {
+  checkMoneyAmount(OperationType? newType, int? newQuantity, double? newPrice, double? newCommission) {
     if (instrument != null) {
       double newValue = _getOperationValue(
-          newType, newQuantity, newPrice, newCommission);
-      Money? m = portfolio.monies.byCurrency(instrument.currency);
+          newType, newQuantity, newPrice) + (newCommission ?? 0);
+      Money? m = portfolio.monies.byCurrency(instrument?.currency);
 
       // check is there enough money for the operation
       if (m == null)
@@ -91,7 +91,7 @@ class Operation extends ChangeNotifier{
     this._commission = commission,
     this.comment = comment;
 
-  Operation.empty({required Portfolio portfolio, required Instrument instrument}) :
+  Operation.empty({required Portfolio portfolio, Instrument? instrument}) :
     this.id = null,
     this.portfolio = portfolio,
     this.instrument = instrument,
@@ -138,7 +138,7 @@ class Operation extends ChangeNotifier{
   }
 
   String dealOperationComment() {
-    return "${type.name} $quantity ${instrument.name}";
+    return "${type?.name} $quantity ${instrument?.name}";
   }
 
   String commissionOperationComment() {
@@ -147,23 +147,24 @@ class Operation extends ChangeNotifier{
 
   Future<int> add(bool createMoneyOperation) async {
     MoneyOperation? dealOp, commissionOp;
+    double commission = this.commission ?? 0;
 
     if (createMoneyOperation)
       dealOp = MoneyOperation(portfolio: portfolio,
           date: date,
-          currency: instrument.currency,
+          currency: instrument?.currency,
           type: operationTypeToMoneyOperationType(type),
           amount: value,
           operation: this,
           comment: dealOperationComment());
-      if (commission != 0)
-        commissionOp = MoneyOperation(portfolio: portfolio,
-            date: date,
-            currency: instrument.currency,
-            type: MoneyOperationType.commission,
-            amount: -commission,
-            operation: this,
-            comment: commissionOperationComment());
+    if (commission != 0)
+      commissionOp = MoneyOperation(portfolio: portfolio,
+          date: date,
+          currency: instrument?.currency,
+          type: MoneyOperationType.commission,
+          amount: -commission,
+          operation: this,
+          comment: commissionOperationComment());
 
     await DBProvider.db.addOperation(this, moneyOperation: dealOp, commissionOperation: commissionOp);
     await portfolio.refresh(); // reload instruments, money and operations from db
@@ -174,6 +175,7 @@ class Operation extends ChangeNotifier{
   Future<bool> update(bool createMoneyOperation) async {
     bool result = false;
     bool wasCommissionOperation = false;
+    double commission = this.commission ?? 0;
 
     if (id != null) {
       await DBProvider.db.updateOperation(this);
@@ -186,7 +188,7 @@ class Operation extends ChangeNotifier{
           for (MoneyOperation mop in mops) {
             if (mop.type == MoneyOperationType.commission) {
               wasCommissionOperation = true;
-              mop.currency = instrument.currency;
+              mop.currency = instrument?.currency;
               mop.type = MoneyOperationType.commission;
               mop.date = date;
               mop.amount = -commission;
@@ -196,7 +198,7 @@ class Operation extends ChangeNotifier{
               if (commission == 0)
                 mop.delete();
               else {
-                mop.currency = instrument.currency;
+                mop.currency = instrument?.currency;
                 mop.type = operationTypeToMoneyOperationType(this.type);
                 mop.date = date;
                 mop.amount = -commission;
@@ -207,7 +209,7 @@ class Operation extends ChangeNotifier{
           if (createMoneyOperation && !wasCommissionOperation && commission != 0) {
             MoneyOperation commissionOp = MoneyOperation(portfolio: portfolio,
                 date: date,
-                currency: instrument.currency,
+                currency: instrument?.currency,
                 type: MoneyOperationType.commission,
                 amount: -commission,
                 operation: this,
@@ -220,7 +222,7 @@ class Operation extends ChangeNotifier{
         if (createMoneyOperation) {
           MoneyOperation mop = MoneyOperation(portfolio: portfolio,
               date: date,
-              currency: instrument.currency,
+              currency: instrument?.currency,
               type: operationTypeToMoneyOperationType(type),
               amount: value + commission,
               operation: this);
@@ -240,7 +242,7 @@ class Operation extends ChangeNotifier{
     List<MoneyOperation>? mops = portfolio.moneyOperations.byOperationId(id);
 
     await DBProvider.db.deleteOperation(this);
-    if (mops != null)
+    if (mops != [])
       mops.forEach((element) {element.delete();});
     else
       await portfolio.refresh(); // reload instruments, money and operations from db

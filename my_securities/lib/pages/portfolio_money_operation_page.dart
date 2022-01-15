@@ -10,9 +10,9 @@ import 'money_operation_edit_dialog.dart';
 
 class PortfolioMoneyOperationsPage extends StatelessWidget {
   final Portfolio _portfolio;
-  final Currency _currency;
+  final Currency? _currency;
 
-  const PortfolioMoneyOperationsPage(this._portfolio, {Currency currency, Key key}) :
+  const PortfolioMoneyOperationsPage(this._portfolio, {Currency? currency, Key? key}) :
     _currency = currency,
     super(key: key);
 

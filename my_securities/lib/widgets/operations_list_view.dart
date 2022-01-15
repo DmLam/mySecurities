@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:my_securities/common/message_dialog.dart';
@@ -12,16 +14,17 @@ import 'package:my_securities/models/portfolio.dart';
 import '../constants.dart';
 
 class OperationsListView extends StatelessWidget {
-  final String _ticker;
+  final Instrument? _instrument;
 
-  const OperationsListView({String ticker, Key key}) :
-        _ticker = ticker,
+  const OperationsListView({Instrument? instrument, Key? key}) :
+        _instrument = instrument,
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
     Portfolio portfolio = context.watch<Portfolio>();
-    List<Operation> operations = portfolio.operations.byInstrument(portfolio.instruments.byTicker(_ticker));
+    Instrument? instrument = this._instrument;
+    List<Operation> operations = instrument == null ? [] : portfolio.operations.byInstrument(instrument);
 
     return ListView.builder(
       itemCount: operations.length,
@@ -48,8 +51,8 @@ Widget operationsListItem(BuildContext context, Operation operation) {
   }
 
   deleteOperation() async {
-    String date = dateString(operation.date);
-    String description =  "${operation.instrument.ticker} * ${operation.quantity} (${date})";
+    String date = dateString(operation.date!);
+    String description =  "${operation.instrument!.ticker!} * ${operation.quantity} (${date})";
     String confirmation = await messageDialog(context,
         title: S.of(context).operationsListView_confirmDeleteDialogTitle,
         content: S.of(context).operationsListView_confirmDeleteDialogContent(description),
@@ -59,22 +62,23 @@ Widget operationsListItem(BuildContext context, Operation operation) {
     if (confirmation == S.of(context).dialogAction_Continue) {
       await operation.delete();
       // if the operation was the last one on this instrument - close the page
-      if (operation.instrument != null && operation.portfolio.operations.byInstrument(operation.instrument).length == 1)
+      if (operation.instrument != null && operation.portfolio.operations.byInstrument(operation.instrument!).length == 1)
         Navigator.pop(context);
     }
   }
 
+  Uint8List? image = operation.instrument?.image;
+
   return GestureDetector(
     child: ListTile(
-      leading: operation.instrument.image == null ? Icon(Icons.attach_money) :
-        Image.memory(operation.instrument.image),
-      title: Text('${operation.type.name} ${operation.quantity} ${S.of(context).pcs} * ${operation.price} ${operation.instrument.currency.sign}'),
+      leading: image == null ? Icon(Icons.attach_money) : Image.memory(image),
+      title: Text('${operation.type!.name} ${operation.quantity} ${S.of(context).pcs} * ${operation.price} ${operation.instrument!.currency.sign}'),
       subtitle: Row(mainAxisSize: MainAxisSize.max,
           children: [
             Expanded(flex: 70,
-              child: Text('${operation.value.toString()} ${operation.instrument.currency.sign}')),
+              child: Text('${operation.value.toString()} ${operation.instrument!.currency.sign}')),
             Expanded(flex: 30,
-              child: Text(dateString(operation.date),
+              child: Text(dateString(operation.date!),
                 style: TextStyle(fontStyle: FontStyle.italic, fontSize: 11),
                 textAlign: TextAlign.right)
             )

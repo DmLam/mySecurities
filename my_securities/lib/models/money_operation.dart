@@ -119,8 +119,8 @@ class MoneyOperationList extends DatabaseList<MoneyOperation>{
 
   MoneyOperationList(Portfolio portfolio): super(portfolio);
 
-  List<MoneyOperation>? byCurrency(Currency? currency) =>
-      length == 0 ? null :
+  List<MoneyOperation> byCurrency(Currency? currency) =>
+      length == 0 ? [] :
       items.where((item) => currency == null || item.currency == currency).toList();
 
   loadFromDb() async {
@@ -131,9 +131,9 @@ class MoneyOperationList extends DatabaseList<MoneyOperation>{
     items = await DBProvider.db.getPortfolioMoneyOperations(portfolioId);
   }
 
-  List<MoneyOperation>? byOperationId(int? id) {
+  List<MoneyOperation> byOperationId(int? id) {
     if (id == null)
-      return null;
+      return [];
 
     return
       items.where((item) => item.operation?.id == id).toList();
@@ -141,7 +141,7 @@ class MoneyOperationList extends DatabaseList<MoneyOperation>{
 
 }
 
-MoneyOperationType? operationTypeToMoneyOperationType(OperationType op) {
+MoneyOperationType? operationTypeToMoneyOperationType(OperationType? op) {
   return op == OperationType.buy ? MoneyOperationType.buy :
   op == OperationType.sell ? MoneyOperationType.sell : null;
 }

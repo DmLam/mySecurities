@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 class PortfolioMoniesListView extends StatelessWidget {
   final Portfolio _portfolio;
 
-  const PortfolioMoniesListView(this._portfolio, {Key key}) : super(key: key);
+  const PortfolioMoniesListView(this._portfolio, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

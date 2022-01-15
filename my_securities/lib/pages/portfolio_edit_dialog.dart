@@ -24,28 +24,28 @@ class _PortfolioEditDialogState extends State<PortfolioEditDialog> {
   final TextEditingController _nameEditController = TextEditingController();
   final TextEditingController _commissionEditController = TextEditingController();
   String _name;
-  bool _visible;
-  double _commission;
+  bool? _visible;
+  double? _commission;
 
 
-  _PortfolioEditDialogState (this._portfolio);
+  _PortfolioEditDialogState(this._portfolio):
+    _name = _portfolio.name,
+    _visible = _portfolio.visible,
+    _commission = _portfolio.commission;
 
   @override
   initState() {
     super.initState();
 
-    _name = _portfolio.name;
-    _visible = _portfolio.visible;
-    _commission = _portfolio.commission;
     _nameEditController.text = _name;
-    _commissionEditController.text = _commission?.toString();
+    _commissionEditController.text = _commission?.toString() ?? "";
   }
 
   @override
   Widget build(BuildContext context) {
 
     bool _fabEnabled() {
-      return _portfolio.name != null;
+      return _portfolio.name != "";
     }
 
     onFABPressed() async {
@@ -106,7 +106,7 @@ class _PortfolioEditDialogState extends State<PortfolioEditDialog> {
                                         children: [
                                           Checkbox(
                                             value: _visible,
-                                            onChanged: (bool value) {
+                                            onChanged: (bool? value) {
                                               setState(() {_visible = value;});
                                             },
                                           ),

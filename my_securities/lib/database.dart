@@ -276,7 +276,7 @@ class DBProvider {
          type.id, exchange.index + 1, additional]);
     var result = await db.rawQuery("SELECT MAX(id) as id FROM instrument");
 
-    return result.first["id"];
+    return result.first["id"] as int;
   }
 
   Future<bool> updateInstrument(Instrument instrument) async {
@@ -325,7 +325,7 @@ class DBProvider {
     var instrument = await db.rawQuery("SELECT id FROM instrument WHERE isin = ?", [isin]);
     var r = instrument.isNotEmpty ? instrument.first['id'] : null;
     if (r != null)
-      result = r;
+      result = r as int;
 
     return Future.value(result);
   }
@@ -385,7 +385,7 @@ class DBProvider {
         where: 'portfolio_id=? and instrument_id=?',
         whereArgs: [portfolioId, instrumentId]);
 
-    result = pi.isEmpty ? null : pi[0]['id'];
+    result = pi.isEmpty ? null : pi[0]['id'] as int;
 
     return  Future.value(result);
   }
@@ -416,7 +416,7 @@ class DBProvider {
 
   Future<int> addOperation(Operation op, {MoneyOperation? moneyOperation, commissionOperation}) async {
     DateTime? operationDate = op.date;
-    int? portfolioId = op.portfolio.id, instrumentId = op.instrument.id;
+    int? portfolioId = op.portfolio.id, instrumentId = op.instrument?.id;
 
     if (op.id == null)
       throw InternalException("Operation already exists");
@@ -435,18 +435,18 @@ class DBProvider {
     await db.transaction((txn) async {
       // if there is no this instrument in this portfolio, then create relation
       if (portfolioInstrumentId == null) {
-        if (op.instrument.id == null)
-          op.instrument.add(); // here the instrument will be added in separate transaction
+        if (op.instrument?.id == null)
+          op.instrument?.add(); // here the instrument will be added in separate transaction
 
         portfolioInstrumentId = await txn.insert('portfolio_instrument',
             {'portfolio_id': op.portfolio.id,
-              'instrument_id': op.instrument.id});
+              'instrument_id': op.instrument?.id});
       }
 
       op.id = await txn.insert('operation',
           {'portfolio_instrument_id': portfolioInstrumentId,
             'date': dbDateString(operationDate),
-            'type': op.type.index,
+            'type': op.type?.index,
             'quantity': op.quantity,
             'price': op.price,
             'value': op.value,
@@ -475,7 +475,7 @@ class DBProvider {
     await db.transaction((txn) async {
       txn.update('operation',
           {'date': dbDateString(operationDate),
-            'type': op.type.index,
+            'type': op.type?.index,
             'quantity': op.quantity,
             'price': op.price,
             'value': op.value,
@@ -485,10 +485,10 @@ class DBProvider {
           whereArgs: [op.id]);
 
       txn.update('money',
-          {'currency_id': op.instrument.currency.id,
+          {'currency_id': op.instrument?.currency.id,
             'date': dbDateString(operationDate),
             'type': moneyOperationTypeId,
-            'amount': op.value - op.commission},
+            'amount': op.value - (op.commission ?? 0)},
           where: 'operation_id = ?',
           whereArgs: [op.id]);
     });
@@ -496,7 +496,7 @@ class DBProvider {
 
   deleteOperation(Operation op) async {
     final Database db = await database;
-    int? portfolioId = op.portfolio.id, instrumentId = op.instrument.id, portfolioInstrumentId;
+    int? portfolioId = op.portfolio.id, instrumentId = op.instrument?.id, portfolioInstrumentId;
 
     if (portfolioId == null)
       throw InternalException("Operation's portfolio id is unassigned");
@@ -516,7 +516,7 @@ class DBProvider {
       if (restOpCount[0]['cnt'] == 0)
         await txn.delete('portfolio_instrument',
             where: 'portfolio_id = ? and instrument_id = ?',
-            whereArgs: [op.portfolio.id, op.instrument.id]
+            whereArgs: [op.portfolio.id, op.instrument?.id]
         );
     });
   }

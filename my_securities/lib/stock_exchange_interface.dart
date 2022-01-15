@@ -12,12 +12,12 @@ class SearchItem {
   final String ticker;
   final String name;
   final String? shortName;
-  final InstrumentType? type;
+  final InstrumentType type;
   final Currency currency;
   final String? additional;
 
   SearchItem({required this.exchange, required this.ticker, required this.name, this.shortName,
-    required this.isin, this.type, required this.currency, this.additional});
+    required this.isin, required this.type, required this.currency, this.additional});
 }
 
   class TimestampedQuote {
@@ -41,7 +41,7 @@ abstract class StockExchangeProvider {
     return sep;
   }
 
-  Future<List?> search({required String ticker});
+  Future<List<SearchItem>> search({required String ticker});
   Future<Uint8List?> getInstrumentImage(Instrument instrument);
   Future<List<Quote>> getInstrumentQuotes(String ticker, DateTime from, DateTime to);
   // last quote at previous trade session (yesterday)

@@ -29,7 +29,7 @@ class Instrument extends ChangeNotifier {
   InstrumentType type;
   Exchange exchange;
   Currency currency;
-  double commission;
+  double? commission;
   Uint8List? _image;
   String? additional;
   int? portfolioPercentPlan;
@@ -59,7 +59,7 @@ class Instrument extends ChangeNotifier {
 
   Instrument({int? id, required Portfolio portfolio, String isin = '',
     required String ticker, String name = '', required Currency currency,
-    required double commission, required InstrumentType type,
+    double? commission, required InstrumentType type,
     Exchange exchange = Exchange.MCX, Uint8List? image, String? additional,
     int? portfolioPercentPlan, int quantity = 0,
     double averagePrice = 0.0, double value = 0.0, int operationCount = 0}):

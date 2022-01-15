@@ -11,12 +11,12 @@ import '../exchange.dart';
 
 class MoneyOperationEditDialog extends StatefulWidget {
   final MoneyOperation _moneyOperation;
-  final Currency currency;
-  double _operationAmount;
-  DateTime _operationDate;
-  MoneyOperationType _operationType;
+  final Currency? currency;
+  double? _operationAmount;
+  DateTime? _operationDate;
+  MoneyOperationType? _operationType;
 
-  MoneyOperationEditDialog(this._moneyOperation, {this.currency, Key key}) : super(key: key);
+  MoneyOperationEditDialog(this._moneyOperation, {this.currency, Key? key}) : super(key: key);
 
   @override
   MoneyOperationEditDialogState createState() => MoneyOperationEditDialogState();
@@ -25,24 +25,24 @@ class MoneyOperationEditDialog extends StatefulWidget {
 class MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
   final TextEditingController _dateEditController = TextEditingController();
   final TextEditingController _amountEditController = TextEditingController();
+  late DateTime operationDate;
 
   void _init() async {
-    DateTime date = widget._moneyOperation.date;
+    operationDate = widget._moneyOperation.date ??
+        await DBProvider.db.getMostLastOperationDate() ?? currentDate();
 
     if (widget.currency != null) {
       widget._moneyOperation.currency = widget.currency;
     }
 
-    if (date == null)
-      date = await DBProvider.db.getMostLastOperationDate();
-    widget._moneyOperation.date = date;
+    widget._moneyOperation.date = operationDate;
 
     widget._operationAmount = widget._moneyOperation.amount;
     widget._operationDate = widget._moneyOperation.date;
     widget._operationType = widget._moneyOperation.type;
 
-    _dateEditController.text = dateString(date);
-    _amountEditController.text = widget._moneyOperation.amount?.toString();
+    _dateEditController.text = dateString(operationDate);
+    _amountEditController.text = widget._moneyOperation.amount?.toString() ?? "";
   }
 
   @override
@@ -66,14 +66,18 @@ class MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
     }
 
     onFabPressed() async  {
+      double? operationAmount = widget._operationAmount;
+
       Navigator.of(context).pop(true);
       widget._moneyOperation.type = widget._operationType;
       widget._moneyOperation.date = widget._operationDate;
-      if (widget._operationType == MoneyOperationType.withdraw)
-        widget._moneyOperation.amount = -widget._operationAmount;
-      else
-        widget._moneyOperation.amount = widget._operationAmount;
 
+      if (operationAmount != null) {
+        if (widget._operationType == MoneyOperationType.withdraw)
+          widget._moneyOperation.amount = -operationAmount;
+        else
+          widget._moneyOperation.amount = operationAmount;
+      }
       if (widget._moneyOperation.id == null)
         widget._moneyOperation.add();
       else
@@ -98,7 +102,7 @@ class MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
                 onTap: () {
                   showDatePicker(
                       context: context,
-                      initialDate: widget._moneyOperation.date,
+                      initialDate: operationDate,
                       firstDate: DateTime(2000),
                       lastDate: DateTime.now()).then((value)
                   {
@@ -128,7 +132,7 @@ class MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
                   )
                 ).toList(),
                 onChanged: widget._moneyOperation.currency == null ?
-                    (value) {
+                    (Currency? value) {
                       widget._moneyOperation.currency = value;
                     } : null,
               )
@@ -153,7 +157,7 @@ class MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
                     child: Text(MoneyOperationType.withdraw.name),
                   )
                 ],
-                onChanged: (value) {
+                onChanged: (MoneyOperationType? value) {
                   setState(() {
                     widget._operationType = value;
                   });
@@ -178,7 +182,7 @@ class MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
                   ),
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   validator: (value) {
-                    String result;
+                    String? result;
                     if (value != null && value != '') {
                       if (widget._operationAmount == null) {
                         result = S.of(context).errorInvalidValue;

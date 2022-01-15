@@ -73,23 +73,20 @@ class PortfolioListViewItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String started;
+    String started = S.of(context).portfoliosListView_portfolioStarted + ': '+
+        DateFormat('dd.MM.yyyy').format(context.read<Portfolio>().startDate);
 
     return
       ChangeNotifierProvider<Portfolio>.value(
         value: _portfolio,
         builder: (context, _) {
-          if (_portfolio.startDate != null)
-            started = S.of(context).portfoliosListView_portfolioStarted + ': '+
-                DateFormat('dd.MM.yyyy').format(context.read<Portfolio>().startDate);
-
           return GestureDetector(
             child: ListTile(
               title: Text(context.watch<Portfolio>().name,
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: _portfolio.visible ? Theme.of(context).textTheme.subtitle1.color : Theme.of(context).disabledColor
+                  color: _portfolio.visible ? Theme.of(context).textTheme.subtitle1!.color : Theme.of(context).disabledColor
                 ),
               ),
               subtitle: Text(started ?? ''),

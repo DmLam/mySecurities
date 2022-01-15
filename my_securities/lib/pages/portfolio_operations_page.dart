@@ -10,20 +10,22 @@ import 'package:provider/provider.dart';
 
 class PortfolioOperationsPage extends StatelessWidget {
   final Portfolio _portfolio;
-  final Instrument _instrument;
+  final Instrument? _instrument;
 
-  const PortfolioOperationsPage(this._portfolio, {Instrument instrument, Key key}) :
+  const PortfolioOperationsPage(this._portfolio, {Instrument? instrument, Key? key}) :
     _instrument = instrument,
     super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    Instrument? instrument = this._instrument;
 
     String appBarTitle() {
+
       return
-        _instrument == null ?
+        instrument == null ?
           S.of(context).portfolioOperations_Title(_portfolio.name) :
-          S.of(context).operationsByInstrument_Title(_portfolio.name, _instrument.ticker);
+          S.of(context).operationsByInstrument_Title(_portfolio.name, instrument.ticker);
     }
 
     addOperation() async {
@@ -40,7 +42,7 @@ class PortfolioOperationsPage extends StatelessWidget {
         appBar: MySecuritiesAppBar(pageName: appBarTitle()),
         body: ChangeNotifierProvider<Portfolio>.value(
             value: _portfolio,
-            child: OperationsListView(ticker: _instrument.ticker)),
+            child: OperationsListView(instrument: _instrument)),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),
           onPressed: addOperation,
