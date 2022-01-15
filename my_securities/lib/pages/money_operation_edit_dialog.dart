@@ -42,7 +42,7 @@ class MoneyOperationEditDialogState extends State<MoneyOperationEditDialog> {
     widget._operationType = widget._moneyOperation.type;
 
     _dateEditController.text = dateString(operationDate);
-    _amountEditController.text = widget._moneyOperation.amount?.toString() ?? "";
+    _amountEditController.text = widget._moneyOperation.amount.toString();
   }
 
   @override

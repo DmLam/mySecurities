@@ -52,7 +52,7 @@ Widget operationsListItem(BuildContext context, Operation operation) {
 
   deleteOperation() async {
     String date = dateString(operation.date!);
-    String description =  "${operation.instrument!.ticker!} * ${operation.quantity} (${date})";
+    String description =  "${operation.instrument!.ticker} * ${operation.quantity} (${date})";
     String confirmation = await messageDialog(context,
         title: S.of(context).operationsListView_confirmDeleteDialogTitle,
         content: S.of(context).operationsListView_confirmDeleteDialogContent(description),

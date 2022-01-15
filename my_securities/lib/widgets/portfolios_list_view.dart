@@ -89,7 +89,7 @@ class PortfolioListViewItem extends StatelessWidget {
                   color: _portfolio.visible ? Theme.of(context).textTheme.subtitle1!.color : Theme.of(context).disabledColor
                 ),
               ),
-              subtitle: Text(started ?? ''),
+              subtitle: Text(started),
               trailing: PopupMenuButton(
                   itemBuilder: (_) =>
                     <PopupMenuItem<String>>[

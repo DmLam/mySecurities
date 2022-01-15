@@ -46,18 +46,18 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
   _OperationEditDialogState(this._operation);
 
   void _init() async {
-    operationDate = _operation?.date ??
+    operationDate = _operation.date ??
         await DBProvider.db.getMostLastOperationDate() ?? currentDate();
 
     widget._operation.date = operationDate;
 
-    _tickerEditController.text = _operation?.instrument?.ticker ?? "";
-    _instrumentNameEditController.text = _operation?.instrument?.name ?? "";
+    _tickerEditController.text = _operation.instrument?.ticker ?? "";
+    _instrumentNameEditController.text = _operation.instrument?.name ?? "";
     _dateEditController.text = dateString(operationDate);
-    _priceEditController.text = _operation?.price?.toString() ?? "";
-    _quantityEditController.text = _operation?.quantity?.toString() ?? "";
-    _commissionEditController.text = _operation?.commission?.toString() ?? "";
-    _commentEditController.text = _operation?.comment ?? "";
+    _priceEditController.text = _operation.price?.toString() ?? "";
+    _quantityEditController.text = _operation.quantity?.toString() ?? "";
+    _commissionEditController.text = _operation.commission?.toString() ?? "";
+    _commentEditController.text = _operation.comment ?? "";
     receiveInstrumentPrice();
   }
 
@@ -79,7 +79,7 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
 
   @override
   Widget build(BuildContext context) {
-    String pageName = _operation?.id == null ?
+    String pageName = _operation.id == null ?
       S.of(context).operationEditDialog_Title_add :
       S.of(context).operationEditDialog_Title_edit;
 
@@ -183,7 +183,7 @@ class _OperationEditDialogState extends State<OperationEditDialog> {
         if (quantity != 0 && price != 0) {
           double? commission = _operation.portfolio.commission;
           String ticker = _tickerEditController.text;
-          if ((ticker ?? '') != '') {
+          if (ticker != '') {
             Instrument? instrument = _operation.portfolio.instruments.byTicker(ticker);
             if (instrument != null && (instrument.commission  != null))
               commission = instrument.commission;
@@ -472,7 +472,7 @@ class UpperCaseTextFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
     return TextEditingValue(
-      text: newValue.text?.toUpperCase() ?? "",
+      text: newValue.text.toUpperCase(),
       selection: newValue.selection,
     );
   }

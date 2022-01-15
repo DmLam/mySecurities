@@ -111,7 +111,7 @@ class PortfolioInstrumentListItem extends StatelessWidget {
       ]),
       subtitle: Row(mainAxisSize: MainAxisSize.max, children: [
         Text(
-            (_instrument.quantity ?? 0) * (_instrument.averagePrice ?? 0) == 0
+            _instrument.quantity * (_instrument.averagePrice ?? 0) == 0
                 ? _instrument.quantityString()
                 : _instrument.quantityString() +
                 ' * ' +
@@ -122,7 +122,7 @@ class PortfolioInstrumentListItem extends StatelessWidget {
             future: priceFuture,
             resultWidget: (price) {
               return Row(children: [
-                Text(formatCurrency(price) ?? "",
+                Text(formatCurrency(price),
                     style: TextStyle(fontSize: 12, color: Colors.yellow),
                     textAlign: TextAlign.right)
               ]);

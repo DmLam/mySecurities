@@ -58,7 +58,7 @@ class MoneyOperationsListItem extends StatelessWidget {
 
     if (confirmation == S.of(context).dialogAction_Continue) {
       _operation.delete();
-      if (_operation.portfolio.moneyOperations.byCurrency(_operation.currency)?.length == 1)
+      if (_operation.portfolio.moneyOperations.byCurrency(_operation.currency).length == 1)
         // if the operation was the last one on this currency - close the page
         Navigator.pop(context);
     }

@@ -34,8 +34,8 @@ class Instrument extends ChangeNotifier {
   String? additional;
   int? portfolioPercentPlan;
   int quantity;
-  double _averagePrice;
-  double _value;
+  double? _averagePrice;
+  double? _value;
   int _operationCount;
 
   Portfolio get portfolio => _portfolio;
@@ -45,8 +45,8 @@ class Instrument extends ChangeNotifier {
 
     return _image;
   }
-  double get averagePrice => _averagePrice;
-  double get value => _value;
+  double? get averagePrice => _averagePrice;
+  double? get value => _value;
   int get operationCount => _operationCount;
 
   _initId() async {
@@ -62,7 +62,7 @@ class Instrument extends ChangeNotifier {
     double? commission, required InstrumentType type,
     Exchange exchange = Exchange.MCX, Uint8List? image, String? additional,
     int? portfolioPercentPlan, int quantity = 0,
-    double averagePrice = 0.0, double value = 0.0, int operationCount = 0}):
+    double? averagePrice = 0.0, double value = 0.0, int operationCount = 0}):
     _portfolio = portfolio,
     this.id = id,
     this.isin = isin,
@@ -120,9 +120,9 @@ class Instrument extends ChangeNotifier {
           value: json["value"],
           operationCount: json["operation_count"]);
 
-  double currentValue() => quantity * averagePrice;
+  double currentValue() => quantity * (averagePrice ?? 0);
 
-  double profit(double currentPrice) => (quantity ?? 0) == 0 ? 0 : quantity * (currentPrice - averagePrice);
+  double profit(double currentPrice) => quantity == 0 ? 0 : quantity * (currentPrice - (averagePrice ?? 0));
 
   String profitString(double currentPrice, {Currency? currency}) => (profit(currentPrice) == 0) ? '' : formatCurrency(profit(currentPrice), currency: currency == null ? this.currency : currency);
 
