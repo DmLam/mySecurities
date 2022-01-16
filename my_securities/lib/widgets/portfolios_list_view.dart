@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:my_securities/common/future_builder.dart';
 import 'package:my_securities/common/message_dialog.dart';
+import 'package:my_securities/common/types.dart';
 import 'package:my_securities/generated/l10n.dart';
 import 'package:my_securities/pages/portfolio_edit_dialog.dart';
 import 'package:my_securities/pages/portfolio_instruments_page.dart';
@@ -74,7 +75,7 @@ class PortfolioListViewItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String started = S.of(context).portfoliosListView_portfolioStarted + ': '+
-        DateFormat('dd.MM.yyyy').format(context.read<Portfolio>().startDate);
+        DateFormat('dd.MM.yyyy').format(_portfolio.startDate);
 
     return
       ChangeNotifierProvider<Portfolio>.value(
@@ -111,7 +112,7 @@ class PortfolioListViewItem extends StatelessWidget {
                         _deletePortfolio(context);
                         break;
                       default:
-                        throw Exception("Unknown instrument menu item");
+                        InternalException("Unknown instrument menu item");
                     }
                   }
               ),
